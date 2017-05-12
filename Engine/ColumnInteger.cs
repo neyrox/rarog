@@ -6,6 +6,12 @@ namespace Engine
     {
         private List<int> values = new List<int>();
 
+        public override void Update(int row, string value)
+        {
+            int val = int.Parse(value);
+            values[row] = val;
+        }
+
         public override void Insert(string value)
         {
             int val = int.Parse(value);
@@ -16,9 +22,10 @@ namespace Engine
         {
             var result = new List<int>();
             int val = int.Parse(value);
-            for (int i = 0; i < values.Count; ++i)
+            for (int row = 0; row < values.Count; ++row)
             {
-                values.Add(val);
+                if (values[row] == val)
+                    result.Add(row);
             }
 
             return result;
