@@ -33,7 +33,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void LexerSplitsSimpleInser()
+        public void LexerSplitsSimpleInsert()
         {
             var tokens = Lexer.Split("INSERT INTO Customers (CustomerName, Country) VALUES (\'Cardinal\', \'Norway\');");
             Assert.AreEqual("INSERT", tokens[0]);
@@ -50,6 +50,27 @@ namespace UnitTests
             Assert.AreEqual(",", tokens[11]);
             Assert.AreEqual("Norway", tokens[12]);
             Assert.AreEqual(")", tokens[13]);
+            Assert.AreEqual(";", tokens[14]);
+        }
+
+        [TestMethod]
+        public void LexerSplitsSimpleUpdate()
+        {
+            var tokens = Lexer.Split("UPDATE Customers SET ContactName = \'Alfred\', City= \'Frankfurt\' WHERE CustomerID = 1;");
+            Assert.AreEqual("UPDATE", tokens[0]);
+            Assert.AreEqual("Customers", tokens[1]);
+            Assert.AreEqual("SET", tokens[2]);
+            Assert.AreEqual("ContactName", tokens[3]);
+            Assert.AreEqual("=", tokens[4]);
+            Assert.AreEqual("Alfred", tokens[5]);
+            Assert.AreEqual(",", tokens[6]);
+            Assert.AreEqual("City", tokens[7]);
+            Assert.AreEqual("=", tokens[8]);
+            Assert.AreEqual("Frankfurt", tokens[9]);
+            Assert.AreEqual("WHERE", tokens[10]);
+            Assert.AreEqual("CustomerID", tokens[11]);
+            Assert.AreEqual("=", tokens[12]);
+            Assert.AreEqual("1", tokens[13]);
             Assert.AreEqual(";", tokens[14]);
         }
     }

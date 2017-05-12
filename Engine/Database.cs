@@ -2,12 +2,23 @@
 
 namespace Engine
 {
+    // TODO: validate queries
     public class Database
     {
         private static List<List<string>> emptyResult = new List<List<string>>();
         private Dictionary<string, Table> tables = new Dictionary<string, Table>();
 
-        public List<List<string>> Execute(CreateTableNode spec)
+        public void Execute(UpdateNode query)
+        {
+            if (!tables.ContainsKey(query.TableName))
+                return;
+
+            tables[query.TableName].Update(query.ColumnNames, query.Values, query.Conditions);
+
+            return;
+        }
+
+        public void Execute(CreateTableNode spec)
         {
             var table = new Table();
             for (int i = 0; i < spec.ColumnNames.Count; ++i)
@@ -17,17 +28,15 @@ namespace Engine
 
             tables.Add(spec.TableName, table);
 
-            return emptyResult;
+            return;
         }
 
-        public List<List<string>> Execute(InsertNode query)
+        public void Execute(InsertNode query)
         {
             if (!tables.ContainsKey(query.TableName))
-                return emptyResult;
+                return;
 
             tables[query.TableName].Insert(query.ColumnNames, query.Values);
-
-            return emptyResult;
         }
 
         public List<List<string>> Execute(SelectNode query)

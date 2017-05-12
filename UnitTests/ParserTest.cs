@@ -59,12 +59,34 @@ namespace UnitTests
             var root = Parser.Convert(tokens);
             Assert.IsInstanceOfType(root, typeof(InsertNode));
             var insert = (InsertNode)root;
+            Assert.AreEqual("Customers", insert.TableName);
             Assert.AreEqual(2, insert.ColumnNames.Count);
             Assert.AreEqual("CustomerName", insert.ColumnNames[0]);
             Assert.AreEqual("Country", insert.ColumnNames[1]);
             Assert.AreEqual(2, insert.Values.Count);
             Assert.AreEqual("Cardinal", insert.Values[0]);
             Assert.AreEqual("Norway", insert.Values[1]);
+        }
+
+        [TestMethod]
+        public void ParseSimpleUpdate()
+        {
+            var tokens = new string[] { "UPDATE", "Customers",
+                "SET", "ContactName", "=", "Alfred", ",", "City", "=", "Frankfurt", "WHERE", "CustomerID", "=", "1", ";"};
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(UpdateNode));
+            var update = (UpdateNode)root;
+            Assert.AreEqual("Customers", update.TableName);
+            Assert.AreEqual(2, update.ColumnNames.Count);
+            Assert.AreEqual("ContactName", update.ColumnNames[0]);
+            Assert.AreEqual("City", update.ColumnNames[1]);
+            Assert.AreEqual(2, update.Values.Count);
+            Assert.AreEqual("Alfred", update.Values[0]);
+            Assert.AreEqual("Frankfurt", update.Values[1]);
+            Assert.AreEqual(1, update.Conditions.Count);
+            Assert.AreEqual("CustomerID", update.Conditions[0].ColumnName);
+            Assert.AreEqual("=", update.Conditions[0].Operation);
+            Assert.AreEqual("1", update.Conditions[0].Value);
         }
     }
 }

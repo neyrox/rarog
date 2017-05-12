@@ -12,6 +12,9 @@ namespace Engine
                 var upperToken = tokens[pos].ToUpperInvariant();
                 switch (upperToken)
                 {
+                    case "UPDATE":
+                        root = ParserUpdate.Convert(tokens, ref pos);
+                        break;
                     case "SELECT":
                         root = ParserSelect.Convert(tokens, ref pos);
                         break;
