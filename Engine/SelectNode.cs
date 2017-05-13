@@ -5,12 +5,14 @@ namespace Engine
     public class SelectNode: Node
     {
         public List<string> What;
-        public string From;
+        public string TableName;
+        public List<ConditionNode> Conditions;
 
-        public SelectNode(List<string> what, string from)
+        public SelectNode(List<string> what, string tableName, List<ConditionNode> conditions)
         {
             What = what;
-            From = from;
+            TableName = tableName;
+            Conditions = conditions;
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Engine
     public class Table
     {
         private Dictionary<string, Column> columns = new Dictionary<string, Column>();
+        private List<int> allRows = new List<int>();
         private int rowCount = 0;
 
         public void AddColumn(string name, string type, int length)
@@ -22,24 +23,7 @@ namespace Engine
 
         public void Update(List<string> columnNames, List<string> values, List<ConditionNode> conditions)
         {
-            var allColumnNames = new HashSet<string>(columns.Keys);
-            var updatingColumnNames = new HashSet<string>(columnNames);
-
-            var rowsToUpdate = new List<int>();
-            for (int i = 0; i < conditions.Count; ++i)
-            {
-                var condition = conditions[i];
-                
-                switch (condition.Operation)
-                {
-                    case "=":
-                        var inclusions = columns[condition.ColumnName].GetInclusions(condition.Value);
-                        rowsToUpdate.AddRange(inclusions);
-                        break;
-                    default:
-                        break;
-                }
-            }
+            var rowsToUpdate = GetRowsThatSatisfies(conditions);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -74,14 +58,16 @@ namespace Engine
                 columns[columnName].Insert(value);
             }
 
-            ++rowCount;
+            AddRow();
         }
 
-        public List<List<string>> Select(List<string> columnNames)
+        public List<List<string>> Select(List<string> columnNames, List<ConditionNode> conditions)
         {
+            var rowsToSelect = GetRowsThatSatisfies(conditions);
+
             var result = new List<List<string>>();
 
-            List<Column> columnsToQuery;// = new List<Column>();
+            List<Column> columnsToQuery;
             if (columnNames[0] == "*")
             {
                 columnsToQuery = new List<Column>(columns.Values);
@@ -96,18 +82,85 @@ namespace Engine
                 }
             }
 
-            for (int i = 0; i < rowCount; ++i)
+            for (int i = 0; i < rowsToSelect.Count; ++i)
+            {
+                var rowNumber = rowsToSelect[i];
+                var resultRow = new List<string>();
+                for (int j = 0; j < columnsToQuery.Count; ++j)
+                {
+                    resultRow.Add(columnsToQuery[j].Get(rowNumber));
+                }
+
+                result.Add(resultRow);
+            }
+
+            return result;
+        }
+
+        private List<List<string>> Select(List<string> columnNames, List<int> rows)
+        {
+            var result = new List<List<string>>();
+
+            List<Column> columnsToQuery;
+            if (columnNames[0] == "*")
+            {
+                columnsToQuery = new List<Column>(columns.Values);
+            }
+            else
+            {
+                columnsToQuery = new List<Column>();
+                for (int i = 0; i < columnNames.Count; ++i)
+                {
+                    var columnName = columnNames[i];
+                    columnsToQuery.Add(columns[columnName]);
+                }
+            }
+
+            for (int i = 0; i < rows.Count; ++i)
             {
                 var row = new List<string>();
                 for (int j = 0; j < columnsToQuery.Count; ++j)
                 {
-                    row.Add(columnsToQuery[j].Get(i));
+                    row.Add(columnsToQuery[j].Get(rows[i]));
                 }
 
                 result.Add(row);
             }
 
             return result;
+        }
+
+
+        private void AddRow()
+        {
+            allRows.Add(rowCount);
+            ++rowCount;
+        }
+
+        private List<int> GetRowsThatSatisfies(List<ConditionNode> conditions)
+        {
+            if (conditions.Count == 0)
+            {
+                return allRows;
+            }
+
+            var resultRows = new List<int>();
+            for (int i = 0; i < conditions.Count; ++i)
+            {
+                var condition = conditions[i];
+
+                switch (condition.Operation)
+                {
+                    case "=":
+                        var inclusions = columns[condition.ColumnName].GetInclusions(condition.Value);
+                        resultRows.AddRange(inclusions);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return resultRows;
         }
     }
 }

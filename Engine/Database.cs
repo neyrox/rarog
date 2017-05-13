@@ -41,10 +41,10 @@ namespace Engine
 
         public List<List<string>> Execute(SelectNode query)
         {
-            if (!tables.ContainsKey(query.From))
+            if (!tables.ContainsKey(query.TableName))
                 return emptyResult;
 
-            return tables[query.From].Select(query.What);
+            return tables[query.TableName].Select(query.What, query.Conditions);
         }
     }
 }

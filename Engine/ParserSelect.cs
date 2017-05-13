@@ -13,21 +13,30 @@ namespace Engine
                 ++pos;
             else
                 return null;
-            var from = string.Empty;
+            var tableName = string.Empty;
             if (pos < tokens.Length)
             {
-                from = tokens[pos];
+                tableName = tokens[pos];
                 ++pos;
             }
             else
                 return null;
+
+            var conditions = new List<ConditionNode>();
+            if (ParserCommon.AssertToken("WHERE", tokens, pos))
+            {
+                ++pos;
+
+                var condition = ParserCondition.Convert(tokens, ref pos);
+                conditions.Add(condition);
+            }
 
             if (ParserCommon.AssertToken(";", tokens, pos))
                 ++pos;
             else
                 return null;
 
-            var result = new SelectNode(what, from);
+            var result = new SelectNode(what, tableName, conditions);
             return result;
         }
 

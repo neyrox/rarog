@@ -6,6 +6,13 @@ namespace Engine
     {
         private List<int> values = new List<int>();
 
+        public override void FullUpdate(string value)
+        {
+            int val = int.Parse(value);
+            for (int row = 0; row < values.Count; ++row)
+                values[row] = val;
+        }
+
         public override void Update(int row, string value)
         {
             int val = int.Parse(value);
