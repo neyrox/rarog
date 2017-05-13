@@ -5,8 +5,10 @@ server mode not yet implemented - works via own shell (Rarog.exe)
 durability not yet implemented
 
 ## supported statements
-create table, drop table
-insert, update, select
+create table, drop table, insert, update, select
+
+## supported coditions
+where column = value
 
 ## supported column types
 int
