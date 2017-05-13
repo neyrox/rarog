@@ -22,6 +22,16 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void LexerSplitsSimpleDropTable()
+        {
+            var tokens = Lexer.Split("DROP TABLE Persons;");
+            Assert.AreEqual("DROP", tokens[0]);
+            Assert.AreEqual("TABLE", tokens[1]);
+            Assert.AreEqual("Persons", tokens[2]);
+            Assert.AreEqual(";", tokens[3]);
+        }
+
+        [TestMethod]
         public void LexerSplitsSimpleSelect()
         {
             var tokens = Lexer.Split("SELECT * FROM Customers;");

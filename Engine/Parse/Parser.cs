@@ -24,6 +24,9 @@ namespace Engine
                     case "CREATE":
                         root = ParserCreateTable.Convert(tokens, ref pos);
                         break;
+                    case "DROP":
+                        root = ParserDropTable.Convert(tokens, ref pos);
+                        break;
                     default:
                         // TODO: log unknown token
                         return null;

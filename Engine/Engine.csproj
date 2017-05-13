@@ -41,25 +41,29 @@
   <ItemGroup>
     <Compile Include="Column.cs" />
     <Compile Include="ColumnInteger.cs" />
-    <Compile Include="ConditionNode.cs" />
-    <Compile Include="CreateTableNode.cs" />
     <Compile Include="Database.cs" />
-    <Compile Include="InsertNode.cs" />
-    <Compile Include="Lexer.cs" />
-    <Compile Include="Node.cs" />
-    <Compile Include="Parser.cs" />
-    <Compile Include="ParserCommon.cs" />
-    <Compile Include="ParserInsert.cs" />
-    <Compile Include="ParserCreateTable.cs" />
-    <Compile Include="ParserSelect.cs" />
-    <Compile Include="ParserCondition.cs" />
-    <Compile Include="ParserUpdate.cs" />
+    <Compile Include="Parse\Lexer.cs" />
+    <Compile Include="Parse\Parser.cs" />
+    <Compile Include="Parse\ParserCommon.cs" />
+    <Compile Include="Parse\ParserCondition.cs" />
+    <Compile Include="Parse\ParserCreateTable.cs" />
+    <Compile Include="Parse\ParserDropTable.cs" />
+    <Compile Include="Parse\ParserInsert.cs" />
+    <Compile Include="Parse\ParserSelect.cs" />
+    <Compile Include="Parse\ParserUpdate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SelectNode.cs" />
+    <Compile Include="Result.cs" />
     <Compile Include="Shell.cs" />
+    <Compile Include="Statement\ConditionNode.cs" />
+    <Compile Include="Statement\CreateTableNode.cs" />
+    <Compile Include="Statement\DropTableNode.cs" />
+    <Compile Include="Statement\InsertNode.cs" />
+    <Compile Include="Statement\Node.cs" />
+    <Compile Include="Statement\SelectNode.cs" />
+    <Compile Include="Statement\UpdateNode.cs" />
     <Compile Include="Table.cs" />
-    <Compile Include="UpdateNode.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

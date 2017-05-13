@@ -12,7 +12,7 @@ namespace Engine
             db = database;
         }
 
-        public List<List<string>> Execute(string query)
+        public Result Execute(string query)
         {
             var tokens = Lexer.Split(query);
             var command = Parser.Convert(tokens);
@@ -20,9 +20,10 @@ namespace Engine
             var selectCmd = command as SelectNode;
             var insertCmd = command as InsertNode;
             var createTableCmd = command as CreateTableNode;
+            var dropTableCmd = command as DropTableNode;
             if (updateCmd != null)
             {
-                db.Execute(updateCmd);
+                return db.Execute(updateCmd);
             }
             else if (selectCmd != null)
             {
@@ -30,16 +31,18 @@ namespace Engine
             }
             else if (insertCmd != null)
             {
-                db.Execute(insertCmd);
+                return db.Execute(insertCmd);
             }
             else if (createTableCmd != null)
             {
-                db.Execute(createTableCmd);
+                return db.Execute(createTableCmd);
+            }
+            else if (dropTableCmd != null)
+            {
+                return db.Execute(dropTableCmd);
             }
             else
                 throw new Exception("wrong query");
-
-            return null;
         }
     }
 }
