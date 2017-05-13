@@ -8,17 +8,17 @@ namespace Engine
         private static List<List<string>> emptyResult = new List<List<string>>();
         private Dictionary<string, Table> tables = new Dictionary<string, Table>();
 
-        public void Execute(UpdateNode query)
+        public Result Execute(UpdateNode query)
         {
             if (!tables.ContainsKey(query.TableName))
-                return;
+                return Result.TableNotFound(query.TableName);
 
             tables[query.TableName].Update(query.ColumnNames, query.Values, query.Conditions);
 
-            return;
+            return Result.OK;
         }
 
-        public void Execute(CreateTableNode spec)
+        public Result Execute(CreateTableNode spec)
         {
             var table = new Table();
             for (int i = 0; i < spec.ColumnNames.Count; ++i)
@@ -28,23 +28,34 @@ namespace Engine
 
             tables.Add(spec.TableName, table);
 
-            return;
+            return Result.OK;
         }
 
-        public void Execute(InsertNode query)
+        public Result Execute(DropTableNode query)
+        {
+            if (tables.Remove(query.TableName))
+                return Result.OK;
+            else
+                return Result.TableNotFound(query.TableName);
+        }
+
+        public Result Execute(InsertNode query)
         {
             if (!tables.ContainsKey(query.TableName))
-                return;
+                return Result.TableNotFound(query.TableName);
 
             tables[query.TableName].Insert(query.ColumnNames, query.Values);
+
+            return Result.OK;
         }
 
-        public List<List<string>> Execute(SelectNode query)
+        public Result Execute(SelectNode query)
         {
             if (!tables.ContainsKey(query.TableName))
-                return emptyResult;
+                return Result.TableNotFound(query.TableName);
 
-            return tables[query.TableName].Select(query.What, query.Conditions);
+            var rows = tables[query.TableName].Select(query.What, query.Conditions);
+            return new Result(rows);
         }
     }
 }

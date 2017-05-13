@@ -20,12 +20,12 @@ namespace NxDb
                 try
                 {
                     var result = shell.Execute(query);
-                    if (result == null)
+                    if (result.Rows == null)
                         continue;
 
-                    for (int i = 0; i < result.Count; ++i)
+                    for (int i = 0; i < result.Rows.Count; ++i)
                     {
-                        var row = result[i];
+                        var row = result.Rows[i];
                         for (int j = 0; j < row.Count; ++j)
                         {
                             Console.Write(row[j]);

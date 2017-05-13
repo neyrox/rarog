@@ -67,6 +67,16 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void ParseSropTable()
+        {
+            var tokens = new string[] { "DROP", "TABLE", "Persons", ";"};
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(DropTableNode));
+            var drop = (DropTableNode)root;
+            Assert.AreEqual("Persons", drop.TableName);
+        }
+
+        [TestMethod]
         public void ParseSimpleInsert()
         {
             var tokens = new string[] { "INSERT", "INTO", "Customers",
