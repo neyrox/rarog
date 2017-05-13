@@ -27,21 +27,31 @@ namespace UnitTests
         [TestMethod]
         public void SelectReturnsAll()
         {
-            var result = table.Select(new List<string> { "*" });
+            var result = table.Select(new List<string> { "*" }, new List<ConditionNode>());
             Assert.AreEqual(2, result.Count);
             CollectionAssert.AreEqual(values1, result[0]);
             CollectionAssert.AreEqual(values2, result[1]);
         }
 
         [TestMethod]
-        public void CorrespondingRowUpdate()
+        public void CorrespondingRowSelected()
+        {
+            var conditions = new List<ConditionNode>() { new ConditionNode("c1", "=", "4") };
+
+            var result = table.Select(new List<string> { "*" }, conditions);
+            Assert.AreEqual(1, result.Count);
+            CollectionAssert.AreEqual(values2, result[0]);
+        }
+
+        [TestMethod]
+        public void CorrespondingRowUpdated()
         {
             var conditions = new List<ConditionNode>() { new ConditionNode("c1", "=", "4") };
 
             table.Update(new List<string> { "c2" }, new List<string> { "10" }, conditions);
             var values2Updated = new List<string> { "4", "10", "6" };
 
-            var result = table.Select(new List<string> { "*" });
+            var result = table.Select(new List<string> { "*" }, new List<ConditionNode>());
             Assert.AreEqual(2, result.Count);
             CollectionAssert.AreEqual(values1, result[0]);
             CollectionAssert.AreEqual(values2Updated, result[1]);

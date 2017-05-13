@@ -15,7 +15,22 @@ namespace UnitTests
             Assert.IsInstanceOfType(root, typeof(SelectNode));
             var select = (SelectNode)root;
             Assert.AreEqual("*", select.What[0]);
-            Assert.AreEqual("Customers", select.From);
+            Assert.AreEqual("Customers", select.TableName);
+        }
+
+        [TestMethod]
+        public void ParseSelectWhere()
+        {
+            var tokens = new string[] { "SELECT", "*", "FROM", "Customers", "WHERE", "CustomerID", "=", "1", ";" };
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(SelectNode));
+            var select = (SelectNode)root;
+            Assert.AreEqual("*", select.What[0]);
+            Assert.AreEqual("Customers", select.TableName);
+            Assert.AreEqual(1, select.Conditions.Count);
+            Assert.AreEqual("CustomerID", select.Conditions[0].ColumnName);
+            Assert.AreEqual("=", select.Conditions[0].Operation);
+            Assert.AreEqual("1", select.Conditions[0].Value);
         }
 
         [TestMethod]
@@ -28,7 +43,7 @@ namespace UnitTests
             Assert.AreEqual(2, select.What.Count);
             Assert.AreEqual("CustomerName", select.What[0]);
             Assert.AreEqual("Country", select.What[1]);
-            Assert.AreEqual("Customers", select.From);
+            Assert.AreEqual("Customers", select.TableName);
         }
 
         [TestMethod]
@@ -70,6 +85,22 @@ namespace UnitTests
 
         [TestMethod]
         public void ParseSimpleUpdate()
+        {
+            var tokens = new string[] { "UPDATE", "Customers",
+                "SET", "ContactName", "=", "Alfred", ";"};
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(UpdateNode));
+            var update = (UpdateNode)root;
+            Assert.AreEqual("Customers", update.TableName);
+            Assert.AreEqual(1, update.ColumnNames.Count);
+            Assert.AreEqual("ContactName", update.ColumnNames[0]);
+            Assert.AreEqual(1, update.Values.Count);
+            Assert.AreEqual("Alfred", update.Values[0]);
+            Assert.AreEqual(0, update.Conditions.Count);
+        }
+
+        [TestMethod]
+        public void ParseUpdateWhere()
         {
             var tokens = new string[] { "UPDATE", "Customers",
                 "SET", "ContactName", "=", "Alfred", ",", "City", "=", "Frankfurt", "WHERE", "CustomerID", "=", "1", ";"};
