@@ -61,45 +61,16 @@ namespace Engine
             AddRow();
         }
 
-        public List<List<string>> Select(List<string> columnNames, ConditionNode condition)
+        public List<ResultColumnBase> Select(List<string> columnNames, ConditionNode condition)
         {
             var rowsToSelect = GetRowsThatSatisfies(condition);
 
-            var result = new List<List<string>>();
-
-            List<Column> columnsToQuery;
-            if (columnNames[0] == "*")
-            {
-                columnsToQuery = new List<Column>(columns.Values);
-            }
-            else
-            {
-                columnsToQuery = new List<Column>();
-                for (int i = 0; i < columnNames.Count; ++i)
-                {
-                    var columnName = columnNames[i];
-                    columnsToQuery.Add(columns[columnName]);
-                }
-            }
-
-            for (int i = 0; i < rowsToSelect.Count; ++i)
-            {
-                var rowNumber = rowsToSelect[i];
-                var resultRow = new List<string>();
-                for (int j = 0; j < columnsToQuery.Count; ++j)
-                {
-                    resultRow.Add(columnsToQuery[j].Get(rowNumber));
-                }
-
-                result.Add(resultRow);
-            }
-
-            return result;
+            return Select(columnNames, rowsToSelect);
         }
 
-        private List<List<string>> Select(List<string> columnNames, List<int> rows)
+        private List<ResultColumnBase> Select(List<string> columnNames, List<int> rows)
         {
-            var result = new List<List<string>>();
+            var result = new List<ResultColumnBase>();
 
             List<Column> columnsToQuery;
             if (columnNames[0] == "*")
@@ -116,15 +87,9 @@ namespace Engine
                 }
             }
 
-            for (int i = 0; i < rows.Count; ++i)
+            for (int j = 0; j < columnsToQuery.Count; ++j)
             {
-                var row = new List<string>();
-                for (int j = 0; j < columnsToQuery.Count; ++j)
-                {
-                    row.Add(columnsToQuery[j].Get(rows[i]));
-                }
-
-                result.Add(row);
+                result.Add(columnsToQuery[j].Get(rows));
             }
 
             return result;

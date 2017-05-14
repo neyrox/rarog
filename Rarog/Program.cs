@@ -1,7 +1,7 @@
 ﻿using Engine;
 using System;
 
-namespace NxDb
+namespace Rarog
 {
     class Program
     {
@@ -20,16 +20,19 @@ namespace NxDb
                 try
                 {
                     var result = shell.Execute(query);
-                    if (result.Rows == null)
+                    if (result.Columns == null || result.Columns.Count == 0)
                         continue;
 
-                    for (int i = 0; i < result.Rows.Count; ++i)
+                    int rowCount = result.Columns[0].Count;
+                    int colCount = result.Columns.Count;
+
+                    for (int i = 0; i < rowCount; ++i)
                     {
-                        var row = result.Rows[i];
-                        for (int j = 0; j < row.Count; ++j)
+                        for (int j = 0; j < colCount; ++j)
                         {
-                            Console.Write(row[j]);
-                            if (j < (row.Count - 1))
+                            var column = result.Columns[j];
+                            Console.Write(column.Get(i));
+                            if (j < (colCount - 1))
                                 Console.Write(" | ");
                         }
                         Console.WriteLine("");

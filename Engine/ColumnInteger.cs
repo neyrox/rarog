@@ -38,9 +38,15 @@ namespace Engine
             return result;
         }
 
-        public override string Get(int index)
+        public override ResultColumnBase Get(List<int> rows)
         {
-            return values[index].ToString();
+            var resultValues = new int[rows.Count];
+            for (int i = 0; i < rows.Count; ++i)
+            {
+                resultValues[i] = values[rows[i]];
+            }
+
+            return new ResultColumnInteger(resultValues);
         }
     }
 }

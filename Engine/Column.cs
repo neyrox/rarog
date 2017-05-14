@@ -12,6 +12,6 @@ namespace Engine
 
         public abstract List<int> GetInclusions(string value);
 
-        public abstract string Get(int index);
+        public abstract ResultColumnBase Get(List<int> rows);
     }
 }
