@@ -21,9 +21,9 @@ namespace Engine
             }
         }
 
-        public void Update(List<string> columnNames, List<string> values, List<ConditionNode> conditions)
+        public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
         {
-            var rowsToUpdate = GetRowsThatSatisfies(conditions);
+            var rowsToUpdate = GetRowsThatSatisfies(condition);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -61,9 +61,9 @@ namespace Engine
             AddRow();
         }
 
-        public List<List<string>> Select(List<string> columnNames, List<ConditionNode> conditions)
+        public List<List<string>> Select(List<string> columnNames, ConditionNode condition)
         {
-            var rowsToSelect = GetRowsThatSatisfies(conditions);
+            var rowsToSelect = GetRowsThatSatisfies(condition);
 
             var result = new List<List<string>>();
 
@@ -130,34 +130,29 @@ namespace Engine
             return result;
         }
 
-
         private void AddRow()
         {
             allRows.Add(rowCount);
             ++rowCount;
         }
 
-        private List<int> GetRowsThatSatisfies(List<ConditionNode> conditions)
+        private List<int> GetRowsThatSatisfies(ConditionNode condition)
         {
-            if (conditions.Count == 0)
+            if (condition == null)
             {
                 return allRows;
             }
 
             var resultRows = new List<int>();
-            for (int i = 0; i < conditions.Count; ++i)
-            {
-                var condition = conditions[i];
 
-                switch (condition.Operation)
-                {
-                    case "=":
-                        var inclusions = columns[condition.ColumnName].GetInclusions(condition.Value);
-                        resultRows.AddRange(inclusions);
-                        break;
-                    default:
-                        break;
-                }
+            switch (condition.Operation)
+            {
+                case "=":
+                    var inclusions = columns[condition.ColumnName].GetInclusions(condition.Value);
+                    resultRows.AddRange(inclusions);
+                    break;
+                default:
+                    break;
             }
 
             return resultRows;

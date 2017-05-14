@@ -6,13 +6,13 @@ namespace Engine
     {
         public List<string> What;
         public string TableName;
-        public List<ConditionNode> Conditions;
+        public ConditionNode Condition;
 
-        public SelectNode(List<string> what, string tableName, List<ConditionNode> conditions)
+        public SelectNode(List<string> what, string tableName, ConditionNode condition)
         {
             What = what;
             TableName = tableName;
-            Conditions = conditions;
+            Condition = condition;
         }
     }
 }

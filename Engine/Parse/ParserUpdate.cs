@@ -24,15 +24,14 @@ namespace Engine
 
             var columnNames = new List<string>();
             var values = new List<string>();
-            var conditions = new List<ConditionNode>();
+            ConditionNode condition = null;
             ConvertColumns(tokens, columnNames, values, ref pos);
 
             if (ParserCommon.AssertToken("WHERE", tokens, pos))
             {
                 ++pos;
 
-                var condition = ParserCondition.Convert(tokens, ref pos);
-                conditions.Add(condition);
+                condition = ParserCondition.Convert(tokens, ref pos);
             }
 
             if (ParserCommon.AssertToken(";", tokens, pos))
@@ -40,7 +39,7 @@ namespace Engine
             else
                 return null;
 
-            return new UpdateNode(tableName, columnNames, values, conditions);
+            return new UpdateNode(tableName, columnNames, values, condition);
         }
 
         private static void ConvertColumns(string[] tokens, List<string> columnNames, List<string> values, ref int pos)

@@ -27,10 +27,10 @@ namespace UnitTests
             var select = (SelectNode)root;
             Assert.AreEqual("*", select.What[0]);
             Assert.AreEqual("Customers", select.TableName);
-            Assert.AreEqual(1, select.Conditions.Count);
-            Assert.AreEqual("CustomerID", select.Conditions[0].ColumnName);
-            Assert.AreEqual("=", select.Conditions[0].Operation);
-            Assert.AreEqual("1", select.Conditions[0].Value);
+            Assert.IsNotNull(select.Condition);
+            Assert.AreEqual("CustomerID", select.Condition.ColumnName);
+            Assert.AreEqual("=", select.Condition.Operation);
+            Assert.AreEqual("1", select.Condition.Value);
         }
 
         [TestMethod]
@@ -106,7 +106,7 @@ namespace UnitTests
             Assert.AreEqual("ContactName", update.ColumnNames[0]);
             Assert.AreEqual(1, update.Values.Count);
             Assert.AreEqual("Alfred", update.Values[0]);
-            Assert.AreEqual(0, update.Conditions.Count);
+            Assert.IsNull(update.Condition);
         }
 
         [TestMethod]
@@ -124,10 +124,10 @@ namespace UnitTests
             Assert.AreEqual(2, update.Values.Count);
             Assert.AreEqual("Alfred", update.Values[0]);
             Assert.AreEqual("Frankfurt", update.Values[1]);
-            Assert.AreEqual(1, update.Conditions.Count);
-            Assert.AreEqual("CustomerID", update.Conditions[0].ColumnName);
-            Assert.AreEqual("=", update.Conditions[0].Operation);
-            Assert.AreEqual("1", update.Conditions[0].Value);
+            Assert.IsNotNull(update.Condition);
+            Assert.AreEqual("CustomerID", update.Condition.ColumnName);
+            Assert.AreEqual("=", update.Condition.Operation);
+            Assert.AreEqual("1", update.Condition.Value);
         }
     }
 }

@@ -22,13 +22,12 @@ namespace Engine
             else
                 return null;
 
-            var conditions = new List<ConditionNode>();
+            ConditionNode condition = null;
             if (ParserCommon.AssertToken("WHERE", tokens, pos))
             {
                 ++pos;
 
-                var condition = ParserCondition.Convert(tokens, ref pos);
-                conditions.Add(condition);
+                condition = ParserCondition.Convert(tokens, ref pos);
             }
 
             if (ParserCommon.AssertToken(";", tokens, pos))
@@ -36,7 +35,7 @@ namespace Engine
             else
                 return null;
 
-            var result = new SelectNode(what, tableName, conditions);
+            var result = new SelectNode(what, tableName, condition);
             return result;
         }
 

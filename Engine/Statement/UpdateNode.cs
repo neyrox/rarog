@@ -7,14 +7,14 @@ namespace Engine
         public string TableName;
         public List<string> ColumnNames;
         public List<string> Values;
-        public List<ConditionNode> Conditions;
+        public ConditionNode Condition;
 
-        public UpdateNode(string tableName, List<string> columnNames, List<string> values, List<ConditionNode> conditions)
+        public UpdateNode(string tableName, List<string> columnNames, List<string> values, ConditionNode condition)
         {
             TableName = tableName;
             ColumnNames = columnNames;
             Values = values;
-            Conditions = conditions;
+            Condition = condition;
         }
     }
 }

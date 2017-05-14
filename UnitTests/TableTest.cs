@@ -27,7 +27,7 @@ namespace UnitTests
         [TestMethod]
         public void SelectReturnsAll()
         {
-            var result = table.Select(new List<string> { "*" }, new List<ConditionNode>());
+            var result = table.Select(new List<string> { "*" }, null);
             Assert.AreEqual(2, result.Count);
             CollectionAssert.AreEqual(values1, result[0]);
             CollectionAssert.AreEqual(values2, result[1]);
@@ -36,9 +36,9 @@ namespace UnitTests
         [TestMethod]
         public void CorrespondingRowSelected()
         {
-            var conditions = new List<ConditionNode>() { new ConditionNode("c1", "=", "4") };
+            var condition = new ConditionNode("c1", "=", "4");
 
-            var result = table.Select(new List<string> { "*" }, conditions);
+            var result = table.Select(new List<string> { "*" }, condition);
             Assert.AreEqual(1, result.Count);
             CollectionAssert.AreEqual(values2, result[0]);
         }
@@ -46,12 +46,12 @@ namespace UnitTests
         [TestMethod]
         public void CorrespondingRowUpdated()
         {
-            var conditions = new List<ConditionNode>() { new ConditionNode("c1", "=", "4") };
+            var condition = new ConditionNode("c1", "=", "4");
 
-            table.Update(new List<string> { "c2" }, new List<string> { "10" }, conditions);
+            table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
             var values2Updated = new List<string> { "4", "10", "6" };
 
-            var result = table.Select(new List<string> { "*" }, new List<ConditionNode>());
+            var result = table.Select(new List<string> { "*" }, null);
             Assert.AreEqual(2, result.Count);
             CollectionAssert.AreEqual(values1, result[0]);
             CollectionAssert.AreEqual(values2Updated, result[1]);
