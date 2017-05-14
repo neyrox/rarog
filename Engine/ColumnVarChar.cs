@@ -29,18 +29,6 @@ namespace Engine
             values.Add(Clamp(value));
         }
 
-        public override List<int> GetInclusions(string value)
-        {
-            var result = new List<int>();
-            for (int row = 0; row < values.Count; ++row)
-            {
-                if (values[row] == value)
-                    result.Add(row);
-            }
-
-            return result;
-        }
-
         public override ResultColumnBase Get(List<int> rows)
         {
             var resultValues = new string[rows.Count];
@@ -63,6 +51,24 @@ namespace Engine
                 // TODO: produce warning if string is too long
                 return value.Substring(0, maxLength);
             }
+        }
+
+        public override List<int> Filter(ConditionNode conditionNode)
+        {
+            var result = new List<int>();
+
+            var condition = ConditionString.Transform(conditionNode);
+            if (condition == null)
+                return result;
+
+            for (int row = 0; row < values.Count; ++row)
+            {
+                var value = values[row];
+                if (condition.Satisfies(value))
+                    result.Add(row);
+            }
+
+            return result;
         }
     }
 }

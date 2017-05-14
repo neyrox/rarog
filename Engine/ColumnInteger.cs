@@ -25,19 +25,6 @@ namespace Engine
             values.Add(val);
         }
 
-        public override List<int> GetInclusions(string value)
-        {
-            var result = new List<int>();
-            int val = int.Parse(value);
-            for (int row = 0; row < values.Count; ++row)
-            {
-                if (values[row] == val)
-                    result.Add(row);
-            }
-
-            return result;
-        }
-
         public override ResultColumnBase Get(List<int> rows)
         {
             var resultValues = new int[rows.Count];
@@ -47,6 +34,24 @@ namespace Engine
             }
 
             return new ResultColumnInteger(resultValues);
+        }
+
+        public override List<int> Filter(ConditionNode conditionNode)
+        {
+            var result = new List<int>();
+
+            var condition = ConditionInteger.Transform(conditionNode);
+            if (condition == null)
+                return result;
+
+            for (int row = 0; row < values.Count; ++row)
+            {
+                var value = values[row];
+                if (condition.Satisfies(value))
+                    result.Add(row);
+            }
+
+            return result;
         }
     }
 }

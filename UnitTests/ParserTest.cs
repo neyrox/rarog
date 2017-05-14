@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Engine;
 
 namespace UnitTests
 {

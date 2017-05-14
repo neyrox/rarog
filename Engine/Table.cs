@@ -111,18 +111,7 @@ namespace Engine
                 return allRows;
             }
 
-            var resultRows = new List<int>();
-
-            switch (condition.Operation)
-            {
-                case "=":
-                    var inclusions = columns[condition.ColumnName].GetInclusions(condition.Value);
-                    resultRows.AddRange(inclusions);
-                    break;
-                default:
-                    break;
-            }
-
+            var resultRows = columns[condition.ColumnName].Filter(condition);
             return resultRows;
         }
     }

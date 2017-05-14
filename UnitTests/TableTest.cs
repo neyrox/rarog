@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Engine;
 using System.Collections.Generic;
 
 namespace UnitTests
@@ -51,17 +50,30 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void CorrespondingRowUpdated()
+        public void RowWhereIntEqualUpdated()
         {
             var condition = new ConditionNode("c1", "=", "4");
 
             table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
-            var values2Updated = new List<string> { "4", "10", "b" };
 
             var result = table.Select(new List<string> { "*" }, null);
             Assert.AreEqual(3, result.Count);
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(new List<string> { "2", "10" }, result[1].All());
+            CollectionAssert.AreEqual(col3, result[2].All());
+        }
+
+        [TestMethod]
+        public void RowWhereStringEqualUpdated()
+        {
+            var condition = new ConditionNode("c3", "=", "a");
+
+            table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
+
+            var result = table.Select(new List<string> { "*" }, null);
+            Assert.AreEqual(3, result.Count);
+            CollectionAssert.AreEqual(col1, result[0].All());
+            CollectionAssert.AreEqual(new List<string> { "10", "5" }, result[1].All());
             CollectionAssert.AreEqual(col3, result[2].All());
         }
 
