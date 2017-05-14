@@ -55,6 +55,7 @@
     <Compile Include="ParserTest.cs" />
     <Compile Include="TableTest.cs" />
     <Compile Include="ShellTest.cs" />
+    <Compile Include="StringConditionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">

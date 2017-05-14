@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Engine;
 
 namespace UnitTests
 {
@@ -40,6 +39,25 @@ namespace UnitTests
             Assert.AreEqual("FROM", tokens[2]);
             Assert.AreEqual("Customers", tokens[3]);
             Assert.AreEqual(";", tokens[4]);
+        }
+
+        [TestMethod]
+        public void LexerSplitsMultiConditionSelect()
+        {
+            var tokens = Lexer.Split("SELECT * FROM t1 WHERE c1 >= 1 and c2 <= 10;");
+            Assert.AreEqual("SELECT", tokens[0]);
+            Assert.AreEqual("*", tokens[1]);
+            Assert.AreEqual("FROM", tokens[2]);
+            Assert.AreEqual("t1", tokens[3]);
+            Assert.AreEqual("WHERE", tokens[4]);
+            Assert.AreEqual("c1", tokens[5]);
+            Assert.AreEqual(">=", tokens[6]);
+            Assert.AreEqual("1", tokens[7]);
+            Assert.AreEqual("and", tokens[8]);
+            Assert.AreEqual("c2", tokens[9]);
+            Assert.AreEqual("<=", tokens[10]);
+            Assert.AreEqual("10", tokens[11]);
+            Assert.AreEqual(";", tokens[12]);
         }
 
         [TestMethod]

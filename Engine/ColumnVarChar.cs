@@ -2,45 +2,62 @@
 
 namespace Engine
 {
-    public class ColumnInteger: Column
+    public class ColumnVarChar: Column
     {
-        private List<int> values = new List<int>();
+        private List<string> values = new List<string>();
+        private readonly int maxLength;
+
+        public ColumnVarChar(int maxLen)
+        {
+            maxLength = maxLen;
+        }
 
         public override void FullUpdate(string value)
         {
-            int val = int.Parse(value);
+            var val = Clamp(value);
             for (int row = 0; row < values.Count; ++row)
                 values[row] = val;
         }
 
         public override void Update(int row, string value)
         {
-            int val = int.Parse(value);
-            values[row] = val;
+            values[row] = Clamp(value);
         }
 
         public override void Insert(string value)
         {
-            int val = int.Parse(value);
-            values.Add(val);
+            values.Add(Clamp(value));
         }
 
         public override ResultColumnBase Get(List<int> rows)
         {
-            var resultValues = new int[rows.Count];
+            var resultValues = new string[rows.Count];
             for (int i = 0; i < rows.Count; ++i)
             {
                 resultValues[i] = values[rows[i]];
             }
 
-            return new ResultColumnInteger(resultValues);
+            return new ResultColumnString(resultValues);
+        }
+
+        private string Clamp(string value)
+        {
+            if (value.Length < maxLength)
+            {
+                return value;
+            }
+            else
+            {
+                // TODO: produce warning if string is too long
+                return value.Substring(0, maxLength);
+            }
         }
 
         public override List<int> Filter(ConditionNode conditionNode)
         {
             var result = new List<int>();
 
-            var condition = ConditionInteger.Transform(conditionNode);
+            var condition = ConditionString.Transform(conditionNode);
             if (condition == null)
                 return result;
 

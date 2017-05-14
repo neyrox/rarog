@@ -15,15 +15,18 @@ namespace Engine
                 case "int":
                     columns.Add(name, new ColumnInteger());
                     break;
+                case "varchar":
+                    columns.Add(name, new ColumnVarChar(length));
+                    break;
                 default:
                     // TODO: log error
                     return;
             }
         }
 
-        public void Update(List<string> columnNames, List<string> values, List<ConditionNode> conditions)
+        public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
         {
-            var rowsToUpdate = GetRowsThatSatisfies(conditions);
+            var rowsToUpdate = GetRowsThatSatisfies(condition);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -61,11 +64,16 @@ namespace Engine
             AddRow();
         }
 
-        public List<List<string>> Select(List<string> columnNames, List<ConditionNode> conditions)
+        public List<ResultColumnBase> Select(List<string> columnNames, ConditionNode condition)
         {
-            var rowsToSelect = GetRowsThatSatisfies(conditions);
+            var rowsToSelect = GetRowsThatSatisfies(condition);
 
-            var result = new List<List<string>>();
+            return Select(columnNames, rowsToSelect);
+        }
+
+        private List<ResultColumnBase> Select(List<string> columnNames, List<int> rows)
+        {
+            var result = new List<ResultColumnBase>();
 
             List<Column> columnsToQuery;
             if (columnNames[0] == "*")
@@ -82,54 +90,13 @@ namespace Engine
                 }
             }
 
-            for (int i = 0; i < rowsToSelect.Count; ++i)
+            for (int j = 0; j < columnsToQuery.Count; ++j)
             {
-                var rowNumber = rowsToSelect[i];
-                var resultRow = new List<string>();
-                for (int j = 0; j < columnsToQuery.Count; ++j)
-                {
-                    resultRow.Add(columnsToQuery[j].Get(rowNumber));
-                }
-
-                result.Add(resultRow);
+                result.Add(columnsToQuery[j].Get(rows));
             }
 
             return result;
         }
-
-        private List<List<string>> Select(List<string> columnNames, List<int> rows)
-        {
-            var result = new List<List<string>>();
-
-            List<Column> columnsToQuery;
-            if (columnNames[0] == "*")
-            {
-                columnsToQuery = new List<Column>(columns.Values);
-            }
-            else
-            {
-                columnsToQuery = new List<Column>();
-                for (int i = 0; i < columnNames.Count; ++i)
-                {
-                    var columnName = columnNames[i];
-                    columnsToQuery.Add(columns[columnName]);
-                }
-            }
-
-            for (int i = 0; i < rows.Count; ++i)
-            {
-                var row = new List<string>();
-                for (int j = 0; j < columnsToQuery.Count; ++j)
-                {
-                    row.Add(columnsToQuery[j].Get(rows[i]));
-                }
-
-                result.Add(row);
-            }
-
-            return result;
-        }
-
 
         private void AddRow()
         {
@@ -137,29 +104,14 @@ namespace Engine
             ++rowCount;
         }
 
-        private List<int> GetRowsThatSatisfies(List<ConditionNode> conditions)
+        private List<int> GetRowsThatSatisfies(ConditionNode condition)
         {
-            if (conditions.Count == 0)
+            if (condition == null)
             {
                 return allRows;
             }
 
-            var resultRows = new List<int>();
-            for (int i = 0; i < conditions.Count; ++i)
-            {
-                var condition = conditions[i];
-
-                switch (condition.Operation)
-                {
-                    case "=":
-                        var inclusions = columns[condition.ColumnName].GetInclusions(condition.Value);
-                        resultRows.AddRange(inclusions);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
+            var resultRows = columns[condition.ColumnName].Filter(condition);
             return resultRows;
         }
     }

@@ -10,8 +10,8 @@ namespace Engine
 
         public abstract void Insert(string value);
 
-        public abstract List<int> GetInclusions(string value);
+        public abstract ResultColumnBase Get(List<int> rows);
 
-        public abstract string Get(int index);
+        public abstract List<int> Filter(ConditionNode condition);
     }
 }

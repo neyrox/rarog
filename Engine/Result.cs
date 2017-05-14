@@ -8,14 +8,14 @@ namespace Engine
         public static readonly Result OK = new Result(null, null);
 
         public readonly string Error;
-        public readonly List<List<string>> Rows;
+        public readonly List<ResultColumnBase> Columns;
 
         public bool IsOK { get { return Error == null; } }
 
-        public Result(List<List<string>> rows, string error = null)
+        public Result(List<ResultColumnBase> columns, string error = null)
         {
             Error = error;
-            Rows = rows;
+            Columns = columns;
         }
 
         public static Result TableNotFound(string tableName)

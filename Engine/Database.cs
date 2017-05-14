@@ -13,7 +13,7 @@ namespace Engine
             if (!tables.ContainsKey(query.TableName))
                 return Result.TableNotFound(query.TableName);
 
-            tables[query.TableName].Update(query.ColumnNames, query.Values, query.Conditions);
+            tables[query.TableName].Update(query.ColumnNames, query.Values, query.Condition);
 
             return Result.OK;
         }
@@ -54,7 +54,7 @@ namespace Engine
             if (!tables.ContainsKey(query.TableName))
                 return Result.TableNotFound(query.TableName);
 
-            var rows = tables[query.TableName].Select(query.What, query.Conditions);
+            var rows = tables[query.TableName].Select(query.What, query.Condition);
             return new Result(rows);
         }
     }
