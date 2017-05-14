@@ -15,6 +15,9 @@ namespace Engine
                 case "int":
                     columns.Add(name, new ColumnInteger());
                     break;
+                case "varchar":
+                    columns.Add(name, new ColumnVarChar(length));
+                    break;
                 default:
                     // TODO: log error
                     return;

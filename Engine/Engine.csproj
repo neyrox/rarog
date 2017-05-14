@@ -40,6 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Column.cs" />
+    <Compile Include="ColumnVarChar.cs" />
+    <Compile Include="ResultColumnString.cs" />
     <Compile Include="ResultColumnInteger.cs" />
     <Compile Include="ColumnInteger.cs" />
     <Compile Include="Database.cs" />

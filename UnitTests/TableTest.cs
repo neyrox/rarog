@@ -9,12 +9,12 @@ namespace UnitTests
     public class TableTest
     {
         private Table table;
-        private readonly List<string> values1 = new List<string> { "1", "2", "3" };
-        private readonly List<string> values2 = new List<string> { "4", "5", "6" };
+        private readonly List<string> values1 = new List<string> { "1", "2", "a" };
+        private readonly List<string> values2 = new List<string> { "4", "5", "b" };
 
         private readonly List<string> col1 = new List<string> { "1", "4" };
         private readonly List<string> col2 = new List<string> { "2", "5" };
-        private readonly List<string> col3 = new List<string> { "3", "6" };
+        private readonly List<string> col3 = new List<string> { "a", "b" };
 
         [TestInitialize]
         public void Setup()
@@ -22,7 +22,7 @@ namespace UnitTests
             table = new Table();
             table.AddColumn("c1", "int", 0);
             table.AddColumn("c2", "int", 0);
-            table.AddColumn("c3", "int", 0);
+            table.AddColumn("c3", "varchar", 255);
             var columnNames = new List<string> { "c1", "c2", "c3" };
             table.Insert(columnNames, values1);
             table.Insert(columnNames, values2);
@@ -47,7 +47,7 @@ namespace UnitTests
             Assert.AreEqual(3, result.Count);
             CollectionAssert.AreEqual(ToList("4"), result[0].All());
             CollectionAssert.AreEqual(ToList("5"), result[1].All());
-            CollectionAssert.AreEqual(ToList("6"), result[2].All());
+            CollectionAssert.AreEqual(ToList("b"), result[2].All());
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace UnitTests
             var condition = new ConditionNode("c1", "=", "4");
 
             table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
-            var values2Updated = new List<string> { "4", "10", "6" };
+            var values2Updated = new List<string> { "4", "10", "b" };
 
             var result = table.Select(new List<string> { "*" }, null);
             Assert.AreEqual(3, result.Count);
