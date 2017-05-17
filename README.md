@@ -9,7 +9,7 @@ durability not yet implemented
 ## supported statements
 create table, drop table
 
-insert, update, select
+insert, update, select, delete
 
 ## supported conditions
 =, >, <, >=, <=, <>, and, or

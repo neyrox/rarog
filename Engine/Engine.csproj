@@ -43,6 +43,7 @@
     <Compile Include="ColumnVarChar.cs" />
     <Compile Include="ConditionString.cs" />
     <Compile Include="ConditionInteger.cs" />
+    <Compile Include="Parse\ParserDelete.cs" />
     <Compile Include="ResultColumnString.cs" />
     <Compile Include="ResultColumnInteger.cs" />
     <Compile Include="ColumnInteger.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="Statement\DropTableNode.cs" />
     <Compile Include="Statement\InsertNode.cs" />
     <Compile Include="Statement\Node.cs" />
+    <Compile Include="Statement\DeleteNode.cs" />
     <Compile Include="Statement\SelectNode.cs" />
     <Compile Include="Statement\UpdateNode.cs" />
     <Compile Include="Table.cs" />

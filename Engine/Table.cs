@@ -76,6 +76,23 @@ namespace Engine
             return Select(columnNames, rowsToSelect);
         }
 
+        public void Delete(ConditionNode condition)
+        {
+            List<int> rowsToDelete = allRows;
+            // TODO: replace with empty condition
+            if (condition != null)
+            {
+                rowsToDelete = condition.GetRowsThatSatisfy(this);
+            }
+
+            foreach (var column in columns)
+            {
+                column.Value.Delete(rowsToDelete);
+            }
+
+            DeleteRows(rowsToDelete.Count);
+        }
+
         private List<ResultColumnBase> Select(List<string> columnNames, List<int> rows)
         {
             var result = new List<ResultColumnBase>();
@@ -107,6 +124,12 @@ namespace Engine
         {
             allRows.Add(rowCount);
             ++rowCount;
+        }
+
+        private void DeleteRows(int amount)
+        {
+            rowCount -= amount;
+            allRows.RemoveRange(allRows.Count - amount, amount);
         }
     }
 }

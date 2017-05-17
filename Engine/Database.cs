@@ -49,6 +49,16 @@ namespace Engine
             return Result.OK;
         }
 
+        public Result Execute(DeleteNode query)
+        {
+            if (!tables.ContainsKey(query.TableName))
+                return Result.TableNotFound(query.TableName);
+
+            tables[query.TableName].Delete(query.Condition);
+
+            return Result.OK;
+        }
+
         public Result Execute(SelectNode query)
         {
             if (!tables.ContainsKey(query.TableName))

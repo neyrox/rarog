@@ -31,10 +31,20 @@ namespace UnitTests
             CollectionAssert.AreEqual(new List<string> { "1", "3" }, select2.Columns[0].All());
             CollectionAssert.AreEqual(new List<string> { "8", "2" }, select2.Columns[1].All());
             CollectionAssert.AreEqual(new List<string> { "a", "b" }, select2.Columns[2].All());
-            
-            // TODO: check success
+
+            var delete = shell.Execute("DELETE FROM t1 WHERE c1 = 1;");
+            var select3 = shell.Execute("SELECT * FROM t1;");
+            CollectionAssert.AreEqual(ToList("3"), select3.Columns[0].All());
+            CollectionAssert.AreEqual(ToList("2"), select3.Columns[1].All());
+            CollectionAssert.AreEqual(ToList("b"), select3.Columns[2].All());
+
             var drop = shell.Execute("DROP TABLE t1;");
             Assert.IsTrue(drop.IsOK);
+        }
+
+        private List<string> ToList(string item)
+        {
+            return new List<string> { item };
         }
     }
 }

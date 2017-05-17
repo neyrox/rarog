@@ -53,5 +53,18 @@ namespace Engine
 
             return result;
         }
+
+        public override void Delete(List<int> rowsToDelete)
+        {
+            // TODO: optimize
+            var newValues = new List<int>(values.Count - rowsToDelete.Count);
+            var rowSet = new HashSet<int>(rowsToDelete);
+            for (int i = 0; i < values.Count; ++i)
+            {
+                if (!rowSet.Contains(i))
+                    newValues.Add(values[i]);
+            }
+            values = newValues;
+        }
     }
 }

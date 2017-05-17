@@ -77,6 +77,17 @@ namespace UnitTests
             CollectionAssert.AreEqual(col3, result[2].All());
         }
 
+        [TestMethod]
+        public void OneRowDeleted()
+        {
+            table.Delete(new ColumnConditionNode("c1", "=", "1"));
+            var result = table.Select(new List<string> { "*" }, null);
+            Assert.AreEqual(3, result.Count);
+            CollectionAssert.AreEqual(ToList("4"), result[0].All());
+            CollectionAssert.AreEqual(ToList("5"), result[1].All());
+            CollectionAssert.AreEqual(ToList("b"), result[2].All());
+        }
+
         private List<string> ToList(string item)
         {
             return new List<string> { item };

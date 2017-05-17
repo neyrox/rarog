@@ -21,6 +21,9 @@ namespace Engine
                     case "INSERT":
                         root = ParserInsert.Convert(tokens, ref pos);
                         break;
+                    case "DELETE":
+                        root = ParserDelete.Convert(tokens, ref pos);
+                        break;
                     case "CREATE":
                         root = ParserCreateTable.Convert(tokens, ref pos);
                         break;

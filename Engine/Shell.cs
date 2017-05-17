@@ -14,13 +14,16 @@ namespace Engine
 
         public Result Execute(string query)
         {
+            // TODO: rework it
             var tokens = Lexer.Split(query);
             var command = Parser.Convert(tokens);
             var updateCmd = command as UpdateNode;
             var selectCmd = command as SelectNode;
             var insertCmd = command as InsertNode;
+            var deleteCmd = command as DeleteNode;
             var createTableCmd = command as CreateTableNode;
             var dropTableCmd = command as DropTableNode;
+
             if (updateCmd != null)
             {
                 return db.Execute(updateCmd);
@@ -32,6 +35,10 @@ namespace Engine
             else if (insertCmd != null)
             {
                 return db.Execute(insertCmd);
+            }
+            else if (deleteCmd != null)
+            {
+                return db.Execute(deleteCmd);
             }
             else if (createTableCmd != null)
             {
