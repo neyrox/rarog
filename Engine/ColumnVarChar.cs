@@ -53,22 +53,35 @@ namespace Engine
             }
         }
 
-        public override List<int> Filter(ConditionNode conditionNode)
+        public override List<int> Filter(string operation, string value)
         {
             var result = new List<int>();
 
-            var condition = ConditionString.Transform(conditionNode);
+            var condition = ConditionString.Transform(operation, value);
             if (condition == null)
                 return result;
 
             for (int row = 0; row < values.Count; ++row)
             {
-                var value = values[row];
-                if (condition.Satisfies(value))
+                var val = values[row];
+                if (condition.Satisfies(val))
                     result.Add(row);
             }
 
             return result;
+        }
+
+        public override void Delete(List<int> rowsToDelete)
+        {
+            // TODO: optimize
+            var newValues = new List<string>(values.Count - rowsToDelete.Count);
+            var rowSet = new HashSet<int>(rowsToDelete);
+            for (int i = 0; i < values.Count; ++i)
+            {
+                if (!rowSet.Contains(i))
+                    newValues.Add(values[i]);
+            }
+            values = newValues;
         }
     }
 }

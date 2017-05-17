@@ -6,6 +6,28 @@ namespace Engine
     {
         public static ConditionNode Convert(string[] tokens, ref int pos)
         {
+            ConditionNode result = ConvertSingle(tokens, ref pos);
+            while (!ParserCommon.AssertToken(";", tokens, pos))
+            {
+                if (ParserCommon.AssertUpperToken("AND", tokens, pos))
+                {
+                    ++pos;
+                    var node2 = ConvertSingle(tokens, ref pos);
+                    result = new CompositeConditionNode(result, "AND", node2);
+                }
+                else if (ParserCommon.AssertUpperToken("OR", tokens, pos))
+                {
+                    ++pos;
+                    var node2 = ConvertSingle(tokens, ref pos);
+                    result = new CompositeConditionNode(result, "OR", node2);
+                }
+
+            }
+            return result;
+        }
+
+        public static ConditionNode ConvertSingle(string[] tokens, ref int pos)
+        {
             var columnName = string.Empty;
             if (pos < tokens.Length)
             {
@@ -33,7 +55,7 @@ namespace Engine
             else
                 return null;
 
-            return new ConditionNode(columnName, operation, value);
+            return new ColumnConditionNode(columnName, operation, value);
         }
     }
 }

@@ -2,17 +2,17 @@
 
 namespace Engine
 {
-    public static class ParserSelect
+    public static class ParserDelete
     {
         public static Node Convert(string[] tokens, ref int pos)
         {
-            var what = new List<string>();
-            ++pos;  // skip "SELECT" itself
-            ConvertWhat(tokens, what, ref pos);
+            ++pos;  // skip "DELETE" itself
+
             if (ParserCommon.AssertUpperToken("FROM", tokens, pos))
-                ++pos;
+                ++pos;  // skip "FROM"
             else
                 return null;
+
             var tableName = string.Empty;
             if (pos < tokens.Length)
             {
@@ -35,23 +35,8 @@ namespace Engine
             else
                 return null;
 
-            var result = new SelectNode(what, tableName, condition);
+            var result = new DeleteNode(tableName, condition);
             return result;
-        }
-
-        private static void ConvertWhat(string[] tokens, List<string> what, ref int pos)
-        {
-            while (pos < tokens.Length)
-            {
-                if (tokens[pos] != ",")
-                {
-                    var tokenUpper = tokens[pos].ToUpperInvariant();
-                    if (tokenUpper == "FROM")
-                        break;
-                    what.Add(tokens[pos]);
-                }
-                ++pos;
-            }
         }
     }
 }

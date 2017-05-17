@@ -40,7 +40,7 @@ namespace UnitTests
         [TestMethod]
         public void CorrespondingRowSelected()
         {
-            var condition = new ConditionNode("c1", "=", "4");
+            var condition = new ColumnConditionNode("c1", "=", "4");
 
             var result = table.Select(new List<string> { "*" }, condition);
             Assert.AreEqual(3, result.Count);
@@ -52,7 +52,7 @@ namespace UnitTests
         [TestMethod]
         public void RowWhereIntEqualUpdated()
         {
-            var condition = new ConditionNode("c1", "=", "4");
+            var condition = new ColumnConditionNode("c1", "=", "4");
 
             table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
 
@@ -66,7 +66,7 @@ namespace UnitTests
         [TestMethod]
         public void RowWhereStringEqualUpdated()
         {
-            var condition = new ConditionNode("c3", "=", "a");
+            var condition = new ColumnConditionNode("c3", "=", "a");
 
             table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
 
@@ -75,6 +75,17 @@ namespace UnitTests
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(new List<string> { "10", "5" }, result[1].All());
             CollectionAssert.AreEqual(col3, result[2].All());
+        }
+
+        [TestMethod]
+        public void OneRowDeleted()
+        {
+            table.Delete(new ColumnConditionNode("c1", "=", "1"));
+            var result = table.Select(new List<string> { "*" }, null);
+            Assert.AreEqual(3, result.Count);
+            CollectionAssert.AreEqual(ToList("4"), result[0].All());
+            CollectionAssert.AreEqual(ToList("5"), result[1].All());
+            CollectionAssert.AreEqual(ToList("b"), result[2].All());
         }
 
         private List<string> ToList(string item)

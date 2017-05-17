@@ -27,9 +27,61 @@ namespace UnitTests
             Assert.AreEqual("*", select.What[0]);
             Assert.AreEqual("Customers", select.TableName);
             Assert.IsNotNull(select.Condition);
-            Assert.AreEqual("CustomerID", select.Condition.ColumnName);
-            Assert.AreEqual("=", select.Condition.Operation);
-            Assert.AreEqual("1", select.Condition.Value);
+            var columnCondition = select.Condition as ColumnConditionNode;
+            Assert.AreEqual("CustomerID", columnCondition.ColumnName);
+            Assert.AreEqual("=", columnCondition.Operation);
+            Assert.AreEqual("1", columnCondition.Value);
+        }
+
+        [TestMethod]
+        public void ParseSelectWhereComposite2()
+        {
+            var tokens = new string[] { "SELECT", "*", "FROM", "t1", "WHERE", "c1", "=", "1", "AND", "c2", "=", "2", ";" };
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(SelectNode));
+            var select = (SelectNode)root;
+            Assert.AreEqual("*", select.What[0]);
+            Assert.AreEqual("t1", select.TableName);
+            Assert.IsNotNull(select.Condition);
+            var compositeCondition = select.Condition as CompositeConditionNode;
+            var columnCondition1 = compositeCondition.Left as ColumnConditionNode;
+            Assert.AreEqual("c1", columnCondition1.ColumnName);
+            Assert.AreEqual("=", columnCondition1.Operation);
+            Assert.AreEqual("1", columnCondition1.Value);
+            var columnCondition2 = compositeCondition.Right as ColumnConditionNode;
+            Assert.AreEqual("c2", columnCondition2.ColumnName);
+            Assert.AreEqual("=", columnCondition2.Operation);
+            Assert.AreEqual("2", columnCondition2.Value);
+        }
+
+        [TestMethod]
+        public void ParseSelectWhereComposite3()
+        {
+            var tokens = new string[] { "SELECT", "*", "FROM", "t1", "WHERE", "c1", "<", "1", "AND", "c2", "=", "2", "AND", "c3", ">", "3", ";" };
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(SelectNode));
+            var select = (SelectNode)root;
+            Assert.AreEqual("*", select.What[0]);
+            Assert.AreEqual("t1", select.TableName);
+            Assert.IsNotNull(select.Condition);
+            var compositeCondition1 = select.Condition as CompositeConditionNode;
+
+            var compositeCondition2 = compositeCondition1.Left as CompositeConditionNode;
+
+            var columnCondition1 = compositeCondition2.Left as ColumnConditionNode;
+            Assert.AreEqual("c1", columnCondition1.ColumnName);
+            Assert.AreEqual("<", columnCondition1.Operation);
+            Assert.AreEqual("1", columnCondition1.Value);
+
+            var columnCondition2 = compositeCondition2.Right as ColumnConditionNode;
+            Assert.AreEqual("c2", columnCondition2.ColumnName);
+            Assert.AreEqual("=", columnCondition2.Operation);
+            Assert.AreEqual("2", columnCondition2.Value);
+
+            var columnCondition3 = compositeCondition1.Right as ColumnConditionNode;
+            Assert.AreEqual("c3", columnCondition3.ColumnName);
+            Assert.AreEqual(">", columnCondition3.Operation);
+            Assert.AreEqual("3", columnCondition3.Value);
         }
 
         [TestMethod]
@@ -124,9 +176,10 @@ namespace UnitTests
             Assert.AreEqual("Alfred", update.Values[0]);
             Assert.AreEqual("Frankfurt", update.Values[1]);
             Assert.IsNotNull(update.Condition);
-            Assert.AreEqual("CustomerID", update.Condition.ColumnName);
-            Assert.AreEqual("=", update.Condition.Operation);
-            Assert.AreEqual("1", update.Condition.Value);
+            var columnCondition = update.Condition as ColumnConditionNode;
+            Assert.AreEqual("CustomerID", columnCondition.ColumnName);
+            Assert.AreEqual("=", columnCondition.Operation);
+            Assert.AreEqual("1", columnCondition.Value);
         }
     }
 }
