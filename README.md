@@ -11,8 +11,8 @@ create table, drop table
 
 insert, update, select
 
-## supported coditions
-=, >, <, >=, <=, <>
+## supported conditions
+=, >, <, >=, <=, <>, and, or
 
 ## supported column types
 int, varchar

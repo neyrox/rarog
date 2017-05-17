@@ -53,18 +53,18 @@ namespace Engine
             }
         }
 
-        public override List<int> Filter(ConditionNode conditionNode)
+        public override List<int> Filter(string operation, string value)
         {
             var result = new List<int>();
 
-            var condition = ConditionString.Transform(conditionNode);
+            var condition = ConditionString.Transform(operation, value);
             if (condition == null)
                 return result;
 
             for (int row = 0; row < values.Count; ++row)
             {
-                var value = values[row];
-                if (condition.Satisfies(value))
+                var val = values[row];
+                if (condition.Satisfies(val))
                     result.Add(row);
             }
 

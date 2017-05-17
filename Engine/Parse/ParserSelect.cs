@@ -23,7 +23,7 @@ namespace Engine
                 return null;
 
             ConditionNode condition = null;
-            if (ParserCommon.AssertToken("WHERE", tokens, pos))
+            if (ParserCommon.AssertUpperToken("WHERE", tokens, pos))
             {
                 ++pos;
 

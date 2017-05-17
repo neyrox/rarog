@@ -4,7 +4,7 @@ namespace Engine
 {
     public class Table
     {
-        private Dictionary<string, Column> columns = new Dictionary<string, Column>();
+        public Dictionary<string, Column> columns = new Dictionary<string, Column>();
         private List<int> allRows = new List<int>();
         private int rowCount = 0;
 
@@ -26,7 +26,7 @@ namespace Engine
 
         public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
         {
-            var rowsToUpdate = GetRowsThatSatisfies(condition);
+            var rowsToUpdate = condition.GetRowsThatSatisfy(this);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -66,7 +66,12 @@ namespace Engine
 
         public List<ResultColumnBase> Select(List<string> columnNames, ConditionNode condition)
         {
-            var rowsToSelect = GetRowsThatSatisfies(condition);
+            List<int> rowsToSelect = allRows;
+            // TODO: replace with empty condition
+            if (condition != null)
+            {
+                rowsToSelect = condition.GetRowsThatSatisfy(this);
+            }
 
             return Select(columnNames, rowsToSelect);
         }
@@ -102,17 +107,6 @@ namespace Engine
         {
             allRows.Add(rowCount);
             ++rowCount;
-        }
-
-        private List<int> GetRowsThatSatisfies(ConditionNode condition)
-        {
-            if (condition == null)
-            {
-                return allRows;
-            }
-
-            var resultRows = columns[condition.ColumnName].Filter(condition);
-            return resultRows;
         }
     }
 }

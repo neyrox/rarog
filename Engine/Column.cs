@@ -12,6 +12,6 @@ namespace Engine
 
         public abstract ResultColumnBase Get(List<int> rows);
 
-        public abstract List<int> Filter(ConditionNode condition);
+        public abstract List<int> Filter(string op, string value);
     }
 }

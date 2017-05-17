@@ -40,7 +40,7 @@ namespace UnitTests
         [TestMethod]
         public void CorrespondingRowSelected()
         {
-            var condition = new ConditionNode("c1", "=", "4");
+            var condition = new ColumnConditionNode("c1", "=", "4");
 
             var result = table.Select(new List<string> { "*" }, condition);
             Assert.AreEqual(3, result.Count);
@@ -52,7 +52,7 @@ namespace UnitTests
         [TestMethod]
         public void RowWhereIntEqualUpdated()
         {
-            var condition = new ConditionNode("c1", "=", "4");
+            var condition = new ColumnConditionNode("c1", "=", "4");
 
             table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
 
@@ -66,7 +66,7 @@ namespace UnitTests
         [TestMethod]
         public void RowWhereStringEqualUpdated()
         {
-            var condition = new ConditionNode("c3", "=", "a");
+            var condition = new ColumnConditionNode("c3", "=", "a");
 
             table.Update(new List<string> { "c2" }, new List<string> { "10" }, condition);
 

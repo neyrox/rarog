@@ -60,6 +60,8 @@
     <Compile Include="Result.cs" />
     <Compile Include="ResultColumnBase.cs" />
     <Compile Include="Shell.cs" />
+    <Compile Include="Statement\CompositeConditionNode.cs" />
+    <Compile Include="Statement\ColumnConditionNode.cs" />
     <Compile Include="Statement\ConditionNode.cs" />
     <Compile Include="Statement\CreateTableNode.cs" />
     <Compile Include="Statement\DropTableNode.cs" />

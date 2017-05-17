@@ -5,20 +5,20 @@ namespace Engine
     {
         public abstract bool Satisfies(string value);
 
-        public static ConditionString Transform(ConditionNode conditionNode)
+        public static ConditionString Transform(string operation, string value)
         {
-            if (conditionNode.Operation == "=")
-                return new ConditionStringEqual(conditionNode.Value);
-            else if (conditionNode.Operation == "<")
-                return new ConditionStringLess(conditionNode.Value);
-            else if (conditionNode.Operation == "<=")
-                return new ConditionStringLessOrEqual(conditionNode.Value);
-            else if (conditionNode.Operation == ">")
-                return new ConditionStringGreater(conditionNode.Value);
-            else if (conditionNode.Operation == ">=")
-                return new ConditionStringGreaterOrEqual(conditionNode.Value);
-            else if (conditionNode.Operation == "<>")
-                return new ConditionStringNotEqual(conditionNode.Value);
+            if (operation == "=")
+                return new ConditionStringEqual(value);
+            else if (operation == "<")
+                return new ConditionStringLess(value);
+            else if (operation == "<=")
+                return new ConditionStringLessOrEqual(value);
+            else if (operation == ">")
+                return new ConditionStringGreater(value);
+            else if (operation == ">=")
+                return new ConditionStringGreaterOrEqual(value);
+            else if (operation == "<>")
+                return new ConditionStringNotEqual(value);
             else
                 return null;
         }
