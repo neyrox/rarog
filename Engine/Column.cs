@@ -10,7 +10,7 @@ namespace Engine
 
         public abstract void Insert(string value);
 
-        public abstract ResultColumnBase Get(List<int> rows);
+        public abstract ResultColumn Get(List<int> rows);
 
         public abstract List<int> Filter(string op, string value);
 

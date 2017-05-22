@@ -2,15 +2,11 @@
 
 namespace Engine
 {
-    public class ResultColumnInteger: ResultColumnBase
+    public class ResultColumnInteger: ResultColumnBase<int>
     {
-        private readonly int[] values;
-
-        public override int Count { get { return values.Length; } }
-
         public ResultColumnInteger(int[] vals)
+            : base(vals)
         {
-            values = vals;
         }
 
         public override string Get(int index)

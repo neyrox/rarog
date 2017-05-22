@@ -17,7 +17,7 @@ namespace Engine
 
         public override List<int> GetRowsThatSatisfy(Table table)
         {
-            return table.columns[ColumnName].Filter(Operation, Value);
+            return table.GetColumn(ColumnName).Filter(Operation, Value);
         }
     }
 }

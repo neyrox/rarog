@@ -8,11 +8,11 @@ namespace Engine
         public static readonly Result OK = new Result(null, null);
 
         public readonly string Error;
-        public readonly List<ResultColumnBase> Columns;
+        public readonly List<ResultColumn> Columns;
 
         public bool IsOK { get { return Error == null; } }
 
-        public Result(List<ResultColumnBase> columns, string error = null)
+        public Result(List<ResultColumn> columns, string error = null)
         {
             Error = error;
             Columns = columns;

@@ -2,9 +2,8 @@
 
 namespace Engine
 {
-    public class ColumnVarChar: Column
+    public class ColumnVarChar: ColumnBase<string>
     {
-        private List<string> values = new List<string>();
         private readonly int maxLength;
 
         public ColumnVarChar(int maxLen)
@@ -15,8 +14,7 @@ namespace Engine
         public override void FullUpdate(string value)
         {
             var val = Clamp(value);
-            for (int row = 0; row < values.Count; ++row)
-                values[row] = val;
+            FullUpdateBase(val);
         }
 
         public override void Update(int row, string value)
@@ -29,7 +27,7 @@ namespace Engine
             values.Add(Clamp(value));
         }
 
-        public override ResultColumnBase Get(List<int> rows)
+        public override ResultColumn Get(List<int> rows)
         {
             var resultValues = new string[rows.Count];
             for (int i = 0; i < rows.Count; ++i)

@@ -2,15 +2,12 @@
 
 namespace Engine
 {
-    public class ColumnInteger: Column
+    public class ColumnInteger: ColumnBase<int>
     {
-        private List<int> values = new List<int>();
-
         public override void FullUpdate(string value)
         {
             int val = int.Parse(value);
-            for (int row = 0; row < values.Count; ++row)
-                values[row] = val;
+            FullUpdateBase(val);
         }
 
         public override void Update(int row, string value)
@@ -25,7 +22,7 @@ namespace Engine
             values.Add(val);
         }
 
-        public override ResultColumnBase Get(List<int> rows)
+        public override ResultColumn Get(List<int> rows)
         {
             var resultValues = new int[rows.Count];
             for (int i = 0; i < rows.Count; ++i)

@@ -14,5 +14,14 @@ namespace Engine
             TableName = tableName;
             Condition = condition;
         }
+
+        public override Result Execute(Database db)
+        {
+            if (!db.ContainsTable(TableName))
+                return Result.TableNotFound(TableName);
+
+            var rows = db.GetTable(TableName).Select(What, Condition);
+            return new Result(rows);
+        }
     }
 }

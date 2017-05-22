@@ -2,70 +2,30 @@
 
 namespace Engine
 {
-    // TODO: validate queries
     public class Database
     {
-        private static List<List<string>> emptyResult = new List<List<string>>();
         private Dictionary<string, Table> tables = new Dictionary<string, Table>();
 
-        public Result Execute(UpdateNode query)
+        public bool ContainsTable(string tableName)
         {
-            if (!tables.ContainsKey(query.TableName))
-                return Result.TableNotFound(query.TableName);
-
-            tables[query.TableName].Update(query.ColumnNames, query.Values, query.Condition);
-
-            return Result.OK;
+            return tables.ContainsKey(tableName);
         }
 
-        public Result Execute(CreateTableNode spec)
+        public Table GetTable(string tableName)
+        {
+            return tables[tableName];
+        }
+
+        public Table CreateTable(string tableName)
         {
             var table = new Table();
-            for (int i = 0; i < spec.ColumnNames.Count; ++i)
-            {
-                table.AddColumn(spec.ColumnNames[i], spec.DataTypes[i], spec.Lengths[i]);
-            }
-
-            tables.Add(spec.TableName, table);
-
-            return Result.OK;
+            tables.Add(tableName, table);
+            return table;
         }
 
-        public Result Execute(DropTableNode query)
+        public bool RemoveTable(string tableName)
         {
-            if (tables.Remove(query.TableName))
-                return Result.OK;
-            else
-                return Result.TableNotFound(query.TableName);
-        }
-
-        public Result Execute(InsertNode query)
-        {
-            if (!tables.ContainsKey(query.TableName))
-                return Result.TableNotFound(query.TableName);
-
-            tables[query.TableName].Insert(query.ColumnNames, query.Values);
-
-            return Result.OK;
-        }
-
-        public Result Execute(DeleteNode query)
-        {
-            if (!tables.ContainsKey(query.TableName))
-                return Result.TableNotFound(query.TableName);
-
-            tables[query.TableName].Delete(query.Condition);
-
-            return Result.OK;
-        }
-
-        public Result Execute(SelectNode query)
-        {
-            if (!tables.ContainsKey(query.TableName))
-                return Result.TableNotFound(query.TableName);
-
-            var rows = tables[query.TableName].Select(query.What, query.Condition);
-            return new Result(rows);
+            return tables.Remove(tableName);
         }
     }
 }

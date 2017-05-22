@@ -2,22 +2,15 @@
 
 namespace Engine
 {
-    public abstract class ResultColumnBase
+    public abstract class ResultColumnBase<T>: ResultColumn
     {
-        public abstract int Count { get; }
+        protected readonly T[] values;
 
-        public abstract string Get(int index);
+        public override int Count { get { return values.Length; } }
 
-        public List<string> All()
+        protected ResultColumnBase(T[] vals)
         {
-            var result = new List<string>(Count);
-
-            for (int i = 0; i < Count; ++i)
-            {
-                result.Add(Get(i));
-            }
-
-            return result;
+            values = vals;
         }
     }
 }
