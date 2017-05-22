@@ -14,5 +14,15 @@ namespace Engine
             ColumnNames = columnNames;
             Values = values;
         }
+
+        public override Result Execute(Database db)
+        {
+            if (!db.ContainsTable(TableName))
+                return Result.TableNotFound(TableName);
+
+            db.GetTable(TableName).Insert(ColumnNames, Values);
+
+            return Result.OK;
+        }
     }
 }

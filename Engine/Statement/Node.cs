@@ -1,7 +1,8 @@
 ﻿
 namespace Engine
 {
-    public class Node
+    public abstract class Node
     {
+        public abstract Result Execute(Database db);
     }
 }

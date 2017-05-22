@@ -10,5 +10,13 @@ namespace Engine
         {
             TableName = tableName;
         }
+
+        public override Result Execute(Database db)
+        {
+            if (db.RemoveTable(TableName))
+                return Result.OK;
+            else
+                return Result.TableNotFound(TableName);
+        }
     }
 }

@@ -16,5 +16,15 @@ namespace Engine
             Values = values;
             Condition = condition;
         }
+
+        public override Result Execute(Database db)
+        {
+            if (!db.ContainsTable(TableName))
+                return Result.TableNotFound(TableName);
+
+            db.GetTable(TableName).Update(ColumnNames, Values, Condition);
+
+            return Result.OK;
+        }
     }
 }

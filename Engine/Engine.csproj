@@ -39,11 +39,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColumnBase.cs" />
     <Compile Include="Column.cs" />
     <Compile Include="ColumnVarChar.cs" />
     <Compile Include="ConditionString.cs" />
     <Compile Include="ConditionInteger.cs" />
     <Compile Include="Parse\ParserDelete.cs" />
+    <Compile Include="ResultColumn.cs" />
     <Compile Include="ResultColumnString.cs" />
     <Compile Include="ResultColumnInteger.cs" />
     <Compile Include="ColumnInteger.cs" />

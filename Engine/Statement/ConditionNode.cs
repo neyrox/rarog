@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-    public abstract class ConditionNode: Node
+    public abstract class ConditionNode
     {
         public abstract List<int> GetRowsThatSatisfy(Table table);
     }

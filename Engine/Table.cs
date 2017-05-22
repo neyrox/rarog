@@ -4,9 +4,14 @@ namespace Engine
 {
     public class Table
     {
-        public Dictionary<string, Column> columns = new Dictionary<string, Column>();
+        private Dictionary<string, Column> columns = new Dictionary<string, Column>();
         private List<int> allRows = new List<int>();
         private int rowCount = 0;
+
+        public Column GetColumn(string name)
+        {
+            return columns[name];
+        }
 
         public void AddColumn(string name, string type, int length)
         {
@@ -64,7 +69,7 @@ namespace Engine
             AddRow();
         }
 
-        public List<ResultColumnBase> Select(List<string> columnNames, ConditionNode condition)
+        public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition)
         {
             List<int> rowsToSelect = allRows;
             // TODO: replace with empty condition
@@ -93,9 +98,9 @@ namespace Engine
             DeleteRows(rowsToDelete.Count);
         }
 
-        private List<ResultColumnBase> Select(List<string> columnNames, List<int> rows)
+        private List<ResultColumn> Select(List<string> columnNames, List<int> rows)
         {
-            var result = new List<ResultColumnBase>();
+            var result = new List<ResultColumn>();
 
             List<Column> columnsToQuery;
             if (columnNames[0] == "*")
