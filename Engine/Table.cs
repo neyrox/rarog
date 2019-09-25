@@ -4,8 +4,8 @@ namespace Engine
 {
     public class Table
     {
-        private Dictionary<string, Column> columns = new Dictionary<string, Column>();
-        private List<int> allRows = new List<int>();
+        private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
+        private readonly List<int> allRows = new List<int>();
         private int rowCount = 0;
 
         public Column GetColumn(string name)
