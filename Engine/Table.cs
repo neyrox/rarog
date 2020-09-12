@@ -5,9 +5,15 @@ namespace Engine
 {
     public class Table
     {
+        private readonly string tableName;
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
         private readonly List<int> allRows = new List<int>();
         private int rowCount = 0;
+
+        public Table(string name)
+        {
+            tableName = name;
+        }
 
         public Column GetColumn(string name)
         {
@@ -29,9 +35,16 @@ namespace Engine
                     AddColumn(name, new ColumnVarChar(length));
                     break;
                 default:
-                    // TODO: log error
-                    return;
+                    throw new Exception($"Unknown type {type}");
             }
+        }
+
+        public void DropColumn(string name)
+        {
+            if (columns.ContainsKey(name))
+                columns.Remove(name);
+            else
+                throw new Exception($"Column '{name}' not found in table '{tableName}'");
         }
 
         public void Update(List<string> columnNames, List<string> values, ConditionNode condition)

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿
 namespace Engine
 {
     public static class ParserAlterTable
@@ -19,19 +18,29 @@ namespace Engine
                 ++pos;
             }
             else
+            {
                 return null;
+            }
 
             if (ParserCommon.AssertUpperToken("ADD", tokens, pos))
-                ++pos;  // skip "ADD"
-            else
-                return null;
+                return ExtractAddColumn(tokens, tableName, ref pos);
 
-            var columnName = tokens[pos];  // TODO: check column names
+            if (ParserCommon.AssertUpperToken("DROP", tokens, pos))
+                return ExtractDropColumn(tokens, tableName, ref pos);
+
+            return null;
+        }
+
+        private static Node ExtractAddColumn(string[] tokens, string tableName, ref int pos)
+        {
+            ++pos; // skip "ADD"
+
+            var columnName = tokens[pos]; // TODO: check column names
             ++pos;
             if (pos >= tokens.Length)
                 return null;
 
-            var dataType = tokens[pos];  // TODO: check data types
+            var dataType = tokens[pos]; // TODO: check data types
             ++pos;
             if (pos >= tokens.Length)
                 return null;
@@ -60,6 +69,28 @@ namespace Engine
                 return null;
 
             return new AlterTableAddColumnNode(tableName, columnName, dataType, length);
+        }
+
+        private static Node ExtractDropColumn(string[] tokens, string tableName, ref int pos)
+        {
+            ++pos; // skip "DROP"
+
+            if (ParserCommon.AssertUpperToken("COLUMN", tokens, pos))
+                ++pos;  // skip "COLUMN"
+            else
+                return null;
+
+            var columnName = tokens[pos]; // TODO: check column names
+            ++pos;
+            if (pos >= tokens.Length)
+                return null;
+
+            if (ParserCommon.AssertToken(";", tokens, pos))
+                ++pos;
+            else
+                return null;
+
+            return new AlterTableDropColumnNode(tableName, columnName);
         }
     }
 }

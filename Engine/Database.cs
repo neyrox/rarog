@@ -18,7 +18,7 @@ namespace Engine
 
         public Table CreateTable(string tableName)
         {
-            var table = new Table();
+            var table = new Table(tableName);
             tables.Add(tableName, table);
             return table;
         }

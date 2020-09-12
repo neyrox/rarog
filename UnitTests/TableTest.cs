@@ -18,7 +18,7 @@ namespace UnitTests
         [TestInitialize]
         public void Setup()
         {
-            table = new Table();
+            table = new Table("t1");
             table.AddColumn("c1", "int", 0);
             table.AddColumn("c2", "double", 0);
             table.AddColumn("c3", "varchar", 255);
