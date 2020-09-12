@@ -2,11 +2,11 @@
 
 namespace Engine
 {
-    public static class ParserCreateTable
+    public static class ParserAlterTable
     {
         public static Node Convert(string[] tokens, ref int pos)
         {
-            ++pos;  // skip "CREATE"
+            ++pos;  // skip "ALTER"
             if (ParserCommon.AssertUpperToken("TABLE", tokens, pos))
                 ++pos;  // skip "TABLE"
             else
@@ -21,22 +21,45 @@ namespace Engine
             else
                 return null;
 
-            if (ParserCommon.AssertToken("(", tokens, pos))
-                ++pos;
+            if (ParserCommon.AssertUpperToken("ADD", tokens, pos))
+                ++pos;  // skip "ADD"
             else
                 return null;
 
-            var columnNames = new List<string>();
-            var dataTypes = new List<string>();
-            var lengths = new List<int>();
-            ConvertColumns(tokens, columnNames, dataTypes, lengths, ref pos);
+            var columnName = tokens[pos];  // TODO: check column names
+            ++pos;
+            if (pos >= tokens.Length)
+                return null;
+
+            var dataType = tokens[pos];  // TODO: check data types
+            ++pos;
+            if (pos >= tokens.Length)
+                return null;
+
+            int length;
+            if (ParserCommon.AssertToken("(", tokens, pos))
+            {
+                ++pos;
+                if (pos >= tokens.Length)
+                    return null;
+                length = int.Parse(tokens[pos]);
+                ++pos;
+                if (ParserCommon.AssertToken(")", tokens, pos))
+                    ++pos;
+                else
+                    return null;
+            }
+            else
+            {
+                length = 0;
+            }
 
             if (ParserCommon.AssertToken(";", tokens, pos))
                 ++pos;
             else
                 return null;
 
-            return new CreateTableNode(tableName, columnNames, dataTypes, lengths);
+            return new AlterTableAddColumnNode(tableName, columnName, dataType, length);
         }
 
         private static void ConvertColumns(string[] tokens, List<string> columnNames, List<string> dataTypes, List<int> lengths, ref int pos)

@@ -46,6 +46,7 @@
     <Compile Include="ConditionDouble.cs" />
     <Compile Include="ConditionString.cs" />
     <Compile Include="ConditionInteger.cs" />
+    <Compile Include="Parse\ParserAlterTable.cs" />
     <Compile Include="Parse\ParserDelete.cs" />
     <Compile Include="ResultColumn.cs" />
     <Compile Include="ResultColumnDouble.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Statement\CompositeConditionNode.cs" />
     <Compile Include="Statement\ColumnConditionNode.cs" />
     <Compile Include="Statement\ConditionNode.cs" />
+    <Compile Include="Statement\AlterTableAddColumnNode.cs" />
     <Compile Include="Statement\CreateTableNode.cs" />
     <Compile Include="Statement\DropTableNode.cs" />
     <Compile Include="Statement\InsertNode.cs" />

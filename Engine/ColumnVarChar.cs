@@ -6,6 +6,8 @@ namespace Engine
     {
         private readonly int maxLength;
 
+        public override string DefaultValue => "";
+
         public ColumnVarChar(int maxLen)
         {
             maxLength = maxLen;

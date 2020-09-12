@@ -21,6 +21,19 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void LexerSplitsAlterTableAddColumn()
+        {
+            var tokens = Lexer.Split("ALTER TABLE Persons ADD weight double;");
+            Assert.AreEqual("ALTER", tokens[0]);
+            Assert.AreEqual("TABLE", tokens[1]);
+            Assert.AreEqual("Persons", tokens[2]);
+            Assert.AreEqual("ADD", tokens[3]);
+            Assert.AreEqual("weight", tokens[4]);
+            Assert.AreEqual("double", tokens[5]);
+            Assert.AreEqual(";", tokens[6]);
+        }
+
+        [TestMethod]
         public void LexerSplitsSimpleDropTable()
         {
             var tokens = Lexer.Split("DROP TABLE Persons;");

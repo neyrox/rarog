@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Engine
 {
@@ -18,14 +19,14 @@ namespace Engine
             switch (type.ToLowerInvariant())
             {
                 case "int":
-                    columns.Add(name, new ColumnInteger());
+                    AddColumn(name, new ColumnInteger());
                     break;
                 case "float":
                 case "double":
-                    columns.Add(name, new ColumnDouble());
+                    AddColumn(name, new ColumnDouble());
                     break;
                 case "varchar":
-                    columns.Add(name, new ColumnVarChar(length));
+                    AddColumn(name, new ColumnVarChar(length));
                     break;
                 default:
                     // TODO: log error
@@ -100,6 +101,22 @@ namespace Engine
             }
 
             DeleteRows(rowsToDelete.Count);
+        }
+
+        private void AddColumn(string name, Column column)
+        {
+            if (columns.Count > 0)
+            {
+                using (var enumerator = columns.GetEnumerator())
+                {
+                    enumerator.MoveNext();
+                    var firstColumn = enumerator.Current.Value;
+                    for (int i = 0; i < firstColumn.Count; i++)
+                        column.Insert(column.DefaultValue);
+                }
+            }
+
+            columns.Add(name, column);
         }
 
         private List<ResultColumn> Select(List<string> columnNames, List<int> rows)
