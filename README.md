@@ -15,6 +15,6 @@ insert, update, select, delete
 =, >, <, >=, <=, <>, and, or
 
 ## supported column types
-int, varchar
+int, float(same as double), double, varchar
 
 
