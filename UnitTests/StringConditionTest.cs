@@ -16,11 +16,29 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void StringLessOrEqualToAString()
+        {
+            var condition = new ConditionStringLessOrEqual("bbb");
+            Assert.IsTrue(condition.Satisfies("aaa"));
+            Assert.IsTrue(condition.Satisfies("bbb"));
+            Assert.IsFalse(condition.Satisfies("ccc"));
+        }
+
+        [TestMethod]
         public void StringGreaterThenAString()
         {
             var condition = new ConditionStringGreater("bbb");
             Assert.IsTrue(condition.Satisfies("ccc"));
             Assert.IsFalse(condition.Satisfies("bbb"));
+            Assert.IsFalse(condition.Satisfies("aaa"));
+        }
+
+        [TestMethod]
+        public void StringGreaterOrEqualToAString()
+        {
+            var condition = new ConditionStringGreaterOrEqual("bbb");
+            Assert.IsTrue(condition.Satisfies("ccc"));
+            Assert.IsTrue(condition.Satisfies("bbb"));
             Assert.IsFalse(condition.Satisfies("aaa"));
         }
     }
