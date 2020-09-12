@@ -38,6 +38,21 @@ namespace UnitTests
             CollectionAssert.AreEqual(ToList("2"), select3.Columns[1].All());
             CollectionAssert.AreEqual(ToList("b"), select3.Columns[2].All());
 
+            var insert3 = shell.Execute("INSERT INTO t1 (c1, c2, c3) VALUES (1, 2, a);");
+            Assert.IsTrue(insert3.IsOK);
+            var select4 = shell.Execute("SELECT * FROM t1;");
+            Assert.AreEqual(3, select4.Columns.Count);
+            foreach (var column in select4.Columns)
+            {
+                Assert.AreEqual(2, column.Count);
+            }
+
+            var delete2 = shell.Execute("DELETE FROM t1 WHERE c3 = b;");
+            var select5 = shell.Execute("SELECT * FROM t1;");
+            CollectionAssert.AreEqual(ToList("1"), select5.Columns[0].All());
+            CollectionAssert.AreEqual(ToList("2"), select5.Columns[1].All());
+            CollectionAssert.AreEqual(ToList("a"), select5.Columns[2].All());
+
             var drop = shell.Execute("DROP TABLE t1;");
             Assert.IsTrue(drop.IsOK);
         }

@@ -110,7 +110,7 @@ namespace Engine
 
         public override bool Satisfies(int value)
         {
-            return value > origin;
+            return value >= origin;
         }
     }
 }

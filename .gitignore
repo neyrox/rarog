@@ -10,7 +10,7 @@
 # Solution settings #
 #####################
 *.suo
-
+.vs
 
 # Build folders #
 #################

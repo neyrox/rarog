@@ -4,8 +4,8 @@ namespace Engine
 {
     public class Table
     {
-        private Dictionary<string, Column> columns = new Dictionary<string, Column>();
-        private List<int> allRows = new List<int>();
+        private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
+        private readonly List<int> allRows = new List<int>();
         private int rowCount = 0;
 
         public Column GetColumn(string name)
@@ -19,6 +19,10 @@ namespace Engine
             {
                 case "int":
                     columns.Add(name, new ColumnInteger());
+                    break;
+                case "float":
+                case "double":
+                    columns.Add(name, new ColumnDouble());
                     break;
                 case "varchar":
                     columns.Add(name, new ColumnVarChar(length));

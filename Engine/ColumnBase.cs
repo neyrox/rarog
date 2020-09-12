@@ -12,5 +12,14 @@ namespace Engine
                 values[row] = value;
         }
 
+        // Precondition: rowsToDelete is a sorted list of indices
+        public override void Delete(List<int> rowsToDelete)
+        {
+            for (int i = rowsToDelete.Count - 1; i >= 0; i--)
+            {
+                var rowToDelete = rowsToDelete[i];
+                values.RemoveAt(rowToDelete);
+            }
+        }
     }
 }
