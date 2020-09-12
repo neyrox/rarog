@@ -20,6 +20,10 @@ namespace Engine
                 case "int":
                     columns.Add(name, new ColumnInteger());
                     break;
+                case "float":
+                case "double":
+                    columns.Add(name, new ColumnDouble());
+                    break;
                 case "varchar":
                     columns.Add(name, new ColumnVarChar(length));
                     break;
