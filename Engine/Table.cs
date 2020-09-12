@@ -1,12 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Engine
 {
     public class Table
     {
+        private readonly string tableName;
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
         private readonly List<int> allRows = new List<int>();
         private int rowCount = 0;
+
+        public Table(string name)
+        {
+            tableName = name;
+        }
 
         public Column GetColumn(string name)
         {
@@ -18,19 +25,26 @@ namespace Engine
             switch (type.ToLowerInvariant())
             {
                 case "int":
-                    columns.Add(name, new ColumnInteger());
+                    AddColumn(name, new ColumnInteger());
                     break;
                 case "float":
                 case "double":
-                    columns.Add(name, new ColumnDouble());
+                    AddColumn(name, new ColumnDouble());
                     break;
                 case "varchar":
-                    columns.Add(name, new ColumnVarChar(length));
+                    AddColumn(name, new ColumnVarChar(length));
                     break;
                 default:
-                    // TODO: log error
-                    return;
+                    throw new Exception($"Unknown type {type}");
             }
+        }
+
+        public void DropColumn(string name)
+        {
+            if (columns.ContainsKey(name))
+                columns.Remove(name);
+            else
+                throw new Exception($"Column '{name}' not found in table '{tableName}'");
         }
 
         public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
@@ -100,6 +114,22 @@ namespace Engine
             }
 
             DeleteRows(rowsToDelete.Count);
+        }
+
+        private void AddColumn(string name, Column column)
+        {
+            if (columns.Count > 0)
+            {
+                using (var enumerator = columns.GetEnumerator())
+                {
+                    enumerator.MoveNext();
+                    var firstColumn = enumerator.Current.Value;
+                    for (int i = 0; i < firstColumn.Count; i++)
+                        column.Insert(column.DefaultValue);
+                }
+            }
+
+            columns.Add(name, column);
         }
 
         private List<ResultColumn> Select(List<string> columnNames, List<int> rows)

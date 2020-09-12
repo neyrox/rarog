@@ -4,6 +4,10 @@ namespace Engine
 {
     public abstract class Column
     {
+        public abstract int Count { get; }
+
+        public abstract string DefaultValue { get; }
+
         public abstract void FullUpdate(string value);
 
         public abstract void Update(int row, string value);

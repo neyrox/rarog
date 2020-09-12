@@ -6,13 +6,13 @@ namespace Engine
     {
         public static Node Convert(string[] tokens, ref int pos)
         {
-            var what = new List<string>();
             ++pos;  // skip "CREATE"
             if (ParserCommon.AssertUpperToken("TABLE", tokens, pos))
                 ++pos;  // skip "TABLE"
             else
                 return null;
-            var tableName = string.Empty;
+
+            string tableName;
             if (pos < tokens.Length)
             {
                 tableName = tokens[pos];

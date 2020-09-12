@@ -4,6 +4,8 @@ namespace Engine
 {
     public class ColumnInteger: ColumnBase<int>
     {
+        public override string DefaultValue => "0";
+
         public override void FullUpdate(string value)
         {
             int val = int.Parse(value);

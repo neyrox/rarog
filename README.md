@@ -7,7 +7,7 @@ server mode not yet implemented - works via own shell (Rarog.exe)
 durability not yet implemented
 
 ## supported statements
-create table, drop table
+create table, drop table, alter table add/drop column
 
 insert, update, select, delete
 

@@ -27,6 +27,9 @@ namespace Engine
                     case "CREATE":
                         root = ParserCreateTable.Convert(tokens, ref pos);
                         break;
+                    case "ALTER":
+                        root = ParserAlterTable.Convert(tokens, ref pos);
+                        break;
                     case "DROP":
                         root = ParserDropTable.Convert(tokens, ref pos);
                         break;

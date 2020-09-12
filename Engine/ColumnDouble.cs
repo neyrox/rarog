@@ -4,6 +4,8 @@ namespace Engine
 {
     public class ColumnDouble: ColumnBase<double>
     {
+        public override string DefaultValue => "0";
+
         public override void FullUpdate(string value)
         {
             var val = double.Parse(value);

@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace Engine
 {
     public abstract class ColumnBase<T>: Column
     {
         protected List<T> values = new List<T>();
+
+        public override int Count => values.Count;
 
         protected void FullUpdateBase(T value)
         {

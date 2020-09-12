@@ -118,7 +118,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void ParseSropTable()
+        public void ParseDropTable()
         {
             var tokens = new string[] { "DROP", "TABLE", "Persons", ";"};
             var root = Parser.Convert(tokens);
