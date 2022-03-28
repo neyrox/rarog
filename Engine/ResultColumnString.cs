@@ -13,5 +13,10 @@ namespace Engine
         {
             return values[index];
         }
+
+        public override void Accept(IResultColumnVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

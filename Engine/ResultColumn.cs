@@ -19,5 +19,7 @@ namespace Engine
 
             return result;
         }
+
+        public abstract void Accept(IResultColumnVisitor visitor);
     }
 }

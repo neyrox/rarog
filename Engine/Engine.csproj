@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>7</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -48,6 +50,7 @@
     <Compile Include="ConditionDouble.cs" />
     <Compile Include="ConditionString.cs" />
     <Compile Include="ConditionInteger.cs" />
+    <Compile Include="IResultColumnVisitor.cs" />
     <Compile Include="Parse\ParserAlterTable.cs" />
     <Compile Include="Parse\ParserDelete.cs" />
     <Compile Include="ResultColumn.cs" />
@@ -68,6 +71,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="ResultColumnBase.cs" />
+    <Compile Include="Serialization\BytePacker.cs" />
+    <Compile Include="Serialization\ResultPacker.cs" />
     <Compile Include="Shell.cs" />
     <Compile Include="Statement\AlterTableDropColumnNode.cs" />
     <Compile Include="Statement\CompositeConditionNode.cs" />

@@ -13,5 +13,10 @@ namespace Engine
         {
             return values[index].ToString(CultureInfo.InvariantCulture);
         }
+
+        public override void Accept(IResultColumnVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

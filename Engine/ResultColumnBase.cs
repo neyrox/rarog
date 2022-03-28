@@ -8,6 +8,8 @@ namespace Engine
 
         public override int Count { get { return values.Length; } }
 
+        public T this[int idx] { get { return values[idx]; } }
+
         protected ResultColumnBase(T[] vals)
         {
             values = vals;
