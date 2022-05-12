@@ -23,3 +23,7 @@ packages
 /Rarog/obj
 /UnitTests/bin
 /UnitTests/obj
+/Server/bin
+/Server/obj
+/ConsoleClient/bin
+/ConsoleClient/obj

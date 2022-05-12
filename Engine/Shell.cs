@@ -13,14 +13,21 @@ namespace Engine
 
         public Result Execute(string query)
         {
-            var tokens = Lexer.Split(query);
-            var command = Parser.Convert(tokens);
+            try
+            {
+                var tokens = Lexer.Split(query);
+                var command = Parser.Convert(tokens);
 
-            // TODO: replace with empty command
-            if (command != null)
-                return command.Execute(db);
-            else
+                // TODO: replace with empty command
+                if (command != null)
+                    return command.Execute(db);
+
                 throw new Exception("wrong query");
+            }
+            catch (Exception e)
+            {
+                return new Result(null, e.Message);
+            }
         }
     }
 }
