@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using Engine;
 
 namespace Server
 {
     class Program
     {
+        // Thread signal.
+        private static readonly ManualResetEvent _tcpClientConnected = new ManualResetEvent(false);
+        private static readonly Database _db = new Database();
+        private static readonly Shell _shell = new Shell(_db);
+        // TODO: implement removal on disconnect
+        private static readonly ConcurrentBag<NetClient> _clients = new ConcurrentBag<NetClient>();
+
         static void Main(string[] args)
         {
-            var db = new Database();
-            var shell = new Shell(db);
-
             TcpListener server=null;
             try
             {
@@ -24,7 +30,6 @@ namespace Server
 
                 // Start listening for client requests.
                 server.Start();
-
             }
             catch(SocketException e)
             {
@@ -48,12 +53,7 @@ namespace Server
                 // Enter the listening loop.
                 while(true)
                 {
-                    Console.Write("Waiting for a connection... ");
-
-                    // Perform a blocking call to accept requests.
-                    // You could also use server.AcceptSocket() here.
-                    TcpClient client = server.AcceptTcpClient();
-                    HandleClient(client, shell);
+                    BeginAcceptClient(server);
                 }
             }
             catch(SocketException e)
@@ -65,42 +65,45 @@ namespace Server
                 // Stop listening for new clients.
                 server.Stop();
             }
-
         }
 
-        private static void HandleClient(TcpClient client, Shell shell)
+        // Accept one client connection asynchronously.
+        private static void BeginAcceptClient(TcpListener listener)
         {
-            Console.WriteLine("Connected!");
+            // Set the event to nonsignaled state.
+            _tcpClientConnected.Reset();
 
-            // Buffer for reading data
-            Byte[] bytes = new Byte[65536];
-            String query = null;
+            // Start to listen for connections from a client.
+            Console.WriteLine("Waiting for a connection...");
 
-            // Get a stream object for reading and writing
-            NetworkStream stream = client.GetStream();
+            // Accept the connection.
+            // BeginAcceptSocket() creates the accepted socket.
+            listener.BeginAcceptTcpClient(EndAccept, listener);
 
-            int i;
+            // Wait until a connection is made and processed before
+            // continuing.
+            _tcpClientConnected.WaitOne();
+        }
 
-            // Loop to receive all the data sent by the client.
-            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                // Translate data bytes to a ASCII string.
-                query = System.Text.Encoding.UTF8.GetString(bytes, 0, i);
-                Console.WriteLine("Received: {0}", query);
+        // Process the client connection.
+        private static void EndAccept(IAsyncResult ar)
+        {
+            // Get the listener that handles the client request.
+            var listener = (TcpListener)ar.AsyncState;
 
-                // Process the data sent by the client.
-                var result = shell.Execute(query);
-                var packer = new Engine.Serialization.MPackResultPacker();
+            // End the operation and display the received data on
+            // the console.
+            var client = listener.EndAcceptTcpClient(ar);
 
-                byte[] msg = packer.PackResult(result);
+            // Process the connection here. (Add the client to a
+            // server table, read data, etc.)
+            Console.WriteLine("Client connected");
+            NetClient netClient = new NetClient(client, _shell);
+            _clients.Add(netClient);
+            netClient.Serve();
 
-                // Send back a response.
-                stream.Write(msg, 0, msg.Length);
-                Console.WriteLine("Sent: {0} bytes", msg.Length);
-            }
-
-            // Shutdown and end connection
-            client.Close();
+            // Signal the calling thread to continue.
+            _tcpClientConnected.Set();
         }
     }
 }

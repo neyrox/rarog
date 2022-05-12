@@ -5,6 +5,7 @@ namespace Engine
     public class Shell
     {
         private Database db;
+        private object mutex = new object();
 
         public Shell(Database database)
         {
@@ -20,7 +21,12 @@ namespace Engine
 
                 // TODO: replace with empty command
                 if (command != null)
-                    return command.Execute(db);
+                {
+                    lock (mutex)
+                    {
+                        return command.Execute(db);
+                    }
+                }
 
                 throw new Exception("wrong query");
             }
