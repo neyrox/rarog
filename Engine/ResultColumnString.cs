@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Engine
+﻿namespace Engine
 {
     public class ResultColumnString: ResultColumnBase<string>
     {
