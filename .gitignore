@@ -11,9 +11,12 @@
 #####################
 *.suo
 .vs
+.idea
+*.DotSettings.user
 
 # Build folders #
 #################
+packages
 /Engine/bin
 /Engine/obj
 /Rarog/bin
