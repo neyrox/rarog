@@ -17,13 +17,17 @@
 # Build folders #
 #################
 packages
+/Common/bin
+/Common/obj
 /Engine/bin
 /Engine/obj
-/Rarog/bin
-/Rarog/obj
-/UnitTests/bin
-/UnitTests/obj
 /Server/bin
 /Server/obj
+/Client/bin
+/Client/obj
 /ConsoleClient/bin
 /ConsoleClient/obj
+/UnitTests/bin
+/UnitTests/obj
+/Rarog/bin
+/Rarog/obj

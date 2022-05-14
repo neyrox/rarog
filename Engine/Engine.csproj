@@ -4,7 +4,6 @@
     <AssemblyTitle>Engine</AssemblyTitle>
     <Product>Engine</Product>
     <Copyright>Copyright ©  2017</Copyright>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -15,6 +14,6 @@
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MPack" Version="1.1.0.10" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 </Project>
