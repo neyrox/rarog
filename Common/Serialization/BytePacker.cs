@@ -118,6 +118,20 @@ namespace Engine.Serialization
             return doubleValue;
         }
 
+        public static void PackString8(byte[] buffer, string val, ref int offset)
+        {
+            int len = 0;
+            if (val != null)
+            {
+                len = Encoding.UTF8.GetBytes(val, 0, val.Length, buffer, offset + 1);
+                if (len >= 256)
+                    throw new ArgumentOutOfRangeException(nameof(val), "Can't pack string with more than 255 bytes");
+            }
+
+            buffer[offset++] = (byte)len;
+            offset += len;
+        }
+
         public static void PackString16(byte[] buffer, string val, ref int offset)
         {
             int len = 0;
@@ -125,7 +139,7 @@ namespace Engine.Serialization
             {
                 len = Encoding.UTF8.GetBytes(val, 0, val.Length, buffer, offset + 2);
                 if (len >= 65536)
-                    throw new ArgumentOutOfRangeException(nameof(val), "Cant't pacl string with more than 65535 bytes");
+                    throw new ArgumentOutOfRangeException(nameof(val), "Can't pack string with more than 65535 bytes");
             }
 
             buffer[offset++] = (byte)(len);
@@ -137,6 +151,17 @@ namespace Engine.Serialization
         {
             int len = buffer[offset++];
             len += (buffer[offset++] << 8);
+            if (len == 0)
+                return null;
+
+            var val = Encoding.UTF8.GetString(buffer, offset, len);
+            offset += len;
+            return val;
+        }
+
+        public static string UnpackString8(byte[] buffer, ref int offset)
+        {
+            int len = buffer[offset++];
             if (len == 0)
                 return null;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using Engine;
 using Rarog;
 
 namespace ConsoleClient
@@ -21,7 +22,8 @@ namespace ConsoleClient
                     if (lq == "quit" || lq == "exit")
                         break;
 
-                    Perform(dbConn, query);
+                    var result = dbConn.Perform(query);
+                    Print(result);
                 }
 
                 // Close everything.
@@ -37,9 +39,8 @@ namespace ConsoleClient
             }
         }
 
-        static void Perform(Connection dbConn, string query)
+        static void Print(Result result)
         {
-            var result = dbConn.Perform(query);
             if (result.IsOK)
             {
                 if (result.Columns == null || result.Columns.Count == 0)
@@ -48,15 +49,45 @@ namespace ConsoleClient
                     return;
                 }
 
-                int rowCount = result.Columns[0].Count;
                 int colCount = result.Columns.Count;
+                var maxWidths = new int[colCount];
+                for (int i = 0; i < colCount; ++i)
+                {
+                    var column = result.Columns[i];
+                    var maxWidth = column.Name.Length;
+                    for (int j = 0; j < column.Count; ++j)
+                    {
+                        var cellLength = column.Get(j).Length;
+                        if (cellLength > maxWidth)
+                            maxWidth = cellLength;
+                    }
+                    maxWidths[i] = maxWidth;
+                }
 
+                for (int i = 0; i < colCount; ++i)
+                {
+                    var column = result.Columns[i];
+                    Console.Write(column.Name.PadRight(maxWidths[i]));
+                    if (i < (colCount - 1))
+                        Console.Write(" | ");
+                }
+                Console.WriteLine("");
+                for (int i = 0; i < colCount; ++i)
+                {
+                    for (int j = 0; j < maxWidths[i]; ++j)
+                        Console.Write("-");
+                    if (i < (colCount - 1))
+                        Console.Write("-+-");
+                }
+                Console.WriteLine("");
+
+                int rowCount = result.Columns[0].Count;
                 for (int i = 0; i < rowCount; ++i)
                 {
                     for (int j = 0; j < colCount; ++j)
                     {
                         var column = result.Columns[j];
-                        Console.Write(column.Get(i));
+                        Console.Write(column.Get(i).PadRight(maxWidths[j]));
                         if (j < (colCount - 1))
                             Console.Write(" | ");
                     }

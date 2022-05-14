@@ -31,6 +31,7 @@ namespace Engine.Serialization
                 for (int i = 0; i < res.Columns.Count; ++i)
                 {
                     var column = res.Columns[i];
+                    BytePacker.PackString8(_buffer, column.Name, ref _offset);
                     BytePacker.PackSInt32(_buffer, column.Count, ref _offset);
                     column.Accept(this);
                 }
@@ -62,6 +63,7 @@ namespace Engine.Serialization
 
         public ResultColumn UnpackColumn(byte[] buffer, ref int offset)
         {
+            var name = BytePacker.UnpackString8(buffer, ref offset);
             var itemsCount = BytePacker.UnpackSInt32(buffer, ref offset);
             var columnType = (ColumnType)BytePacker.UnpackUInt8(buffer, ref offset);
             switch (columnType)
@@ -73,7 +75,7 @@ namespace Engine.Serialization
                     {
                         items[i] = BytePacker.UnpackSInt32(buffer, ref offset);
                     }
-                    return new ResultColumnInteger(items);
+                    return new ResultColumnInteger(name, items);
                 }
                 case ColumnType.ColumnDouble:
                 {
@@ -82,7 +84,7 @@ namespace Engine.Serialization
                     {
                         items[i] = BytePacker.UnpackDouble(buffer, ref offset);
                     }
-                    return new ResultColumnDouble(items);
+                    return new ResultColumnDouble(name, items);
                 }
                 case ColumnType.ColumnString:
                 {
@@ -91,7 +93,7 @@ namespace Engine.Serialization
                     {
                         items[i] = BytePacker.UnpackString16(buffer, ref offset);
                     }
-                    return new ResultColumnString(items);
+                    return new ResultColumnString(name, items);
                 }
             }
 

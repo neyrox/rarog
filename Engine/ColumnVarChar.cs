@@ -8,8 +8,9 @@ namespace Engine
 
         public override string DefaultValue => "";
 
-        public ColumnVarChar(int maxLen)
+        public ColumnVarChar(string name, int maxLen)
         {
+            Name = name;
             maxLength = maxLen;
         }
 
@@ -37,7 +38,7 @@ namespace Engine
                 resultValues[i] = values[rows[i]];
             }
 
-            return new ResultColumnString(resultValues);
+            return new ResultColumnString(Name, resultValues);
         }
 
         private string Clamp(string value)

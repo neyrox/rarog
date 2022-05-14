@@ -2,8 +2,8 @@
 {
     public class ResultColumnString: ResultColumnBase<string>
     {
-        public ResultColumnString(string[] vals)
-            : base(vals)
+        public ResultColumnString(string name, string[] vals)
+            : base(name, vals)
         {
         }
 

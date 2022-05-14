@@ -8,7 +8,8 @@
 
         public T this[int idx] { get { return values[idx]; } }
 
-        protected ResultColumnBase(T[] vals)
+        protected ResultColumnBase(string name, T[] vals)
+            : base(name)
         {
             values = vals;
         }

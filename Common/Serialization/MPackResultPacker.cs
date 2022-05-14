@@ -66,6 +66,7 @@ namespace Engine.Serialization
 
         public ResultColumn UnpackColumn(MPackMap srcCol)
         {
+            var columnName = srcCol["Name"].To<string>();
             var columnType = srcCol["Type"].To<string>();
             var columnVals = srcCol["Vals"] as MPackArray;
             var itemsCount = columnVals.Count;
@@ -79,7 +80,7 @@ namespace Engine.Serialization
                     {
                         items[i] = columnVals[i].To<int>();
                     }
-                    return new ResultColumnInteger(items);
+                    return new ResultColumnInteger(columnName, items);
                 }
                 case "Dbl":
                 {
@@ -88,7 +89,7 @@ namespace Engine.Serialization
                     {
                         items[i] = columnVals[i].To<double>();
                     }
-                    return new ResultColumnDouble(items);
+                    return new ResultColumnDouble(columnName, items);
                 }
                 case "Str":
                 {
@@ -97,7 +98,7 @@ namespace Engine.Serialization
                     {
                         items[i] = columnVals[i].To<string>();
                     }
-                    return new ResultColumnString(items);
+                    return new ResultColumnString(columnName, items);
                 }
             }
 
@@ -114,6 +115,7 @@ namespace Engine.Serialization
 
             var col = new MPackMap
             {
+                {"Name", column.Name},
                 {"Type", "Dbl"},
                 {"Vals", vals}
             };
@@ -131,6 +133,7 @@ namespace Engine.Serialization
 
             var col = new MPackMap
             {
+                {"Name", column.Name},
                 {"Type", "Int"},
                 {"Vals", vals}
             };
@@ -148,6 +151,7 @@ namespace Engine.Serialization
 
             var col = new MPackMap
             {
+                {"Name", column.Name},
                 {"Type", "Str"},
                 {"Vals", vals}
             };

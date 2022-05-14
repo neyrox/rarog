@@ -10,9 +10,9 @@ namespace UnitTests
         [TestMethod]
         public void MPackSerializeResultWithColumns()
         {
-            var dColumn = new ResultColumnDouble(new double[] { -0.001, 0, 0.002 });
-            var iColumn = new ResultColumnInteger(new int[] { 42, 333 });
-            var sColumn = new ResultColumnString(new string[] { "a string" });
+            var dColumn = new ResultColumnDouble("dc", new double[] { -0.001, 0, 0.002 });
+            var iColumn = new ResultColumnInteger("ic", new int[] { 42, 333 });
+            var sColumn = new ResultColumnString("sc", new string[] { "a string" });
 
             var columns = new List<ResultColumn> { dColumn, iColumn, sColumn };
 
@@ -29,6 +29,9 @@ namespace UnitTests
             Assert.IsInstanceOfType(result.Columns[0], typeof(ResultColumnDouble));
             Assert.IsInstanceOfType(result.Columns[1], typeof(ResultColumnInteger));
             Assert.IsInstanceOfType(result.Columns[2], typeof(ResultColumnString));
+            Assert.AreEqual(result.Columns[0].Name, outRes.Columns[0].Name);
+            Assert.AreEqual(result.Columns[1].Name, outRes.Columns[1].Name);
+            Assert.AreEqual(result.Columns[2].Name, outRes.Columns[2].Name);
             Assert.AreEqual(result.Columns[0].Count, outRes.Columns[0].Count);
             Assert.AreEqual(result.Columns[1].Count, outRes.Columns[1].Count);
             Assert.AreEqual(result.Columns[2].Count, outRes.Columns[2].Count);

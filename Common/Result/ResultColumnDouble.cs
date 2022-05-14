@@ -4,8 +4,8 @@ namespace Engine
 {
     public class ResultColumnDouble: ResultColumnBase<double>
     {
-        public ResultColumnDouble(double[] vals)
-            : base(vals)
+        public ResultColumnDouble(string name, double[] vals)
+            : base(name, vals)
         {
         }
 

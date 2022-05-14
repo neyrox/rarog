@@ -25,14 +25,14 @@ namespace Engine
             switch (type.ToLowerInvariant())
             {
                 case "int":
-                    AddColumn(name, new ColumnInteger());
+                    AddColumn(name, new ColumnInteger(name));
                     break;
                 case "float":
                 case "double":
-                    AddColumn(name, new ColumnDouble());
+                    AddColumn(name, new ColumnDouble(name));
                     break;
                 case "varchar":
-                    AddColumn(name, new ColumnVarChar(length));
+                    AddColumn(name, new ColumnVarChar(name, length));
                     break;
                 default:
                     throw new Exception($"Unknown type {type}");

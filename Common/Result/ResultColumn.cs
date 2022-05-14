@@ -4,6 +4,13 @@ namespace Engine
 {
     public abstract class ResultColumn
     {
+        public string Name;
+
+        public ResultColumn(string name)
+        {
+            Name = name;
+        }
+
         public abstract int Count { get; }
 
         public abstract string Get(int index);

@@ -2,8 +2,8 @@
 {
     public class ResultColumnInteger: ResultColumnBase<int>
     {
-        public ResultColumnInteger(int[] vals)
-            : base(vals)
+        public ResultColumnInteger(string name, int[] vals)
+            : base(name, vals)
         {
         }
 

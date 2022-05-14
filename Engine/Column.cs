@@ -4,6 +4,8 @@ namespace Engine
 {
     public abstract class Column
     {
+        public string Name;
+
         public abstract int Count { get; }
 
         public abstract string DefaultValue { get; }

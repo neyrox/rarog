@@ -6,6 +6,11 @@ namespace Engine
     {
         public override string DefaultValue => "0";
 
+        public ColumnDouble(string name)
+        {
+            Name = name;
+        }
+
         public override void FullUpdate(string value)
         {
             var val = double.Parse(value);
@@ -32,7 +37,7 @@ namespace Engine
                 resultValues[i] = values[rows[i]];
             }
 
-            return new ResultColumnDouble(resultValues);
+            return new ResultColumnDouble(Name, resultValues);
         }
 
         public override List<int> Filter(string op, string value)
