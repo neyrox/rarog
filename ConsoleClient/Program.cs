@@ -43,7 +43,10 @@ namespace ConsoleClient
             if (result.IsOK)
             {
                 if (result.Columns == null || result.Columns.Count == 0)
+                {
+                    Console.WriteLine("OK");
                     return;
+                }
 
                 int rowCount = result.Columns[0].Count;
                 int colCount = result.Columns.Count;

@@ -7,12 +7,16 @@ namespace Server
     public class NetClient
     {
         private readonly TcpClient _client;
+        private readonly NetworkStream _stream;
         private readonly Shell _shell;
+        private readonly byte[] _requestLength = new byte[4];
 
         public NetClient(TcpClient client, Shell shell)
         {
             _client = client;
             _shell = shell;
+
+            _stream = _client.GetStream();
         }
 
         public void Serve()
@@ -23,16 +27,29 @@ namespace Server
         private void BeginRead()
         {
             // TODO: implement framing
-            var buffer = new byte[65536];
-            var stream = _client.GetStream();
-            stream.BeginRead(buffer, 0, buffer.Length, EndRead, buffer);
+            _stream.BeginRead(_requestLength, 0, _requestLength.Length, EndReadHeader, null);
         }
 
-        private void EndRead(IAsyncResult asyncResult)
+        private void EndReadHeader(IAsyncResult asyncResult)
+        {
+            var bytesAvailable = _stream.EndRead(asyncResult);
+            if (bytesAvailable != 4)
+            {
+                //handle loading more
+                return;
+            }
+
+            int length = BitConverter.ToInt32(_requestLength);
+
+            // TODO: use pools
+            var buffer = new byte[length];
+            _stream.BeginRead(buffer, 0, buffer.Length, EndReadBody, buffer);
+        }
+
+        private void EndReadBody(IAsyncResult asyncResult)
         {
             var buffer = (byte[])asyncResult.AsyncState;
-            var stream = _client.GetStream();
-            var bytesAvailable = stream.EndRead(asyncResult);
+            var bytesAvailable = _stream.EndRead(asyncResult);
 
             var query = System.Text.Encoding.UTF8.GetString(buffer, 0, bytesAvailable);
             Console.WriteLine("Received: {0}", query);
@@ -44,10 +61,17 @@ namespace Server
             byte[] resp = packer.PackResult(result);
 
             // Send back a response.
-            stream.BeginWrite(resp, 0, resp.Length, EndSend, resp);
+            var head = BitConverter.GetBytes(resp.Length);
+            _stream.BeginWrite(head, 0, head.Length, EndSendHeader, resp);
         }
-        
-        private void EndSend(IAsyncResult result)
+
+        private void EndSendHeader(IAsyncResult result)
+        {
+            var buffer = (byte[])result.AsyncState;
+            _stream.BeginWrite(buffer, 0, buffer.Length, EndSendBody, buffer);
+        }
+
+        private void EndSendBody(IAsyncResult result)
         {
             var buffer = (byte[])result.AsyncState;
             Console.WriteLine("Sent {0} bytes to client", buffer.Length);

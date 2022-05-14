@@ -27,24 +27,25 @@ namespace Rarog
             var data = System.Text.Encoding.UTF8.GetBytes(query);
 
             // Send the message to the connected TcpServer.
+            _stream.Write(BitConverter.GetBytes(data.Length), 0, sizeof(int));
             _stream.Write(data, 0, data.Length);
-            
-            Console.WriteLine("Sent: {0}", query);
 
             // Receive the Server response.
+            data = new byte[sizeof(int)];
+            var bytes = _stream.Read(data, 0, data.Length);
+            var bodyLength = BitConverter.ToInt32(data, 0);
 
             // Buffer to store the response bytes.
-            data = new Byte[65536];
+            var body = new byte[bodyLength];
 
-            // Read the first batch of the TcpServer response bytes.
-            var bytes = _stream.Read(data, 0, data.Length);
+            bytes = _stream.Read(body, 0, body.Length);
             Console.WriteLine("Received: {0} bytes", bytes);
-            
-            var resultBytes = new byte[bytes];
+
+            //var resultBytes = new byte[bytes];
             // TODO: get rid of copying here
-            Array.Copy(data, resultBytes, bytes);
+            //Array.Copy(data, resultBytes, bytes);
             var packer = new Engine.Serialization.MPackResultPacker();
-            var result = packer.UnpackResult(resultBytes);
+            var result = packer.UnpackResult(body);
             return result;
         }
 
