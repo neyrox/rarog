@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Engine
 {
@@ -17,24 +18,27 @@ namespace Engine
             FullUpdateBase(val);
         }
 
-        public override void Update(int row, string value)
+        public override void Update(int idx, string value)
         {
             var val = double.Parse(value);
-            values[row] = val;
+            idxValues[idx] = val;
         }
 
-        public override void Insert(string value)
+        public override void Insert(int idx, string value)
         {
             var val = double.Parse(value);
-            values.Add(val);
+            idxValues.Add(idx, val);
         }
 
-        public override ResultColumn Get(List<int> rows)
+        public override ResultColumn Get(List<int> idxs)
         {
-            var resultValues = new double[rows.Count];
-            for (int i = 0; i < rows.Count; ++i)
+            if (idxs == null)
+                return new ResultColumnDouble(Name, idxValues.Values.ToArray());
+
+            var resultValues = new double[idxs.Count];
+            for (int i = 0; i < idxs.Count; ++i)
             {
-                resultValues[i] = values[rows[i]];
+                resultValues[i] = idxValues[idxs[i]];
             }
 
             return new ResultColumnDouble(Name, resultValues);
@@ -48,27 +52,13 @@ namespace Engine
             if (condition == null)
                 return result;
 
-            for (int row = 0; row < values.Count; ++row)
+            foreach (var iv in idxValues)
             {
-                var val = values[row];
-                if (condition.Satisfies(val))
-                    result.Add(row);
+                if (condition.Satisfies(iv.Value))
+                    result.Add(iv.Key);
             }
 
             return result;
-        }
-
-        public override void Delete(List<int> rowsToDelete)
-        {
-            // TODO: optimize
-            var newValues = new List<double>(values.Count - rowsToDelete.Count);
-            var rowSet = new HashSet<int>(rowsToDelete);
-            for (int i = 0; i < values.Count; ++i)
-            {
-                if (!rowSet.Contains(i))
-                    newValues.Add(values[i]);
-            }
-            values = newValues;
         }
     }
 }

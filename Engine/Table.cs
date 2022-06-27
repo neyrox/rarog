@@ -7,8 +7,7 @@ namespace Engine
     {
         private readonly string tableName;
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
-        private readonly List<int> allRows = new List<int>();
-        private int rowCount = 0;
+        private int nextIdx = 0;
 
         public Table(string name)
         {
@@ -68,12 +67,13 @@ namespace Engine
         {
             var allColumnNames = new HashSet<string>(columns.Keys);
             var insertingColumnNames = new HashSet<string>(columnNames);
+
             foreach (var columnName in allColumnNames)
             {
                 if (insertingColumnNames.Contains(columnName))
                     continue;
 
-                columns[columnName].Insert(null);
+                columns[columnName].Insert(nextIdx, null);
             }
 
             for (int i = 0; i < columnNames.Count; ++i)
@@ -81,7 +81,7 @@ namespace Engine
                 var columnName = columnNames[i];
                 var value = values[i];
 
-                columns[columnName].Insert(value);
+                columns[columnName].Insert(nextIdx, value);
             }
 
             AddRow();
@@ -89,8 +89,8 @@ namespace Engine
 
         public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition)
         {
-            List<int> rowsToSelect = allRows;
-            // TODO: replace with empty condition
+            List<int> rowsToSelect = null;
+            // TODO: replace with empty condition?
             if (condition != null)
             {
                 rowsToSelect = condition.GetRowsThatSatisfy(this);
@@ -101,8 +101,8 @@ namespace Engine
 
         public void Delete(ConditionNode condition)
         {
-            List<int> rowsToDelete = allRows;
-            // TODO: replace with empty condition
+            List<int> rowsToDelete = null;
+            // TODO: replace with empty condition?
             if (condition != null)
             {
                 rowsToDelete = condition.GetRowsThatSatisfy(this);
@@ -112,8 +112,6 @@ namespace Engine
             {
                 column.Value.Delete(rowsToDelete);
             }
-
-            DeleteRows(rowsToDelete.Count);
         }
 
         private void AddColumn(string name, Column column)
@@ -124,8 +122,9 @@ namespace Engine
                 {
                     enumerator.MoveNext();
                     var firstColumn = enumerator.Current.Value;
-                    for (int i = 0; i < firstColumn.Count; i++)
-                        column.Insert(column.DefaultValue);
+                    var indices = firstColumn.Indices;
+                    foreach (var idx in indices)
+                        column.Insert(idx, column.DefaultValue);
                 }
             }
 
@@ -161,14 +160,7 @@ namespace Engine
 
         private void AddRow()
         {
-            allRows.Add(rowCount);
-            ++rowCount;
-        }
-
-        private void DeleteRows(int amount)
-        {
-            rowCount -= amount;
-            allRows.RemoveRange(allRows.Count - amount, amount);
+            ++nextIdx;
         }
     }
 }

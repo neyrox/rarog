@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Engine
 {
@@ -20,22 +21,25 @@ namespace Engine
             FullUpdateBase(val);
         }
 
-        public override void Update(int row, string value)
+        public override void Update(int idx, string value)
         {
-            values[row] = Clamp(value);
+            idxValues[idx] = Clamp(value);
         }
 
-        public override void Insert(string value)
+        public override void Insert(int idx, string value)
         {
-            values.Add(Clamp(value));
+            idxValues.Add(idx, Clamp(value));
         }
 
-        public override ResultColumn Get(List<int> rows)
+        public override ResultColumn Get(List<int> idxs)
         {
-            var resultValues = new string[rows.Count];
-            for (int i = 0; i < rows.Count; ++i)
+            if (idxs == null)
+                return new ResultColumnString(Name, idxValues.Values.ToArray());
+
+            var resultValues = new string[idxs.Count];
+            for (int i = 0; i < idxs.Count; ++i)
             {
-                resultValues[i] = values[rows[i]];
+                resultValues[i] = idxValues[idxs[i]];
             }
 
             return new ResultColumnString(Name, resultValues);
@@ -47,11 +51,9 @@ namespace Engine
             {
                 return value;
             }
-            else
-            {
-                // TODO: produce warning if string is too long
-                return value.Substring(0, maxLength);
-            }
+
+            // TODO: produce warning if string is too long
+            return value.Substring(0, maxLength);
         }
 
         public override List<int> Filter(string operation, string value)
@@ -62,11 +64,10 @@ namespace Engine
             if (condition == null)
                 return result;
 
-            for (int row = 0; row < values.Count; ++row)
+            foreach (var iv in idxValues)
             {
-                var val = values[row];
-                if (condition.Satisfies(val))
-                    result.Add(row);
+                if (condition.Satisfies(iv.Value))
+                    result.Add(iv.Key);
             }
 
             return result;
