@@ -5,11 +5,11 @@ namespace Engine
 {
     public abstract class ColumnBase<T>: Column
     {
-        protected SortedDictionary<int, T> idxValues = new SortedDictionary<int, T>();
+        protected SortedDictionary<long, T> idxValues = new SortedDictionary<long, T>();
 
         public override int Count => idxValues.Count;
 
-        public override IReadOnlyCollection<int> Indices => idxValues.Keys;
+        public override IReadOnlyCollection<long> Indices => idxValues.Keys;
 
         protected void FullUpdateBase(T value)
         {
@@ -18,7 +18,7 @@ namespace Engine
         }
 
         // Precondition: rowsToDelete is a sorted list of indices
-        public override void Delete(List<int> rowsToDelete)
+        public override void Delete(List<long> rowsToDelete)
         {
             if (rowsToDelete == null)
             {

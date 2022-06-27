@@ -57,7 +57,7 @@ namespace Engine
 
                 for (int j = 0; j < rowsToUpdate.Count; ++j)
                 {
-                    int row = rowsToUpdate[j];
+                    long row = rowsToUpdate[j];
                     columns[columnName].Update(row, value);
                 }
             }
@@ -89,7 +89,7 @@ namespace Engine
 
         public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition)
         {
-            List<int> rowsToSelect = null;
+            List<long> rowsToSelect = null;
             // TODO: replace with empty condition?
             if (condition != null)
             {
@@ -101,7 +101,7 @@ namespace Engine
 
         public void Delete(ConditionNode condition)
         {
-            List<int> rowsToDelete = null;
+            List<long> rowsToDelete = null;
             // TODO: replace with empty condition?
             if (condition != null)
             {
@@ -131,7 +131,7 @@ namespace Engine
             columns.Add(name, column);
         }
 
-        private List<ResultColumn> Select(List<string> columnNames, List<int> rows)
+        private List<ResultColumn> Select(List<string> columnNames, List<long> rows)
         {
             var result = new List<ResultColumn>();
 

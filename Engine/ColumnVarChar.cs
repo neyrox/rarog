@@ -21,17 +21,17 @@ namespace Engine
             FullUpdateBase(val);
         }
 
-        public override void Update(int idx, string value)
+        public override void Update(long idx, string value)
         {
             idxValues[idx] = Clamp(value);
         }
 
-        public override void Insert(int idx, string value)
+        public override void Insert(long idx, string value)
         {
             idxValues.Add(idx, Clamp(value));
         }
 
-        public override ResultColumn Get(List<int> idxs)
+        public override ResultColumn Get(List<long> idxs)
         {
             if (idxs == null)
                 return new ResultColumnString(Name, idxValues.Values.ToArray());
@@ -56,9 +56,9 @@ namespace Engine
             return value.Substring(0, maxLength);
         }
 
-        public override List<int> Filter(string operation, string value)
+        public override List<long> Filter(string operation, string value)
         {
-            var result = new List<int>();
+            var result = new List<long>();
 
             var condition = ConditionString.Transform(operation, value);
             if (condition == null)

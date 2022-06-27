@@ -4,6 +4,6 @@ namespace Engine
 {
     public abstract class ConditionNode
     {
-        public abstract List<int> GetRowsThatSatisfy(Table table);
+        public abstract List<long> GetRowsThatSatisfy(Table table);
     }
 }

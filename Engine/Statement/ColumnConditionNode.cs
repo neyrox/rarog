@@ -15,7 +15,7 @@ namespace Engine
             Value = value;
         }
 
-        public override List<int> GetRowsThatSatisfy(Table table)
+        public override List<long> GetRowsThatSatisfy(Table table)
         {
             return table.GetColumn(ColumnName).Filter(Operation, Value);
         }

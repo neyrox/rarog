@@ -7,20 +7,20 @@ namespace Engine
         public string Name;
 
         public abstract int Count { get; }
-        public abstract IReadOnlyCollection<int> Indices { get; }
+        public abstract IReadOnlyCollection<long> Indices { get; }
 
         public abstract string DefaultValue { get; }
 
         public abstract void FullUpdate(string value);
 
-        public abstract void Update(int idx, string value);
+        public abstract void Update(long idx, string value);
 
-        public abstract void Insert(int idx, string value);
+        public abstract void Insert(long idx, string value);
 
-        public abstract ResultColumn Get(List<int> idxs);
+        public abstract ResultColumn Get(List<long> idxs);
 
-        public abstract List<int> Filter(string op, string value);
+        public abstract List<long> Filter(string op, string value);
 
-        public abstract void Delete(List<int> idxsToDelete);
+        public abstract void Delete(List<long> idxsToDelete);
     }
 }

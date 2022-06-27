@@ -15,9 +15,9 @@ namespace Engine
             Right = right;
         }
 
-        public override List<int> GetRowsThatSatisfy(Table table)
+        public override List<long> GetRowsThatSatisfy(Table table)
         {
-            var resultSet = new HashSet<int>(Left.GetRowsThatSatisfy(table));
+            var resultSet = new HashSet<long>(Left.GetRowsThatSatisfy(table));
             var rightRows = Right.GetRowsThatSatisfy(table);
             if (Operation == "AND")
             {
@@ -29,7 +29,7 @@ namespace Engine
                 resultSet.UnionWith(rightRows);
             }
 
-            List<int> result = new List<int>(resultSet);
+            var result = new List<long>(resultSet);
             return result;
         }
 
