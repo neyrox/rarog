@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Engine;
+using Engine.Storage;
 
 namespace Server
 {
@@ -11,7 +12,7 @@ namespace Server
     {
         // Thread signal.
         private static readonly ManualResetEvent _tcpClientConnected = new ManualResetEvent(false);
-        private static readonly Database _db = new Database();
+        private static readonly Database _db = new Database(new FileStorage());
         private static readonly Shell _shell = new Shell(_db);
         // TODO: implement removal on disconnect
         private static readonly ConcurrentBag<NetClient> _clients = new ConcurrentBag<NetClient>();

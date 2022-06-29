@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Engine.Serialization
 {
@@ -132,6 +130,24 @@ namespace Engine.Serialization
             offset += len;
         }
 
+        public static void PackString8(Stream stream, string val)
+        {
+            int len = 0;
+            if (val == null)
+            {
+                stream.WriteByte(0);
+                return;
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(val);
+            len = bytes.Length;
+            if (len >= 256)
+                throw new ArgumentOutOfRangeException(nameof(val), "Can't pack string with more than 255 bytes");
+
+            stream.WriteByte((byte)len);
+            stream.Write(bytes, 0, bytes.Length);
+        }
+
         public static void PackString16(byte[] buffer, string val, ref int offset)
         {
             int len = 0;
@@ -168,6 +184,17 @@ namespace Engine.Serialization
             var val = Encoding.UTF8.GetString(buffer, offset, len);
             offset += len;
             return val;
+        }
+
+        public static string UnpackString8(Stream stream)
+        {
+            int len = stream.ReadByte();
+            if (len == 0)
+                return null;
+
+            var bytes = new byte[len];
+            stream.Read(bytes, 0, len);
+            return Encoding.UTF8.GetString(bytes, 0, len);
         }
     }
 }

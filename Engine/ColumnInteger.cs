@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Engine.Storage;
 
 namespace Engine
 {
@@ -7,9 +8,9 @@ namespace Engine
     {
         public override string DefaultValue => "0";
 
-        public ColumnInteger(string name)
+        public ColumnInteger(string name, SortedDictionary<long, int> idxValues = null)
+            : base(name, idxValues)
         {
-            Name = name;
         }
 
         public override void FullUpdate(string value)
@@ -59,6 +60,11 @@ namespace Engine
             }
 
             return result;
+        }
+
+        public override void Store(IStorage storage, string path)
+        {
+            storage.Store(this, path);
         }
     }
 }

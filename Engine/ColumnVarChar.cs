@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Engine.Storage;
 
 namespace Engine
 {
     public class ColumnVarChar: ColumnBase<string>
     {
-        private readonly int maxLength;
+        public int MaxLength = 1000000;
 
         public override string DefaultValue => "";
 
-        public ColumnVarChar(string name, int maxLen)
+        public ColumnVarChar(string name, SortedDictionary<long, string> idxValues = null)
+            : base(name, idxValues)
         {
-            Name = name;
-            maxLength = maxLen;
         }
 
         public override void FullUpdate(string value)
@@ -47,13 +47,13 @@ namespace Engine
 
         private string Clamp(string value)
         {
-            if (value.Length < maxLength)
+            if (value.Length < MaxLength)
             {
                 return value;
             }
 
             // TODO: produce warning if string is too long
-            return value.Substring(0, maxLength);
+            return value.Substring(0, MaxLength);
         }
 
         public override List<long> Filter(string operation, string value)
@@ -71,6 +71,11 @@ namespace Engine
             }
 
             return result;
+        }
+
+        public override void Store(IStorage storage, string path)
+        {
+            storage.Store(this, path);
         }
     }
 }

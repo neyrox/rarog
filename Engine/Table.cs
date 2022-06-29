@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using Engine.Storage;
 
 namespace Engine
 {
     public class Table
     {
-        private readonly string tableName;
+        public const string TableDirExtension = ".Table";
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
+        private readonly IStorage storage;
         private int nextIdx = 0;
 
-        public Table(string name)
+        public string Name { get; }
+
+        public Table(string name, IStorage storage)
         {
-            tableName = name;
+            Name = name;
+            this.storage = storage;
         }
 
         public Column GetColumn(string name)
@@ -31,7 +36,9 @@ namespace Engine
                     AddColumn(name, new ColumnDouble(name));
                     break;
                 case "varchar":
-                    AddColumn(name, new ColumnVarChar(name, length));
+                    var column = new ColumnVarChar(name);
+                    column.MaxLength = length;
+                    AddColumn(name, column);
                     break;
                 default:
                     throw new Exception($"Unknown type {type}");
@@ -41,9 +48,14 @@ namespace Engine
         public void DropColumn(string name)
         {
             if (columns.ContainsKey(name))
+            {
                 columns.Remove(name);
+                storage.DeleteFile(Column.GetFileName(GetTableDir(), name));
+            }
             else
-                throw new Exception($"Column '{name}' not found in table '{tableName}'");
+            {
+                throw new Exception($"Column '{name}' not found in table '{Name}'");
+            }
         }
 
         public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
@@ -58,7 +70,10 @@ namespace Engine
                 for (int j = 0; j < rowsToUpdate.Count; ++j)
                 {
                     long row = rowsToUpdate[j];
-                    columns[columnName].Update(row, value);
+                    var column = columns[columnName];
+                    column.Update(row, value);
+                    //storage.Store(column);
+                    column.Store(storage, GetTableDir());
                 }
             }
         }
@@ -83,6 +98,9 @@ namespace Engine
 
                 columns[columnName].Insert(nextIdx, value);
             }
+
+            foreach (var column in columns.Values)
+                column.Store(storage, GetTableDir());
 
             AddRow();
         }
@@ -114,6 +132,35 @@ namespace Engine
             }
         }
 
+        public void Load()
+        {
+            var tableDir = GetTableDir();
+            foreach (var columnFile in storage.GetColumnFiles(tableDir))
+            {
+                var column = storage.LoadColumn(columnFile);
+                if (column != null)
+                    columns.Add(column.Name, column);
+            }
+            // TODO: check column indices
+        }
+
+        public void Store()
+        {
+            var tableDir = GetTableDir();
+
+            storage.CreateDirectoryIfNotExist(tableDir);
+
+            foreach (var column in columns)
+            {
+                column.Value.Store(storage, tableDir);
+            }
+        }
+
+        public string GetTableDir()
+        {
+            return Name + TableDirExtension;
+        }
+
         private void AddColumn(string name, Column column)
         {
             if (columns.Count > 0)
@@ -127,6 +174,8 @@ namespace Engine
                         column.Insert(idx, column.DefaultValue);
                 }
             }
+
+            column.Store(storage, GetTableDir());
 
             columns.Add(name, column);
         }

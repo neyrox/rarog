@@ -1,18 +1,26 @@
 ﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using Engine.Storage;
 
 namespace UnitTests
 {
     [TestClass]
     public class ShellTest
     {
+        Database db;
+        Shell shell;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            db = new Database(new NullStorage());
+            shell = new Shell(db);
+        }
+
         [TestMethod]
         public void UseCase1()
         {
-            var db = new Database();
-            var shell = new Shell(db);
-
             var create = shell.Execute("CREATE TABLE t1 (c1 int, c2 int);");
             Assert.IsTrue(create.IsOK);
             var alter1 = shell.Execute("ALTER TABLE t1 ADD c3 varchar(255);");
@@ -62,9 +70,6 @@ namespace UnitTests
         [TestMethod]
         public void UseCase2()
         {
-            var db = new Database();
-            var shell = new Shell(db);
-
             var create = shell.Execute("CREATE TABLE t1 (name varchar(3));");
             Assert.IsTrue(create.IsOK);
             var insert1 = shell.Execute("INSERT INTO t1 (name) VALUES (pi);");

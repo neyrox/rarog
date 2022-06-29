@@ -1,6 +1,7 @@
 ﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using Engine.Storage;
 
 namespace UnitTests
 {
@@ -18,7 +19,7 @@ namespace UnitTests
         [TestInitialize]
         public void Setup()
         {
-            table = new Table("t1");
+            table = new Table("t1", new NullStorage());
             table.AddColumn("c1", "int", 0);
             table.AddColumn("c2", "double", 0);
             table.AddColumn("c3", "varchar", 255);

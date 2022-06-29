@@ -1,15 +1,21 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 
 namespace Engine
 {
     public abstract class ColumnBase<T>: Column
     {
-        protected SortedDictionary<long, T> idxValues = new SortedDictionary<long, T>();
+        protected SortedDictionary<long, T> idxValues;
 
         public override int Count => idxValues.Count;
 
         public override IReadOnlyCollection<long> Indices => idxValues.Keys;
+        public IReadOnlyDictionary<long, T> IdxValues => idxValues;
+        
+        protected ColumnBase(string name, SortedDictionary<long, T> idxValues)
+            : base(name)
+        {
+            this.idxValues = idxValues ?? new SortedDictionary<long, T>();
+        }
 
         protected void FullUpdateBase(T value)
         {

@@ -1,5 +1,6 @@
 ﻿using Engine;
 using System;
+using Engine.Storage;
 
 namespace Rarog
 {
@@ -7,7 +8,7 @@ namespace Rarog
     {
         static void Main(string[] args)
         {
-            var db = new Database();
+            var db = new Database(new MemoryStorage());
             var shell = new Shell(db);
             var query = string.Empty;
             while (true)
