@@ -1,10 +1,10 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/c040s6utdqj5fkj7?svg=true)](https://ci.appveyor.com/project/neyrox/rarog)
 # rarog
-column sql database for developers
+column sql database
 
-server mode not yet implemented - works via own shell (Rarog.exe)
+server mode (framed tcp protocol with msgpack serialization)
 
-durability not yet implemented
+durability (database saved after each change)
 
 ## supported statements
 create table, drop table, alter table add/drop column
@@ -16,5 +16,3 @@ insert, update, select, delete
 
 ## supported column types
 int, float(same as double), double, varchar
-
-
