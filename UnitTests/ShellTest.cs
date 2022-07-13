@@ -14,7 +14,7 @@ namespace UnitTests
         [TestInitialize]
         public void Setup()
         {
-            db = new Database(new NullStorage());
+            db = new Database(new MemoryStorage());
             shell = new Shell(db);
         }
 

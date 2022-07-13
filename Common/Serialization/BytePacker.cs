@@ -94,6 +94,27 @@ namespace Engine.Serialization
             return intValue;
         }
 
+        public static void PackSInt64(byte[] buffer, long val, ref int offset)
+        {
+            ulong ulongValue;
+            unsafe
+            {
+                ulongValue = *((ulong*)(&val));
+            }
+            PackUInt64(buffer, ulongValue, ref offset);
+        }
+
+        public static long UnpackSInt64(byte[] buffer, ref int offset)
+        {
+            ulong ulongValue = UnpackUInt64(buffer, ref offset);
+            long longValue;
+            unsafe
+            {
+                longValue = *((int*)(&ulongValue));
+            }
+            return longValue;
+        }
+
         public static void PackDouble(byte[] buffer, double val, ref int offset)
         {
             ulong longValue;

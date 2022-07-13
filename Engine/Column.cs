@@ -6,37 +6,43 @@ namespace Engine
 {
     public abstract class Column
     {
-        public const string ColumnFileExtension = ".clmn";
+        public const string MetaFileExtension = ".meta";
+        public const string DataFileExtension = ".data";
 
+        public string TablePath;
         public string Name;
 
         public abstract int Count { get; }
         public abstract IReadOnlyCollection<long> Indices { get; }
 
         public abstract string DefaultValue { get; }
+        public abstract string TypeNameP { get; }
 
-        protected Column(string name)
+        protected Column(string tablePath, string name)
         {
+            TablePath = tablePath;
             Name = name;
         }
 
-        public abstract void FullUpdate(string value);
+        public abstract void Update(long idx, string value, IStorage storage);
 
-        public abstract void Update(long idx, string value);
+        public abstract void Insert(long idx, string value, IStorage storage);
 
-        public abstract void Insert(long idx, string value);
+        public abstract ResultColumn Get(List<long> idxs, IStorage storage);
 
-        public abstract ResultColumn Get(List<long> idxs);
+        public abstract List<long> Filter(string op, string value, IStorage storage);
 
-        public abstract List<long> Filter(string op, string value);
+        public abstract void Delete(List<long> idxsToDelete, IStorage storage);
+        public abstract void DeleteInternal(List<long> idxsToDelete, IStorage storage);
+        
 
-        public abstract void Delete(List<long> idxsToDelete);
-
-        public static string GetFileName(string path, string name)
+        public static string GetMetaFileName(string path, string name)
         {
-            return Path.Combine(path, name + ColumnFileExtension);
+            return Path.Combine(path, name + MetaFileExtension);
         }
-
-        public abstract void Store(IStorage storage, string path);
+        public static string GetDataFileName(string path, string name)
+        {
+            return Path.Combine(path, name + DataFileExtension);
+        }
     }
 }

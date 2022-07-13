@@ -6,46 +6,53 @@ namespace Engine
 {
     public class ColumnDouble: ColumnBase<double>
     {
+        public const string TypeName = "Dbl";
         public override string DefaultValue => "0";
+        public override string TypeNameP => TypeName;
 
-        public ColumnDouble(string name, SortedDictionary<long, double> idxValues = null)
-            : base(name, idxValues)
+        public ColumnDouble(string tablePath, string name, SortedDictionary<long, double> idxValues = null)
+            : base(tablePath, name, idxValues)
         {
         }
 
-        public override void FullUpdate(string value)
-        {
-            var val = double.Parse(value);
-            FullUpdateBase(val);
-        }
-
-        public override void Update(long idx, string value)
+        public override void Update(long idx, string value, IStorage storage)
         {
             var val = double.Parse(value);
             idxValues[idx] = val;
+
+            storage.UpdateDoubles(GetDataFileName(TablePath, Name), idx, val);
         }
 
-        public override void Insert(long idx, string value)
+        public override void Insert(long idx, string value, IStorage storage)
         {
             var val = double.Parse(value);
             idxValues.Add(idx, val);
+            // TODO: cleanup cache
+            
+            storage.InsertDoubles(GetDataFileName(TablePath, Name), idx, val);
         }
 
-        public override ResultColumn Get(List<long> idxs)
+        public override ResultColumn Get(List<long> indices, IStorage storage)
         {
-            if (idxs == null)
+            var indicesToLoad = GetIndicesToLoad(indices);
+
+            var stored = storage.SelectDoubles(GetDataFileName(TablePath, Name), indicesToLoad);
+            foreach (var iv in stored)
+                idxValues[iv.Key] = iv.Value;
+
+            if (indices == null)
                 return new ResultColumnDouble(Name, idxValues.Values.ToArray());
 
-            var resultValues = new double[idxs.Count];
-            for (int i = 0; i < idxs.Count; ++i)
-            {
-                resultValues[i] = idxValues[idxs[i]];
-            }
+
+            var resultValues = new double[indices.Count];
+            for (int i = 0; i < indices.Count; ++i)
+                resultValues[i] = idxValues[indices[i]];
+            // TODO: cleanup cache
 
             return new ResultColumnDouble(Name, resultValues);
         }
 
-        public override List<long> Filter(string op, string value)
+        public override List<long> Filter(string op, string value, IStorage storage)
         {
             var result = new List<long>();
 
@@ -53,18 +60,19 @@ namespace Engine
             if (condition == null)
                 return result;
 
-            foreach (var iv in idxValues)
+            var stored = storage.SelectDoubles(GetDataFileName(TablePath, Name), condition);
+            foreach (var iv in stored)
             {
-                if (condition.Satisfies(iv.Value))
-                    result.Add(iv.Key);
+                idxValues[iv.Key] = iv.Value;
+                result.Add(iv.Key);
             }
 
             return result;
         }
 
-        public override void Store(IStorage storage, string path)
+        public override void DeleteInternal(List<long> idxsToDelete, IStorage storage)
         {
-            storage.Store(this, path);
+            storage.DeleteDoubles(GetDataFileName(TablePath, Name), new SortedSet<long>(idxsToDelete));
         }
     }
 }

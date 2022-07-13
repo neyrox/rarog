@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Engine.Storage;
 
 namespace Engine
 {
@@ -15,13 +16,12 @@ namespace Engine
             Right = right;
         }
 
-        public override List<long> GetRowsThatSatisfy(Table table)
+        public override List<long> GetRowsThatSatisfy(Table table, IStorage storage)
         {
-            var resultSet = new HashSet<long>(Left.GetRowsThatSatisfy(table));
-            var rightRows = Right.GetRowsThatSatisfy(table);
+            var resultSet = new HashSet<long>(Left.GetRowsThatSatisfy(table, storage));
+            var rightRows = Right.GetRowsThatSatisfy(table, storage);
             if (Operation == "AND")
             {
-                //resultSet.UnionWith(rightRows);
                 resultSet.IntersectWith(rightRows);
             }
             else if (Operation == "OR")

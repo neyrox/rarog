@@ -7,42 +7,159 @@ namespace Engine.Storage
     public class MemoryStorage : IStorage
     {
         private Dictionary<string, byte[]> buffers = new Dictionary<string, byte[]>();
-        
-        public Column LoadColumn(string fileName)
+
+        public void StoreTableMeta(string fileName, long nextIdx)
+        {
+        }
+
+        public void LoadTableMeta(string fileName, out long nextIdx)
+        {
+            nextIdx = 0;
+        }
+
+        public void StoreColumnMeta(Column column, string tableName, string fileName)
+        {
+            using (var stream = new MemoryStream())
+            {
+                StreamStorage.StoreColumnMeta(stream, column);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public Column LoadColumnMeta(string tablePath, string fileName)
         {
             using (var stream = new MemoryStream(buffers[fileName]))
             {
-                return StreamStorage.LoadColumn(stream);
+                return StreamStorage.LoadColumnMeta(stream, tablePath);
             }
         }
 
-        public void Store(ColumnInteger column, string tableDir)
+        public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond)
         {
-            using (var stream = new MemoryStream())
+            using (var stream = new MemoryStream(buffers[fileName]))
             {
-                StreamStorage.Store(column, stream);
-                var key = Column.GetFileName(tableDir, column.Name);
-                buffers[key] = stream.ToArray();
+                return StreamStorage.SelectInts(stream, cond);
             }
         }
 
-        public void Store(ColumnDouble column, string tableDir)
+        public IReadOnlyDictionary<long, int> SelectInts(string fileName, SortedSet<long> indices)
         {
-            using (var stream = new MemoryStream())
+            using (var stream = new MemoryStream(buffers[fileName]))
             {
-                StreamStorage.Store(column, stream);
-                var key = Column.GetFileName(tableDir, column.Name);
-                buffers[key] = stream.ToArray();
+                return StreamStorage.SelectInts(stream, indices);
             }
         }
 
-        public void Store(ColumnVarChar column, string tableDir)
+        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond)
         {
-            using (var stream = new MemoryStream())
+            using (var stream = new MemoryStream(buffers[fileName]))
             {
-                StreamStorage.Store(column, stream);
-                var key = Column.GetFileName(tableDir, column.Name);
-                buffers[key] = stream.ToArray();
+                return StreamStorage.SelectDoubles(stream, cond);
+            }
+        }
+
+        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = new MemoryStream(buffers[fileName]))
+            {
+                return StreamStorage.SelectDoubles(stream, indices);
+            }
+        }
+
+        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond)
+        {
+            using (var stream = new MemoryStream(buffers[fileName]))
+            {
+                return StreamStorage.SelectVarChars(stream, cond);
+            }
+        }
+
+        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = new MemoryStream(buffers[fileName]))
+            {
+                return StreamStorage.SelectVarChars(stream, indices);
+            }
+        }
+
+        public void UpdateInts(string fileName, long idx, int val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.UpdateInts(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void UpdateDoubles(string fileName, long idx, double val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.UpdateDoubles(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void UpdateVarChars(string fileName, long idx, string val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.UpdateVarChars(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void InsertInts(string fileName, long idx, int val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.InsertInts(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void InsertDoubles(string fileName, long idx, double val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.InsertDoubles(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void InsertVarChars(string fileName, long idx, string val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.InsertVarChars(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void DeleteInts(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.DeleteInts(stream, indices);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void DeleteDoubles(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.DeleteDoubles(stream, indices);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void DeleteVarChars(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                StreamStorage.DeleteVarChars(stream, indices);
+                buffers[fileName] = stream.ToArray();
             }
         }
 
@@ -62,6 +179,19 @@ namespace Engine.Storage
 
         public void DeleteFile(string fileName)
         {
+        }
+        
+        private MemoryStream PrepareStream(string fileName)
+        {
+            var stream = new MemoryStream();
+            if (!buffers.ContainsKey(fileName))
+                return stream;
+
+            var buffer = buffers[fileName];
+            stream.Write(buffer, 0, buffer.Length);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            return stream;
         }
     }
 }

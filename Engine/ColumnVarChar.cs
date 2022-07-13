@@ -6,41 +6,48 @@ namespace Engine
 {
     public class ColumnVarChar: ColumnBase<string>
     {
-        public int MaxLength = 1000000;
+        public const string TypeName = "Str";
+
+        public int MaxLength = 65535;
+        public override string TypeNameP => TypeName;
 
         public override string DefaultValue => "";
 
-        public ColumnVarChar(string name, SortedDictionary<long, string> idxValues = null)
-            : base(name, idxValues)
+        public ColumnVarChar(string tablePath, string name, SortedDictionary<long, string> idxValues = null)
+            : base(tablePath, name, idxValues)
         {
         }
 
-        public override void FullUpdate(string value)
-        {
-            var val = Clamp(value);
-            FullUpdateBase(val);
-        }
-
-        public override void Update(long idx, string value)
+        public override void Update(long idx, string value, IStorage storage)
         {
             idxValues[idx] = Clamp(value);
+
+            storage.UpdateVarChars(GetDataFileName(TablePath, Name), idx, value);
         }
 
-        public override void Insert(long idx, string value)
+        public override void Insert(long idx, string value, IStorage storage)
         {
             idxValues.Add(idx, Clamp(value));
+            // TODO: cleanup cache
+            
+            storage.InsertVarChars(GetDataFileName(TablePath, Name), idx, value);
         }
 
-        public override ResultColumn Get(List<long> idxs)
+        public override ResultColumn Get(List<long> indices, IStorage storage)
         {
-            if (idxs == null)
+            var indicesToLoad = GetIndicesToLoad(indices);
+
+            var stored = storage.SelectVarChars(GetDataFileName(TablePath, Name), indicesToLoad);
+            foreach (var iv in stored)
+                idxValues[iv.Key] = iv.Value;
+
+            if (indices == null)
                 return new ResultColumnString(Name, idxValues.Values.ToArray());
 
-            var resultValues = new string[idxs.Count];
-            for (int i = 0; i < idxs.Count; ++i)
-            {
-                resultValues[i] = idxValues[idxs[i]];
-            }
+            var resultValues = new string[indices.Count];
+            for (int i = 0; i < indices.Count; ++i)
+                resultValues[i] = idxValues[indices[i]];
+            // TODO: cleanup cache
 
             return new ResultColumnString(Name, resultValues);
         }
@@ -56,7 +63,7 @@ namespace Engine
             return value.Substring(0, MaxLength);
         }
 
-        public override List<long> Filter(string operation, string value)
+        public override List<long> Filter(string operation, string value, IStorage storage)
         {
             var result = new List<long>();
 
@@ -64,18 +71,19 @@ namespace Engine
             if (condition == null)
                 return result;
 
-            foreach (var iv in idxValues)
+            var stored = storage.SelectVarChars(GetDataFileName(TablePath, Name), condition);
+            foreach (var iv in stored)
             {
-                if (condition.Satisfies(iv.Value))
-                    result.Add(iv.Key);
+                idxValues[iv.Key] = iv.Value;
+                result.Add(iv.Key);
             }
 
             return result;
         }
 
-        public override void Store(IStorage storage, string path)
+        public override void DeleteInternal(List<long> idxsToDelete, IStorage storage)
         {
-            storage.Store(this, path);
+            storage.DeleteVarChars(GetDataFileName(TablePath, Name), new SortedSet<long>(idxsToDelete));
         }
     }
 }

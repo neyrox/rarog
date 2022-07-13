@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Engine.Storage;
 
 namespace Engine
 {
@@ -11,8 +12,8 @@ namespace Engine
         public override IReadOnlyCollection<long> Indices => idxValues.Keys;
         public IReadOnlyDictionary<long, T> IdxValues => idxValues;
         
-        protected ColumnBase(string name, SortedDictionary<long, T> idxValues)
-            : base(name)
+        protected ColumnBase(string tablePath, string name, SortedDictionary<long, T> idxValues)
+            : base(tablePath, name)
         {
             this.idxValues = idxValues ?? new SortedDictionary<long, T>();
         }
@@ -23,21 +24,39 @@ namespace Engine
                 idxValues[idx] = value;
         }
 
+        protected SortedSet<long> GetIndicesToLoad(List<long> indices)
+        {
+            SortedSet<long> indicesToLoad = null;
+
+            if (indices != null)
+            {
+                indicesToLoad = new SortedSet<long>();
+                foreach (var idx in indices)
+                {
+                    if (idxValues.ContainsKey(idx))
+                        continue;
+
+                    indicesToLoad.Add(idx);
+                }
+            }
+
+            return indicesToLoad;
+        }
+        
         // Precondition: rowsToDelete is a sorted list of indices
-        public override void Delete(List<long> rowsToDelete)
+        public override void Delete(List<long> rowsToDelete, IStorage storage)
         {
             if (rowsToDelete == null)
             {
                 idxValues.Clear();
+                storage.DeleteFile(GetDataFileName(TablePath, Name));
                 return;
             }
 
-            for (int i = rowsToDelete.Count - 1; i >= 0; i--)
-            {
-                var rowToDelete = rowsToDelete[i];
-
-                idxValues.Remove(rowToDelete);
-            }
+            for (int i = 0; i < rowsToDelete.Count; ++i)
+                idxValues.Remove(rowsToDelete[i]);
+            
+            DeleteInternal(rowsToDelete, storage);
         }
     }
 }

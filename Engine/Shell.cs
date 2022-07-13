@@ -33,6 +33,7 @@ namespace Engine
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
                 return new Result(null, e.Message);
             }
         }

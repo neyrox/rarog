@@ -42,9 +42,9 @@ namespace Engine
             var columnFiles = storage.GetColumnFiles(tableDir);
             foreach (var columnFile in columnFiles)
             {
-                if (!columnFile.EndsWith(Column.ColumnFileExtension))
+                if (!(columnFile.EndsWith(Column.MetaFileExtension) || columnFile.EndsWith(Column.DataFileExtension)))
                     continue;
-                
+
                 storage.DeleteFile(columnFile);
             }
 

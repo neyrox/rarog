@@ -6,10 +6,11 @@ namespace Engine
 {
     public class Table
     {
-        public const string TableDirExtension = ".Table";
+        public const string MetaFileExtension = ".meta";
+        public const string TableDirExtension = ".data";
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
         private readonly IStorage storage;
-        private int nextIdx = 0;
+        private long nextIdx = 0;
 
         public string Name { get; }
 
@@ -26,19 +27,20 @@ namespace Engine
 
         public void AddColumn(string name, string type, int length)
         {
+            var tablePath = GetTableDir();
             switch (type.ToLowerInvariant())
             {
                 case "int":
-                    AddColumn(name, new ColumnInteger(name));
+                    AddColumn(new ColumnInteger(tablePath, name));
                     break;
                 case "float":
                 case "double":
-                    AddColumn(name, new ColumnDouble(name));
+                    AddColumn(new ColumnDouble(tablePath, name));
                     break;
                 case "varchar":
-                    var column = new ColumnVarChar(name);
+                    var column = new ColumnVarChar(tablePath, name);
                     column.MaxLength = length;
-                    AddColumn(name, column);
+                    AddColumn(column);
                     break;
                 default:
                     throw new Exception($"Unknown type {type}");
@@ -50,7 +52,7 @@ namespace Engine
             if (columns.ContainsKey(name))
             {
                 columns.Remove(name);
-                storage.DeleteFile(Column.GetFileName(GetTableDir(), name));
+                storage.DeleteFile(Column.GetDataFileName(GetTableDir(), name));
             }
             else
             {
@@ -60,7 +62,7 @@ namespace Engine
 
         public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
         {
-            var rowsToUpdate = condition.GetRowsThatSatisfy(this);
+            var rowsToUpdate = condition.GetRowsThatSatisfy(this, storage);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -71,9 +73,7 @@ namespace Engine
                 {
                     long row = rowsToUpdate[j];
                     var column = columns[columnName];
-                    column.Update(row, value);
-                    //storage.Store(column);
-                    column.Store(storage, GetTableDir());
+                    column.Update(row, value, storage);
                 }
             }
         }
@@ -88,7 +88,7 @@ namespace Engine
                 if (insertingColumnNames.Contains(columnName))
                     continue;
 
-                columns[columnName].Insert(nextIdx, null);
+                columns[columnName].Insert(nextIdx, null, storage);
             }
 
             for (int i = 0; i < columnNames.Count; ++i)
@@ -96,11 +96,8 @@ namespace Engine
                 var columnName = columnNames[i];
                 var value = values[i];
 
-                columns[columnName].Insert(nextIdx, value);
+                columns[columnName].Insert(nextIdx, value, storage);
             }
-
-            foreach (var column in columns.Values)
-                column.Store(storage, GetTableDir());
 
             AddRow();
         }
@@ -111,7 +108,7 @@ namespace Engine
             // TODO: replace with empty condition?
             if (condition != null)
             {
-                rowsToSelect = condition.GetRowsThatSatisfy(this);
+                rowsToSelect = condition.GetRowsThatSatisfy(this, storage);
             }
 
             return Select(columnNames, rowsToSelect);
@@ -123,21 +120,22 @@ namespace Engine
             // TODO: replace with empty condition?
             if (condition != null)
             {
-                rowsToDelete = condition.GetRowsThatSatisfy(this);
+                rowsToDelete = condition.GetRowsThatSatisfy(this, storage);
             }
 
             foreach (var column in columns)
             {
-                column.Value.Delete(rowsToDelete);
+                column.Value.Delete(rowsToDelete, storage);
             }
         }
 
         public void Load()
         {
+            storage.LoadTableMeta(GetTableMetaFile(), out nextIdx);
             var tableDir = GetTableDir();
             foreach (var columnFile in storage.GetColumnFiles(tableDir))
             {
-                var column = storage.LoadColumn(columnFile);
+                var column = storage.LoadColumnMeta(tableDir, columnFile);
                 if (column != null)
                     columns.Add(column.Name, column);
             }
@@ -149,11 +147,7 @@ namespace Engine
             var tableDir = GetTableDir();
 
             storage.CreateDirectoryIfNotExist(tableDir);
-
-            foreach (var column in columns)
-            {
-                column.Value.Store(storage, tableDir);
-            }
+            storage.StoreTableMeta(GetTableMetaFile(), nextIdx);
         }
 
         public string GetTableDir()
@@ -161,7 +155,12 @@ namespace Engine
             return Name + TableDirExtension;
         }
 
-        private void AddColumn(string name, Column column)
+        public string GetTableMetaFile()
+        {
+            return Name + MetaFileExtension;
+        }
+
+        private void AddColumn(Column column)
         {
             if (columns.Count > 0)
             {
@@ -171,13 +170,12 @@ namespace Engine
                     var firstColumn = enumerator.Current.Value;
                     var indices = firstColumn.Indices;
                     foreach (var idx in indices)
-                        column.Insert(idx, column.DefaultValue);
+                        column.Insert(idx, column.DefaultValue, storage);
                 }
             }
 
-            column.Store(storage, GetTableDir());
-
-            columns.Add(name, column);
+            columns.Add(column.Name, column);
+            storage.StoreColumnMeta(column, Name, Column.GetMetaFileName(GetTableDir(), column.Name));
         }
 
         private List<ResultColumn> Select(List<string> columnNames, List<long> rows)
@@ -201,7 +199,7 @@ namespace Engine
 
             for (int j = 0; j < columnsToQuery.Count; ++j)
             {
-                result.Add(columnsToQuery[j].Get(rows));
+                result.Add(columnsToQuery[j].Get(rows, storage));
             }
 
             return result;
@@ -210,6 +208,8 @@ namespace Engine
         private void AddRow()
         {
             ++nextIdx;
+
+            storage.StoreTableMeta(GetTableMetaFile(), nextIdx);
         }
     }
 }

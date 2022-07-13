@@ -1,14 +1,33 @@
+using System.Collections.Generic;
+
 namespace Engine.Storage
 {
     public interface IStorage
     {
-        Column LoadColumn(string fileName);
+        void StoreTableMeta(string fileName, long nextIdx);
+        void LoadTableMeta(string fileName, out long nextIdx);
 
-        void Store(ColumnInteger column, string tableDir);
+        void StoreColumnMeta(Column column, string tableName, string fileName);
+        Column LoadColumnMeta(string tablePath, string fileName);
 
-        void Store(ColumnDouble column, string tableDir);
+        IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond);
+        IReadOnlyDictionary<long, int> SelectInts(string fileName, SortedSet<long> indices);
+        IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond);
+        IReadOnlyDictionary<long, double> SelectDoubles(string fileName, SortedSet<long> indices);
+        IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond);
+        IReadOnlyDictionary<long, string> SelectVarChars(string fileName, SortedSet<long> indices);
 
-        void Store(ColumnVarChar column, string tableDir);
+        void UpdateInts(string fileName, long idx, int val);
+        void UpdateDoubles(string fileName, long idx, double val);
+        void UpdateVarChars(string fileName, long idx, string val);
+
+        void InsertInts(string fileName, long idx, int val);
+        void InsertDoubles(string fileName, long idx, double val);
+        void InsertVarChars(string fileName, long idx, string val);
+
+        void DeleteInts(string fileName, SortedSet<long> indices);
+        void DeleteDoubles(string fileName, SortedSet<long> indices);
+        void DeleteVarChars(string fileName, SortedSet<long> indices);
 
         string[] GetTableNames();
 

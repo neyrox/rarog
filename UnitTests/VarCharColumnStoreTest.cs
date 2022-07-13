@@ -8,33 +8,33 @@ namespace UnitTests
     [TestClass]
     public class VarCharColumnStoreTest
     {
-        private ColumnVarChar column;
+        private ColumnVarChar column1;
         private IStorage storage;
 
         [TestInitialize]
         public void Setup()
         {
-            column = new ColumnVarChar("c1");
-            column.Insert(0, "000");
-            column.Insert(1, "aaa");
-            column.Insert(2, "bbb");
-            column.Insert(5, "eee");
-            column.Insert(7, "ggg");
-
             storage = new MemoryStorage();
+
+            column1 = new ColumnVarChar("t1", "c1");
+            column1.Insert(0, "000", storage);
+            column1.Insert(1, "aaa", storage);
+            column1.Insert(2, "bbb", storage);
+            column1.Insert(5, "eee", storage);
+            column1.Insert(7, "ggg", storage);
         }
 
         [TestMethod]
         public void StoredAndLoaded()
         {
-            byte[] buffer;
-            column.Store(storage, "path");
+            var column2 = new ColumnVarChar("t1", "c1");
+            var whole1 = column1.Get(null, storage);
+            var whole2 = column2.Get(null, storage);
 
-            var outColumn = storage.LoadColumn(Column.GetFileName("path", column.Name));
-
-            Assert.AreEqual(column.Count, outColumn.Count);
-            CollectionAssert.AreEqual(column.Indices.ToArray(), outColumn.Indices.ToArray());
-            CollectionAssert.AreEqual(column.Get(null).All(), outColumn.Get(null).All());
+            Assert.AreEqual(column1.Count, column2.Count);
+            Assert.AreEqual(whole1.Count, whole2.Count);
+            CollectionAssert.AreEqual(column1.Indices.ToArray(), column2.Indices.ToArray());
+            CollectionAssert.AreEqual(whole1.All(), whole2.All());
         }
     }
 }
