@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Threading;
 
 namespace Engine
 {
     public class Shell
     {
-        private Database db;
-        private object mutex = new object();
+        private readonly Database db;
+        private readonly object @lock = new object();
+        private readonly TimeSpan lockTimeout = new TimeSpan(0, 1, 0);
 
         public Shell(Database database)
         {
@@ -21,15 +23,21 @@ namespace Engine
                 var command = Parser.Convert(tokens);
 
                 // TODO: replace with empty command
-                if (command != null)
+                if (command == null)
+                    throw new Exception("wrong query");
+
+                if (Monitor.TryEnter(@lock, lockTimeout))
                 {
-                    lock (mutex)
+                    try
                     {
                         return command.Execute(db);
                     }
+                    finally
+                    {
+                        Monitor.Exit(@lock);
+                    }
                 }
-
-                throw new Exception("wrong query");
+                throw new Exception("failed to get database lock");
             }
             catch (Exception e)
             {
