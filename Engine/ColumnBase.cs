@@ -11,7 +11,7 @@ namespace Engine
 
         public override IReadOnlyCollection<long> Indices => idxValues.Keys;
         public IReadOnlyDictionary<long, T> IdxValues => idxValues;
-        
+
         protected ColumnBase(string tablePath, string name, SortedDictionary<long, T> idxValues)
             : base(tablePath, name)
         {
