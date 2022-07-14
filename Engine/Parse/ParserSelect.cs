@@ -30,12 +30,23 @@ namespace Engine
                 condition = ParserCondition.Convert(tokens, ref pos);
             }
 
+            int limit = 0;
+            if (ParserCommon.AssertUpperToken("LIMIT", tokens, pos))
+            {
+                ++pos;
+
+                limit = int.Parse(tokens[pos++]);
+                // forbid negative limits
+                if (limit < 0)
+                    return null;
+            }
+
             if (ParserCommon.AssertToken(";", tokens, pos))
                 ++pos;
             else
                 return null;
 
-            var result = new SelectNode(what, tableName, condition);
+            var result = new SelectNode(what, tableName, condition, limit);
             return result;
         }
 

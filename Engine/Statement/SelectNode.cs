@@ -7,12 +7,14 @@ namespace Engine
         public List<string> What;
         public string TableName;
         public ConditionNode Condition;
+        public int Limit;
 
-        public SelectNode(List<string> what, string tableName, ConditionNode condition)
+        public SelectNode(List<string> what, string tableName, ConditionNode condition, int limit)
         {
             What = what;
             TableName = tableName;
             Condition = condition;
+            Limit = limit;
         }
 
         public override Result Execute(Database db)
