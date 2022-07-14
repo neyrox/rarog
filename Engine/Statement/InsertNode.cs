@@ -4,9 +4,11 @@ namespace Engine
 {
     public class InsertNode: Node
     {
-        public string TableName;
-        public List<string> ColumnNames;
-        public List<string> Values;
+        public readonly string TableName;
+        public readonly List<string> ColumnNames;
+        public readonly List<string> Values;
+
+        public override bool NeedWriterLock => true;
 
         public InsertNode(string tableName, List<string> columnNames, List<string> values)
         {

@@ -4,9 +4,11 @@ namespace Engine
 {
     public class SelectNode: Node
     {
-        public List<string> What;
-        public string TableName;
-        public ConditionNode Condition;
+        public readonly List<string> What;
+        public readonly string TableName;
+        public readonly ConditionNode Condition;
+
+        public override bool NeedWriterLock => false;
 
         public SelectNode(List<string> what, string tableName, ConditionNode condition)
         {

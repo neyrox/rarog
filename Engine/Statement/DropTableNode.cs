@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace Engine
+﻿namespace Engine
 {
     public class DropTableNode: Node
     {
-        public string TableName;
+        public readonly string TableName;
+
+        public override bool NeedWriterLock => true;
 
         public DropTableNode(string tableName)
         {

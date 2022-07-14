@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-
-namespace Engine
+﻿namespace Engine
 {
     public class DeleteNode: Node
     {
-        public string TableName;
-        public ConditionNode Condition;
+        public readonly string TableName;
+        public readonly ConditionNode Condition;
+
+        public override bool NeedWriterLock => true;
 
         public DeleteNode(string tableName, ConditionNode condition)
         {

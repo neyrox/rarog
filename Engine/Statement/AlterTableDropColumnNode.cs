@@ -2,8 +2,10 @@
 {
     public class AlterTableDropColumnNode: Node
     {
-        public string TableName;
-        public string ColumnName;
+        public readonly string TableName;
+        public readonly string ColumnName;
+
+        public override bool NeedWriterLock => true;
 
         public AlterTableDropColumnNode(string tableName, string columnName)
         {

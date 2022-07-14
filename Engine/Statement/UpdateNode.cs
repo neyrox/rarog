@@ -4,10 +4,12 @@ namespace Engine
 {
     public class UpdateNode: Node
     {
-        public string TableName;
-        public List<string> ColumnNames;
-        public List<string> Values;
-        public ConditionNode Condition;
+        public readonly string TableName;
+        public readonly List<string> ColumnNames;
+        public readonly List<string> Values;
+        public readonly ConditionNode Condition;
+
+        public override bool NeedWriterLock => true;
 
         public UpdateNode(string tableName, List<string> columnNames, List<string> values, ConditionNode condition)
         {
