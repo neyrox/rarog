@@ -11,6 +11,9 @@ namespace Engine
 
         public override string Get(int index)
         {
+            if (index >= values.Length)
+                return string.Empty;
+
             return values[index].ToString(CultureInfo.InvariantCulture);
         }
 

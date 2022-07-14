@@ -48,6 +48,9 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond)
         {
+            if (!File.Exists(fileName))
+                return new Dictionary<long, int>();
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
                 return StreamStorage.SelectInts(file, cond);
@@ -58,6 +61,9 @@ namespace Engine.Storage
         {
             if (indices != null && indices.Count == 0)
                 return new Dictionary<long, int>();
+            
+            if (!File.Exists(fileName))
+                return new Dictionary<long, int>();
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
@@ -67,6 +73,9 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond)
         {
+            if (!File.Exists(fileName))
+                return new Dictionary<long, double>();
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
                 return StreamStorage.SelectDoubles(file, cond);
@@ -78,6 +87,9 @@ namespace Engine.Storage
             if (indices != null && indices.Count == 0)
                 return new Dictionary<long, double>();
 
+            if (!File.Exists(fileName))
+                return new Dictionary<long, double>();
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
                 return StreamStorage.SelectDoubles(file, indices);
@@ -86,6 +98,9 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond)
         {
+            if (!File.Exists(fileName))
+                return new Dictionary<long, string>();
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
                 return StreamStorage.SelectVarChars(file, cond);
@@ -97,6 +112,9 @@ namespace Engine.Storage
             if (indices != null && indices.Count == 0)
                 return new Dictionary<long, string>();
 
+            if (!File.Exists(fileName))
+                return new Dictionary<long, string>();
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
                 return StreamStorage.SelectVarChars(file, indices);
@@ -105,6 +123,9 @@ namespace Engine.Storage
 
         public void UpdateInts(string fileName, long idx, int val)
         {
+            if (!File.Exists(fileName))
+                return;
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 StreamStorage.UpdateInts(file, idx, val);
@@ -113,6 +134,9 @@ namespace Engine.Storage
 
         public void UpdateDoubles(string fileName, long idx, double val)
         {
+            if (!File.Exists(fileName))
+                return;
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 StreamStorage.UpdateDoubles(file, idx, val);
@@ -121,6 +145,9 @@ namespace Engine.Storage
 
         public void UpdateVarChars(string fileName, long idx, string val)
         {
+            if (!File.Exists(fileName))
+                return;
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 StreamStorage.UpdateVarChars(file, idx, val);
@@ -153,6 +180,9 @@ namespace Engine.Storage
 
         public void DeleteInts(string fileName, SortedSet<long> indices)
         {
+            if (!File.Exists(fileName))
+                return;
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 StreamStorage.DeleteInts(file, indices);
@@ -161,6 +191,9 @@ namespace Engine.Storage
 
         public void DeleteDoubles(string fileName, SortedSet<long> indices)
         {
+            if (!File.Exists(fileName))
+                return;
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 StreamStorage.DeleteDoubles(file, indices);
@@ -169,6 +202,9 @@ namespace Engine.Storage
 
         public void DeleteVarChars(string fileName, SortedSet<long> indices)
         {
+            if (!File.Exists(fileName))
+                return;
+
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 StreamStorage.DeleteVarChars(file, indices);
@@ -209,7 +245,7 @@ namespace Engine.Storage
             var columnEntries = Directory.GetFiles(tableDir);
             foreach (var columnFile in columnEntries)
             {
-                if (!columnFile.EndsWith(Column.MetaFileExtension))
+                if (!(columnFile.EndsWith(Column.MetaFileExtension) || columnFile.EndsWith(Column.DataFileExtension)))
                     continue;
 
                 result.Add(columnFile);
@@ -227,6 +263,12 @@ namespace Engine.Storage
         public void DeleteFile(string fileName)
         {
             File.Delete(fileName);
+        }
+
+        public void DeleteDirectory(string tableDir)
+        {
+            if (Directory.Exists(tableDir))
+                Directory.Delete(tableDir);
         }
     }
 }

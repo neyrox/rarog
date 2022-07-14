@@ -107,6 +107,26 @@ namespace UnitTests
             Assert.IsTrue(drop.IsOK);
         }
 
+        [TestMethod]
+        public void UseCase3()
+        {
+            var select1 = shell.Execute("SELECT * FROM t1;");
+            Assert.IsFalse(select1.IsOK);
+
+            var create = shell.Execute("CREATE TABLE t1 (c1 int);");
+            Assert.IsTrue(create.IsOK);
+
+            var select2 = shell.Execute("SELECT * FROM t1;");
+            Assert.IsTrue(select2.IsOK);
+
+            var drop = shell.Execute("DROP TABLE t1;");
+            Assert.IsTrue(drop.IsOK);
+
+            var select3 = shell.Execute("SELECT * FROM t1;");
+            Assert.IsFalse(select1.IsOK);
+
+        }
+
         private List<string> ToList(string item)
         {
             return new List<string> { item };

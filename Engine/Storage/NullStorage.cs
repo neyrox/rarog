@@ -106,5 +106,9 @@ namespace Engine.Storage
         public void DeleteFile(string fileName)
         {
         }
+
+        public void DeleteDirectory(string tableDir)
+        {
+        }
     }
 }

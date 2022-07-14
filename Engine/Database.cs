@@ -38,15 +38,15 @@ namespace Engine
             if (!result)
                 return false;
 
+            tables.Remove(tableName);
+
             var tableDir = table.GetTableDir();
             var columnFiles = storage.GetColumnFiles(tableDir);
             foreach (var columnFile in columnFiles)
-            {
-                if (!(columnFile.EndsWith(Column.MetaFileExtension) || columnFile.EndsWith(Column.DataFileExtension)))
-                    continue;
-
                 storage.DeleteFile(columnFile);
-            }
+
+            storage.DeleteDirectory(table.GetTableDir());
+            storage.DeleteFile(table.GetTableMetaFile());
 
             return true;
         }

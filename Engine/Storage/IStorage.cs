@@ -36,5 +36,7 @@ namespace Engine.Storage
         void CreateDirectoryIfNotExist(string tableDir);
 
         void DeleteFile(string fileName);
+
+        void DeleteDirectory(string tableDir);
     }
 }

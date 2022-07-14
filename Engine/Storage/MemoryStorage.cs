@@ -6,20 +6,22 @@ namespace Engine.Storage
 {
     public class MemoryStorage : IStorage
     {
-        private Dictionary<string, byte[]> buffers = new Dictionary<string, byte[]>();
+        private readonly Dictionary<string, byte[]> buffers = new Dictionary<string, byte[]>();
+        private long nextIdx;
 
         public void StoreTableMeta(string fileName, long nextIdx)
         {
+            this.nextIdx = nextIdx;
         }
 
         public void LoadTableMeta(string fileName, out long nextIdx)
         {
-            nextIdx = 0;
+            nextIdx = this.nextIdx;
         }
 
         public void StoreColumnMeta(Column column, string tableName, string fileName)
         {
-            using (var stream = new MemoryStream())
+            using (var stream = PrepareStream(fileName))
             {
                 StreamStorage.StoreColumnMeta(stream, column);
                 buffers[fileName] = stream.ToArray();
@@ -28,7 +30,7 @@ namespace Engine.Storage
 
         public Column LoadColumnMeta(string tablePath, string fileName)
         {
-            using (var stream = new MemoryStream(buffers[fileName]))
+            using (var stream = PrepareStream(fileName))
             {
                 return StreamStorage.LoadColumnMeta(stream, tablePath);
             }
@@ -36,7 +38,7 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond)
         {
-            using (var stream = new MemoryStream(buffers[fileName]))
+            using (var stream = PrepareStream(fileName))
             {
                 return StreamStorage.SelectInts(stream, cond);
             }
@@ -44,7 +46,7 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, int> SelectInts(string fileName, SortedSet<long> indices)
         {
-            using (var stream = new MemoryStream(buffers[fileName]))
+            using (var stream = PrepareStream(fileName))
             {
                 return StreamStorage.SelectInts(stream, indices);
             }
@@ -52,7 +54,7 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond)
         {
-            using (var stream = new MemoryStream(buffers[fileName]))
+            using (var stream = PrepareStream(fileName))
             {
                 return StreamStorage.SelectDoubles(stream, cond);
             }
@@ -60,7 +62,7 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, SortedSet<long> indices)
         {
-            using (var stream = new MemoryStream(buffers[fileName]))
+            using (var stream = PrepareStream(fileName))
             {
                 return StreamStorage.SelectDoubles(stream, indices);
             }
@@ -68,7 +70,7 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond)
         {
-            using (var stream = new MemoryStream(buffers[fileName]))
+            using (var stream = PrepareStream(fileName))
             {
                 return StreamStorage.SelectVarChars(stream, cond);
             }
@@ -76,7 +78,7 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, SortedSet<long> indices)
         {
-            using (var stream = new MemoryStream(buffers[fileName]))
+            using (var stream = PrepareStream(fileName))
             {
                 return StreamStorage.SelectVarChars(stream, indices);
             }
@@ -180,7 +182,11 @@ namespace Engine.Storage
         public void DeleteFile(string fileName)
         {
         }
-        
+
+        public void DeleteDirectory(string tableDir)
+        {
+        }
+
         private MemoryStream PrepareStream(string fileName)
         {
             var stream = new MemoryStream();

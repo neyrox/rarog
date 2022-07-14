@@ -27,9 +27,9 @@ namespace Engine
 
         public override void Insert(long idx, string value, IStorage storage)
         {
-            idxValues.Add(idx, Clamp(value));
+            idxValues.Add(idx, value == null ? DefaultValue : Clamp(value));
             // TODO: cleanup cache
-            
+
             storage.InsertVarChars(GetDataFileName(TablePath, Name), idx, value);
         }
 

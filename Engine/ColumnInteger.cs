@@ -25,7 +25,7 @@ namespace Engine
 
         public override void Insert(long idx, string value, IStorage storage)
         {
-            int val = int.Parse(value);
+            int val = int.Parse(value ?? DefaultValue);
             idxValues.Add(idx, val);
             // TODO: cleanup cache
             

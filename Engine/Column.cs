@@ -28,12 +28,12 @@ namespace Engine
 
         public abstract void Insert(long idx, string value, IStorage storage);
 
-        public abstract ResultColumn Get(List<long> idxs, IStorage storage);
+        public abstract ResultColumn Get(List<long> indices, IStorage storage);
 
         public abstract List<long> Filter(string op, string value, IStorage storage);
 
-        public abstract void Delete(List<long> idxsToDelete, IStorage storage);
-        public abstract void DeleteInternal(List<long> idxsToDelete, IStorage storage);
+        public abstract void Delete(List<long> indicesToDelete, IStorage storage);
+        public abstract void DeleteInternal(List<long> indicesToDelete, IStorage storage);
         
 
         public static string GetMetaFileName(string path, string name)

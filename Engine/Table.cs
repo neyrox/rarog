@@ -52,6 +52,7 @@ namespace Engine
             if (columns.ContainsKey(name))
             {
                 columns.Remove(name);
+                storage.DeleteFile(Column.GetMetaFileName(GetTableDir(), name));
                 storage.DeleteFile(Column.GetDataFileName(GetTableDir(), name));
             }
             else
@@ -135,6 +136,9 @@ namespace Engine
             var tableDir = GetTableDir();
             foreach (var columnFile in storage.GetColumnFiles(tableDir))
             {
+                if (!columnFile.EndsWith(Column.MetaFileExtension))
+                    continue;
+
                 var column = storage.LoadColumnMeta(tableDir, columnFile);
                 if (column != null)
                     columns.Add(column.Name, column);

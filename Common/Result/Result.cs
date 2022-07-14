@@ -20,7 +20,7 @@ namespace Engine
 
         public static Result TableNotFound(string tableName)
         {
-            return new Result(null, String.Format("Table \'{}\' not found", tableName));
+            return new Result(null, $"Table \'{tableName}\' was not found");
         }
     }
 }
