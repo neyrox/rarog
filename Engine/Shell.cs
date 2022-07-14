@@ -6,7 +6,6 @@ namespace Engine
     public class Shell
     {
         private readonly Database db;
-        private readonly object @lock = new object();
         private readonly TimeSpan lockTimeout = new TimeSpan(0, 1, 0);
 
         public Shell(Database database)
@@ -26,7 +25,7 @@ namespace Engine
                 if (command == null)
                     throw new Exception("wrong query");
 
-                if (Monitor.TryEnter(@lock, lockTimeout))
+                if (Monitor.TryEnter(db.SyncObject, lockTimeout))
                 {
                     try
                     {
@@ -34,7 +33,7 @@ namespace Engine
                     }
                     finally
                     {
-                        Monitor.Exit(@lock);
+                        Monitor.Exit(db.SyncObject);
                     }
                 }
                 throw new Exception("failed to get database lock");

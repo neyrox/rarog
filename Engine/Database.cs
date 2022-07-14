@@ -6,6 +6,7 @@ namespace Engine
 {
     public class Database
     {
+        public readonly object SyncObject = new object();
         private readonly Dictionary<string, Table> tables = new Dictionary<string, Table>();
         private readonly IStorage storage;
 
