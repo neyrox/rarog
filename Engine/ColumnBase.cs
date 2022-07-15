@@ -5,39 +5,26 @@ namespace Engine
 {
     public abstract class ColumnBase<T>: Column
     {
-        protected SortedDictionary<long, T> idxValues;
+        protected SortedDictionary<long, T> idxValues = new SortedDictionary<long, T>();
 
         public override int Count => idxValues.Count;
 
         public override IReadOnlyCollection<long> Indices => idxValues.Keys;
-        public IReadOnlyDictionary<long, T> IdxValues => idxValues;
         
-        protected ColumnBase(string tablePath, string name, SortedDictionary<long, T> idxValues)
+        protected ColumnBase(string tablePath, string name)
             : base(tablePath, name)
         {
-            this.idxValues = idxValues ?? new SortedDictionary<long, T>();
-        }
-
-        protected void FullUpdateBase(T value)
-        {
-            foreach (var idx in idxValues.Keys)
-                idxValues[idx] = value;
         }
 
         protected SortedSet<long> GetIndicesToLoad(List<long> indices)
         {
-            SortedSet<long> indicesToLoad = null;
-
-            if (indices != null)
+            var indicesToLoad = new SortedSet<long>();
+            foreach (var idx in indices)
             {
-                indicesToLoad = new SortedSet<long>();
-                foreach (var idx in indices)
-                {
-                    if (idxValues.ContainsKey(idx))
-                        continue;
+                if (idxValues.ContainsKey(idx))
+                    continue;
 
-                    indicesToLoad.Add(idx);
-                }
+                indicesToLoad.Add(idx);
             }
 
             return indicesToLoad;

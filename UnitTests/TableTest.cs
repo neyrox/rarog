@@ -1,6 +1,7 @@
 ﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Linq;
 using Engine.Storage;
 
 namespace UnitTests
@@ -29,9 +30,9 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void SelectReturnsAll()
+        public void SelectAll()
         {
-            var result = table.Select(new List<string> { "*" }, null);
+            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
             Assert.AreEqual(3, result.Count);
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(col2, result[1].All());
@@ -39,15 +40,53 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void SelectWithLimit()
+        {
+            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 1);
+            Assert.AreEqual(3, result.Count);
+            CollectionAssert.AreEqual(col1.Take(1).ToList(), result[0].All());
+            CollectionAssert.AreEqual(col2.Take(1).ToList(), result[1].All());
+            CollectionAssert.AreEqual(col3.Take(1).ToList(), result[2].All());
+        }
+
+        [TestMethod]
         public void CorrespondingRowSelected()
         {
             var condition = new ColumnConditionNode("c1", "=", "4");
 
-            var result = table.Select(new List<string> { "*" }, condition);
+            var result = table.Select(new List<string> { "*" }, condition, 0);
             Assert.AreEqual(3, result.Count);
             CollectionAssert.AreEqual(ToList("4"), result[0].All());
             CollectionAssert.AreEqual(ToList("5.4"), result[1].All());
             CollectionAssert.AreEqual(ToList("b"), result[2].All());
+        }
+
+        [TestMethod]
+        public void SelectWithSingleConditionLimit()
+        {
+            var condition = new ColumnConditionNode("c1", ">", "0");
+
+            var result = table.Select(new List<string> { "*" }, condition, 1);
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual(1, result[0].Count);
+            Assert.AreEqual(1, result[1].Count);
+            Assert.AreEqual(1, result[2].Count);
+        }
+
+        [TestMethod]
+        [DataRow("AND")]
+        [DataRow("OR")]
+        public void SelectWithCompositeConditionLimit(string op)
+        {
+            var leftCond = new ColumnConditionNode("c1", ">", "0");
+            var rightCond = new ColumnConditionNode("c2", ">", "0.0");
+            var condition = new CompositeConditionNode(leftCond, op, rightCond);
+
+            var result = table.Select(new List<string> { "*" }, condition, 1);
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual(1, result[0].Count);
+            Assert.AreEqual(1, result[1].Count);
+            Assert.AreEqual(1, result[2].Count);
         }
 
         [TestMethod]
@@ -57,7 +96,7 @@ namespace UnitTests
 
             table.Update(new List<string> { "c2" }, new List<string> { "10.1" }, condition);
 
-            var result = table.Select(new List<string> { "*" }, null);
+            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
             Assert.AreEqual(3, result.Count);
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(new List<string> { "2.3", "10.1" }, result[1].All());
@@ -71,7 +110,7 @@ namespace UnitTests
 
             table.Update(new List<string> { "c2" }, new List<string> { "10.2" }, condition);
 
-            var result = table.Select(new List<string> { "*" }, null);
+            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
             Assert.AreEqual(3, result.Count);
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(new List<string> { "10.2", "5.4" }, result[1].All());
@@ -82,7 +121,7 @@ namespace UnitTests
         public void OneRowDeleted()
         {
             table.Delete(new ColumnConditionNode("c1", "=", "1"));
-            var result = table.Select(new List<string> { "*" }, null);
+            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
             Assert.AreEqual(3, result.Count);
             CollectionAssert.AreEqual(ToList("4"), result[0].All());
             CollectionAssert.AreEqual(ToList("5.4"), result[1].All());

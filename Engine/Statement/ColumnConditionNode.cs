@@ -16,9 +16,9 @@ namespace Engine
             Value = value;
         }
 
-        public override List<long> GetRowsThatSatisfy(Table table, IStorage storage)
+        public override List<long> GetRowsThatSatisfy(Table table, IStorage storage, int limit)
         {
-            return table.GetColumn(ColumnName).Filter(Operation, Value, storage);
+            return table.GetColumn(ColumnName).Filter(Operation, Value, storage, limit);
         }
     }
 }

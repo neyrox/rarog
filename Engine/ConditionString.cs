@@ -113,4 +113,12 @@ namespace Engine
             return value.CompareTo(origin) >= 0;
         }
     }
+
+    public class ConditionStringAny : ConditionString
+    {
+        public override bool Satisfies(string value)
+        {
+            return true;
+        }
+    }
 }

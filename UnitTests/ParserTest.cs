@@ -18,6 +18,18 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void ParseSelectLimit()
+        {
+            var tokens = new string[] {"SELECT", "*", "FROM", "Agents", "LIMIT", "1", ";" };
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(SelectNode));
+            var select = (SelectNode)root;
+            Assert.AreEqual("*", select.What[0]);
+            Assert.AreEqual("Agents", select.TableName);
+            Assert.AreEqual(1, select.Limit);
+        }
+
+        [TestMethod]
         public void ParseSelectWhere()
         {
             var tokens = new string[] { "SELECT", "*", "FROM", "Customers", "WHERE", "CustomerID", "=", "1", ";" };

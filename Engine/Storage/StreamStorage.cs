@@ -54,7 +54,7 @@ namespace Engine.Storage
             return null;
         }
 
-        public static IReadOnlyDictionary<long, int> SelectInts(Stream stream, ConditionInteger cond)
+        public static IReadOnlyDictionary<long, int> SelectInts(Stream stream, ConditionInteger cond, int limit)
         {
             var result = new Dictionary<long, int>();
             while (stream.Position < stream.Length)
@@ -67,13 +67,16 @@ namespace Engine.Storage
                 {
                     if (cond.Satisfies(iv.Value))
                         result.Add(iv.Key, iv.Value);
+
+                    if (limit > 0 && result.Count >= limit)
+                        return result;
                 }
             }
 
             return result;
         }
 
-        public static IReadOnlyDictionary<long, double> SelectDoubles(Stream stream, ConditionDouble cond)
+        public static IReadOnlyDictionary<long, double> SelectDoubles(Stream stream, ConditionDouble cond, int limit)
         {
             var result = new Dictionary<long, double>();
             while (stream.Position < stream.Length)
@@ -86,13 +89,16 @@ namespace Engine.Storage
                 {
                     if (cond.Satisfies(iv.Value))
                         result.Add(iv.Key, iv.Value);
+
+                    if (limit > 0 && result.Count >= limit)
+                        return result;
                 }
             }
 
             return result;
         }
 
-        public static IReadOnlyDictionary<long, string> SelectVarChars(Stream stream, ConditionString cond)
+        public static IReadOnlyDictionary<long, string> SelectVarChars(Stream stream, ConditionString cond, int limit)
         {
             var result = new Dictionary<long, string>();
             while (stream.Position < stream.Length)
@@ -105,6 +111,9 @@ namespace Engine.Storage
                 {
                     if (cond.Satisfies(iv.Value))
                         result.Add(iv.Key, iv.Value);
+                    
+                    if (limit > 0 && result.Count >= limit)
+                        return result;
                 }
             }
 
@@ -118,23 +127,15 @@ namespace Engine.Storage
             {
                 var page = NextPage(stream);
                 var header = new PageHeader(page);
-                if (indices == null)
-                {
-                    var idxValues = IntPage.Load(header, page);
-                    foreach (var iv in idxValues)
-                        result.Add(iv.Key, iv.Value);
-                }
-                else
-                {
-                    if (!Overlap(header.MinIdx, header.MaxIdx, indices.Min, indices.Max))
+
+                if (!Overlap(header.MinIdx, header.MaxIdx, indices.Min, indices.Max))
                         continue;
 
-                    var idxValues = IntPage.Load(header, page);
-                    foreach (var iv in idxValues)
-                    {
-                        if (indices.Contains(iv.Key))
-                            result.Add(iv.Key, iv.Value);
-                    }
+                var idxValues = IntPage.Load(header, page);
+                foreach (var iv in idxValues)
+                {
+                    if (indices.Contains(iv.Key))
+                        result.Add(iv.Key, iv.Value);
                 }
             }
 
@@ -148,23 +149,15 @@ namespace Engine.Storage
             {
                 var page = NextPage(stream);
                 var header = new PageHeader(page);
-                if (indices == null)
-                {
-                    var idxValues = DoublePage.Load(header, page);
-                    foreach (var iv in idxValues)
-                        result.Add(iv.Key, iv.Value);
-                }
-                else
-                {
-                    if (!Overlap(header.MinIdx, header.MaxIdx, indices.Min, indices.Max))
-                        continue;
 
-                    var idxValues = DoublePage.Load(header, page);
-                    foreach (var iv in idxValues)
-                    {
-                        if (indices.Contains(iv.Key))
-                            result.Add(iv.Key, iv.Value);
-                    }
+                if (!Overlap(header.MinIdx, header.MaxIdx, indices.Min, indices.Max))
+                    continue;
+
+                var idxValues = DoublePage.Load(header, page);
+                foreach (var iv in idxValues)
+                {
+                    if (indices.Contains(iv.Key))
+                        result.Add(iv.Key, iv.Value);
                 }
             }
 

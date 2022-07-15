@@ -46,14 +46,14 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond)
+        public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond, int limit)
         {
             if (!File.Exists(fileName))
                 return new Dictionary<long, int>();
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectInts(file, cond);
+                return StreamStorage.SelectInts(file, cond, limit);
             }
         }
 
@@ -71,14 +71,14 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond)
+        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond, int limit)
         {
             if (!File.Exists(fileName))
                 return new Dictionary<long, double>();
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectDoubles(file, cond);
+                return StreamStorage.SelectDoubles(file, cond, limit);
             }
         }
 
@@ -96,14 +96,14 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond)
+        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond, int limit)
         {
             if (!File.Exists(fileName))
                 return new Dictionary<long, string>();
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectVarChars(file, cond);
+                return StreamStorage.SelectVarChars(file, cond, limit);
             }
         }
 
