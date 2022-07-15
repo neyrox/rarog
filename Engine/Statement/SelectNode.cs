@@ -22,7 +22,7 @@ namespace Engine
             if (!db.ContainsTable(TableName))
                 return Result.TableNotFound(TableName);
 
-            var rows = db.GetTable(TableName).Select(What, Condition);
+            var rows = db.GetTable(TableName).Select(What, Condition, Limit);
             return new Result(rows);
         }
     }

@@ -113,4 +113,12 @@ namespace Engine
             return value >= origin;
         }
     }
+
+    public class ConditionIntegerAny : ConditionInteger
+    {
+        public override bool Satisfies(int value)
+        {
+            return true;
+        }
+    }
 }

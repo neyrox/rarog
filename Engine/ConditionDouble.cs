@@ -113,4 +113,12 @@ namespace Engine
             return value >= origin;
         }
     }
+
+    public class ConditionDoubleAny : ConditionDouble
+    {
+        public override bool Satisfies(double value)
+        {
+            return true;
+        }
+    }
 }

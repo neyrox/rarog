@@ -36,11 +36,11 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond)
+        public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond, int limit)
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectInts(stream, cond);
+                return StreamStorage.SelectInts(stream, cond, limit);
             }
         }
 
@@ -52,11 +52,11 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond)
+        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond, int limit)
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectDoubles(stream, cond);
+                return StreamStorage.SelectDoubles(stream, cond, limit);
             }
         }
 
@@ -68,11 +68,11 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond)
+        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond, int limit)
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectVarChars(stream, cond);
+                return StreamStorage.SelectVarChars(stream, cond, limit);
             }
         }
 

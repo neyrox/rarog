@@ -29,6 +29,10 @@ namespace Engine
 
                 condition = ParserCondition.Convert(tokens, ref pos);
             }
+            else
+            {
+                condition = new AnyConditionNode();
+            }
 
             int limit = 0;
             if (ParserCommon.AssertUpperToken("LIMIT", tokens, pos))

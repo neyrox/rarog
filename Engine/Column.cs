@@ -30,7 +30,8 @@ namespace Engine
 
         public abstract ResultColumn Get(List<long> indices, IStorage storage);
 
-        public abstract List<long> Filter(string op, string value, IStorage storage);
+        public abstract List<long> AllIndices(IStorage storage, int limit);
+        public abstract List<long> Filter(string op, string value, IStorage storage, int limit);
 
         public abstract void Delete(List<long> indicesToDelete, IStorage storage);
         public abstract void DeleteInternal(List<long> indicesToDelete, IStorage storage);

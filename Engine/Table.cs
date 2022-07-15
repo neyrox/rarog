@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Engine.Storage;
 
 namespace Engine
@@ -19,6 +20,8 @@ namespace Engine
             Name = name;
             this.storage = storage;
         }
+
+        public Column FirstColumn => columns.First().Value;
 
         public Column GetColumn(string name)
         {
@@ -63,7 +66,7 @@ namespace Engine
 
         public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
         {
-            var rowsToUpdate = condition.GetRowsThatSatisfy(this, storage);
+            var rowsToUpdate = condition.GetRowsThatSatisfy(this, storage, 0);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -103,14 +106,9 @@ namespace Engine
             AddRow();
         }
 
-        public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition)
+        public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition, int limit)
         {
-            List<long> rowsToSelect = null;
-            // TODO: replace with empty condition?
-            if (condition != null)
-            {
-                rowsToSelect = condition.GetRowsThatSatisfy(this, storage);
-            }
+            var rowsToSelect = condition.GetRowsThatSatisfy(this, storage, limit);
 
             return Select(columnNames, rowsToSelect);
         }
@@ -121,7 +119,7 @@ namespace Engine
             // TODO: replace with empty condition?
             if (condition != null)
             {
-                rowsToDelete = condition.GetRowsThatSatisfy(this, storage);
+                rowsToDelete = condition.GetRowsThatSatisfy(this, storage, 0);
             }
 
             foreach (var column in columns)
@@ -168,14 +166,9 @@ namespace Engine
         {
             if (columns.Count > 0)
             {
-                using (var enumerator = columns.GetEnumerator())
-                {
-                    enumerator.MoveNext();
-                    var firstColumn = enumerator.Current.Value;
-                    var indices = firstColumn.Indices;
-                    foreach (var idx in indices)
-                        column.Insert(idx, column.DefaultValue, storage);
-                }
+                // TODO: optimize
+                foreach (var idx in FirstColumn.AllIndices(storage, 0))
+                    column.Insert(idx, column.DefaultValue, storage);
             }
 
             columns.Add(column.Name, column);
