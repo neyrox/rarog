@@ -28,14 +28,14 @@ namespace Engine
             var val = double.Parse(value ?? DefaultValue);
             idxValues.Add(idx, val);
             // TODO: cleanup cache
-            
+
             storage.InsertDoubles(GetDataFileName(TablePath, Name), idx, val);
         }
 
         public override ResultColumn Get(List<long> indices, IStorage storage)
         {
             var stored = indices == null
-                ? storage.SelectDoubles(GetDataFileName(TablePath, Name), new ConditionDoubleAny(),0) 
+                ? storage.SelectDoubles(GetDataFileName(TablePath, Name), ConditionAny<double>.Instance,0) 
                 : storage.SelectDoubles(GetDataFileName(TablePath, Name), GetIndicesToLoad(indices));
 
             foreach (var iv in stored)
@@ -57,7 +57,7 @@ namespace Engine
             var result = new List<long>();
 
             var stored = storage.SelectDoubles(
-                GetDataFileName(TablePath, Name), new ConditionDoubleAny(), limit);
+                GetDataFileName(TablePath, Name), ConditionAny<double>.Instance, limit);
 
             foreach (var iv in stored)
             {
@@ -70,11 +70,9 @@ namespace Engine
 
         public override List<long> Filter(string op, string value, IStorage storage, int limit)
         {
-            var result = new List<long>();
+            var condition = Condition<double>.Transform(op, value);
 
-            var condition = ConditionDouble.Transform(op, value);
-            if (condition == null)
-                return result;
+            var result = new List<long>();
 
             var stored = storage.SelectDoubles(
                 GetDataFileName(TablePath, Name), condition, limit);
@@ -88,9 +86,9 @@ namespace Engine
             return result;
         }
 
-        public override void DeleteInternal(List<long> idxsToDelete, IStorage storage)
+        public override void DeleteInternal(List<long> indicesToDelete, IStorage storage)
         {
-            storage.DeleteDoubles(GetDataFileName(TablePath, Name), new SortedSet<long>(idxsToDelete));
+            storage.DeleteDoubles(GetDataFileName(TablePath, Name), new SortedSet<long>(indicesToDelete));
         }
     }
 }

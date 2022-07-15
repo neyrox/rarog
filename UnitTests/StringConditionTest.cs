@@ -9,7 +9,7 @@ namespace UnitTests
         [TestMethod]
         public void StringLessThenAString()
         {
-            var condition = new ConditionStringLess("bbb");
+            var condition = new ConditionLess<string>("bbb");
             Assert.IsTrue(condition.Satisfies("aaa"));
             Assert.IsFalse(condition.Satisfies("bbb"));
             Assert.IsFalse(condition.Satisfies("ccc"));
@@ -18,7 +18,7 @@ namespace UnitTests
         [TestMethod]
         public void StringLessOrEqualToAString()
         {
-            var condition = new ConditionStringLessOrEqual("bbb");
+            var condition = new ConditionLessOrEqual<string>("bbb");
             Assert.IsTrue(condition.Satisfies("aaa"));
             Assert.IsTrue(condition.Satisfies("bbb"));
             Assert.IsFalse(condition.Satisfies("ccc"));
@@ -27,7 +27,7 @@ namespace UnitTests
         [TestMethod]
         public void StringGreaterThenAString()
         {
-            var condition = new ConditionStringGreater("bbb");
+            var condition = new ConditionGreater<string>("bbb");
             Assert.IsTrue(condition.Satisfies("ccc"));
             Assert.IsFalse(condition.Satisfies("bbb"));
             Assert.IsFalse(condition.Satisfies("aaa"));
@@ -36,7 +36,7 @@ namespace UnitTests
         [TestMethod]
         public void StringGreaterOrEqualToAString()
         {
-            var condition = new ConditionStringGreaterOrEqual("bbb");
+            var condition = new ConditionGreaterOrEqual<string>("bbb");
             Assert.IsTrue(condition.Satisfies("ccc"));
             Assert.IsTrue(condition.Satisfies("bbb"));
             Assert.IsFalse(condition.Satisfies("aaa"));

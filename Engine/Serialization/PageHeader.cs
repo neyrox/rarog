@@ -3,14 +3,6 @@ using Engine.Serialization;
 
 namespace Engine.Storage
 {
-    public enum PageTypes : byte
-    {
-        Empty = 0,
-        IntColumn = 1,
-        DblColumn = 2,
-        StrColumn = 3,
-    }
-
     public class PageHeader
     {
         public const int DataOffset = sizeof(byte) + sizeof(long) * 2 + sizeof(int);

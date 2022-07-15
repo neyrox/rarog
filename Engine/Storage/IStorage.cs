@@ -10,11 +10,11 @@ namespace Engine.Storage
         void StoreColumnMeta(Column column, string tableName, string fileName);
         Column LoadColumnMeta(string tablePath, string fileName);
 
-        IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond, int limit);
+        IReadOnlyDictionary<long, int> SelectInts(string fileName, Condition<int> cond, int limit);
         IReadOnlyDictionary<long, int> SelectInts(string fileName, SortedSet<long> indices);
-        IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond, int limit);
+        IReadOnlyDictionary<long, double> SelectDoubles(string fileName, Condition<double> cond, int limit);
         IReadOnlyDictionary<long, double> SelectDoubles(string fileName, SortedSet<long> indices);
-        IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond, int limit);
+        IReadOnlyDictionary<long, string> SelectVarChars(string fileName, Condition<string> cond, int limit);
         IReadOnlyDictionary<long, string> SelectVarChars(string fileName, SortedSet<long> indices);
 
         void UpdateInts(string fileName, long idx, int val);

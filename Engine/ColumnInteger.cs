@@ -35,7 +35,7 @@ namespace Engine
         public override ResultColumn Get(List<long> indices, IStorage storage)
         {
             var stored = indices == null
-                ? storage.SelectInts(GetDataFileName(TablePath, Name), new ConditionIntegerAny(),0)
+                ? storage.SelectInts(GetDataFileName(TablePath, Name), ConditionAny<int>.Instance,0)
                 : storage.SelectInts(GetDataFileName(TablePath, Name), GetIndicesToLoad(indices));
 
             foreach (var iv in stored)
@@ -57,7 +57,7 @@ namespace Engine
             var result = new List<long>();
 
             var stored = storage.SelectInts(
-                GetDataFileName(TablePath, Name), new ConditionIntegerAny(), limit);
+                GetDataFileName(TablePath, Name), ConditionAny<int>.Instance, limit);
 
             foreach (var iv in stored)
             {
@@ -72,7 +72,7 @@ namespace Engine
         {
             var result = new List<long>();
 
-            var condition = ConditionInteger.Transform(op, value);
+            var condition = Condition<int>.Transform(op, value);
             if (condition == null)
                 return result;
 

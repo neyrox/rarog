@@ -46,14 +46,14 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond, int limit)
+        public IReadOnlyDictionary<long, int> SelectInts(string fileName, Condition<int> cond, int limit)
         {
             if (!File.Exists(fileName))
                 return new Dictionary<long, int>();
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectInts(file, cond, limit);
+                return IntPage.Instance.Select(file, cond, limit);
             }
         }
 
@@ -67,18 +67,18 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectInts(file, indices);
+                return IntPage.Instance.Select(file, indices);
             }
         }
 
-        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond, int limit)
+        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, Condition<double> cond, int limit)
         {
             if (!File.Exists(fileName))
                 return new Dictionary<long, double>();
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectDoubles(file, cond, limit);
+                return DoublePage.Instance.Select(file, cond, limit);
             }
         }
 
@@ -92,18 +92,18 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectDoubles(file, indices);
+                return DoublePage.Instance.Select(file, indices);
             }
         }
 
-        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond, int limit)
+        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, Condition<string> cond, int limit)
         {
             if (!File.Exists(fileName))
                 return new Dictionary<long, string>();
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectVarChars(file, cond, limit);
+                return VarCharPage.Instance.Select(file, cond, limit);
             }
         }
 
@@ -117,7 +117,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return StreamStorage.SelectVarChars(file, indices);
+                return VarCharPage.Instance.Select(file, indices);
             }
         }
 
@@ -128,7 +128,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                StreamStorage.UpdateInts(file, idx, val);
+                IntPage.Instance.Update(file, idx, val);
             }
         }
 
@@ -139,7 +139,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                StreamStorage.UpdateDoubles(file, idx, val);
+                DoublePage.Instance.Update(file, idx, val);
             }
         }
 
@@ -150,7 +150,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                StreamStorage.UpdateVarChars(file, idx, val);
+                VarCharPage.Instance.Update(file, idx, val);
             }
         }
 
@@ -158,7 +158,7 @@ namespace Engine.Storage
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                StreamStorage.InsertInts(file, idx, val);
+                IntPage.Instance.Insert(file, idx, val);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Engine.Storage
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                StreamStorage.InsertDoubles(file, idx, val);
+                DoublePage.Instance.Insert(file, idx, val);
             }
         }
 
@@ -174,7 +174,7 @@ namespace Engine.Storage
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                StreamStorage.InsertVarChars(file, idx, val);
+                VarCharPage.Instance.Insert(file, idx, val);
             }
         }
 
@@ -185,7 +185,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                StreamStorage.DeleteInts(file, indices);
+                IntPage.Instance.Delete(file, indices);
             }
         }
 
@@ -196,7 +196,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                StreamStorage.DeleteDoubles(file, indices);
+                DoublePage.Instance.Delete(file, indices);
             }
         }
 
@@ -207,7 +207,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                StreamStorage.DeleteVarChars(file, indices);
+                VarCharPage.Instance.Delete(file, indices);
             }
         }
 
