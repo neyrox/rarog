@@ -1,3 +1,4 @@
+using System.Text;
 using Engine.Serialization;
 
 namespace Engine.Storage
@@ -14,6 +15,13 @@ namespace Engine.Storage
         protected override void PackValue(byte[] buffer, string value, ref int offset)
         {
             BytePacker.PackString16(buffer, value, ref offset);
+        }
+
+        protected override int CalcMaxPairSize(string value)
+        {
+            // Leave 64Kb space for updates to longer strings
+            return sizeof(long) + sizeof(ushort) + value.Length * 4 + 65536;
+            //Encoding.UTF8.GetByteCount(value);
         }
     }
 }

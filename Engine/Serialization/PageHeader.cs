@@ -5,7 +5,7 @@ namespace Engine.Storage
 {
     public class PageHeader
     {
-        public const int DataOffset = sizeof(byte) + sizeof(long) * 2 + sizeof(int);
+        public const int DataOffset = Page.HeaderSize;
 
         public readonly long MinIdx;
         public readonly long MaxIdx;

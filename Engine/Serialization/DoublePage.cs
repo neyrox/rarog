@@ -15,5 +15,10 @@ namespace Engine.Storage
         {
             BytePacker.PackDouble(buffer, value, ref offset);
         }
+
+        protected override int CalcMaxPairSize(double value)
+        {
+            return sizeof(long) + sizeof(double);
+        }
     }
 }

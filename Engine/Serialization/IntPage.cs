@@ -15,5 +15,10 @@ namespace Engine.Storage
         {
             BytePacker.PackSInt32(buffer, value, ref offset);
         }
+
+        protected override int CalcMaxPairSize(int value)
+        {
+            return sizeof(long) + sizeof(int);
+        }
     }
 }

@@ -71,6 +71,31 @@ namespace Engine.Storage
             }
         }
 
+        public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, Condition<long> cond, int limit)
+        {
+            if (!File.Exists(fileName))
+                return new Dictionary<long, long>();
+
+            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
+            {
+                return BigIntPage.Instance.Select(file, cond, limit);
+            }
+        }
+
+        public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, SortedSet<long> indices)
+        {
+            if (indices != null && indices.Count == 0)
+                return new Dictionary<long, long>();
+            
+            if (!File.Exists(fileName))
+                return new Dictionary<long, long>();
+
+            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
+            {
+                return BigIntPage.Instance.Select(file, indices);
+            }
+        }
+
         public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, Condition<double> cond, int limit)
         {
             if (!File.Exists(fileName))
@@ -132,6 +157,17 @@ namespace Engine.Storage
             }
         }
 
+        public void UpdateBigInts(string fileName, long idx, long val)
+        {
+            if (!File.Exists(fileName))
+                return;
+
+            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
+            {
+                BigIntPage.Instance.Update(file, idx, val);
+            }
+        }
+
         public void UpdateDoubles(string fileName, long idx, double val)
         {
             if (!File.Exists(fileName))
@@ -162,6 +198,14 @@ namespace Engine.Storage
             }
         }
 
+        public void InsertBigInts(string fileName, long idx, long val)
+        {
+            using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                BigIntPage.Instance.Insert(file, idx, val);
+            }
+        }
+
         public void InsertDoubles(string fileName, long idx, double val)
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
@@ -186,6 +230,17 @@ namespace Engine.Storage
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 IntPage.Instance.Delete(file, indices);
+            }
+        }
+
+        public void DeleteBigInts(string fileName, SortedSet<long> indices)
+        {
+            if (!File.Exists(fileName))
+                return;
+
+            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
+            {
+                BigIntPage.Instance.Delete(file, indices);
             }
         }
 

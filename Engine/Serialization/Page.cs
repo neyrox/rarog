@@ -7,7 +7,8 @@ namespace Engine.Storage
 {
     public struct Page
     {
-        public const int Size = 512 * 1024;  // SSD block size
+        public const int HeaderSize = 4 * 1024;  // block read size (4Kb)
+        public const int Size = 512 * 1024;  // SSD block write size (512Kb)
     }
 
     public abstract class PageBase<T> where T: IComparable<T>
@@ -83,14 +84,19 @@ namespace Engine.Storage
             var idxVals = Load(header, page);
             idxVals[idx] = val;
             // TODO: reuse buffer
-            page = Serialize(idxVals);
+            page = Serialize(idxVals, out var tail);
+            if (tail != null)
+            {
+                var extraPage = Serialize(idxVals, out var tailAgain);
+                stream.Seek(0, SeekOrigin.End);
+                StreamStorage.Write(stream, extraPage);
+            }
 
             StreamStorage.WriteBack(stream, page);
         }
 
         public void Insert(Stream stream, long idx, T val)
         {
-            // TODO: handle split
             SortedDictionary<long, T> idxVals;
             if (StreamStorage.FindPageForInsert(stream, idx, out var header, out var page))
             {
@@ -104,10 +110,16 @@ namespace Engine.Storage
 
             // TODO: reuse buffer
             idxVals.Add(idx, val);
-            page = Serialize(idxVals);
+            page = Serialize(idxVals, out var tail);
             StreamStorage.Write(stream, page);
+            if (tail != null)
+            {
+                var extraPage = Serialize(idxVals, out var tailAgain);
+                stream.Seek(0, SeekOrigin.End);
+                StreamStorage.Write(stream, extraPage);
+            }
         }
-        
+
         public void Delete(Stream stream, SortedSet<long> indices)
         {
             while (stream.Position < stream.Length)
@@ -122,28 +134,42 @@ namespace Engine.Storage
                     idxVals.Remove(idx);
 
                 // TODO: reuse buffer
-                page = Serialize(idxVals);
+                page = Serialize(idxVals, out var tail);
                 StreamStorage.WriteBack(stream, page);
                 return;
             }
         }
 
-        private byte[] Serialize(SortedDictionary<long, T> idxVals)
+        private byte[] Serialize(SortedDictionary<long, T> idxVals, out SortedDictionary<long, T> tail)
         {
-            // TODO: split pages
+            tail = null;
             var buffer = new byte[Page.Size];
             long minIdx = long.MaxValue;
             long maxIdx = long.MinValue;
             int offset = PageHeader.DataOffset;
+            bool split = false;
             foreach (var idxVal in idxVals)
             {
-                if (idxVal.Key < minIdx)
-                    minIdx = idxVal.Key;
-                if (idxVal.Key > maxIdx)
-                    maxIdx = idxVal.Key;
+                if (offset + CalcMaxPairSize(idxVal.Value) >= buffer.Length)
+                {
+                    split = true;
+                    tail = new SortedDictionary<long, T>();
+                }
 
-                BytePacker.PackSInt64(buffer, idxVal.Key, ref offset);
-                PackValue(buffer, idxVal.Value, ref offset);
+                if (!split)
+                {
+                    if (idxVal.Key < minIdx)
+                        minIdx = idxVal.Key;
+                    if (idxVal.Key > maxIdx)
+                        maxIdx = idxVal.Key;
+
+                    BytePacker.PackSInt64(buffer, idxVal.Key, ref offset);
+                    PackValue(buffer, idxVal.Value, ref offset);
+                }
+                else
+                {
+                    tail.Add(idxVal.Key, idxVal.Value);
+                }
             }
             var header = new PageHeader(minIdx, maxIdx, idxVals.Count);
             header.Serialize(buffer);
@@ -153,5 +179,6 @@ namespace Engine.Storage
 
         protected abstract T UnpackValue(byte[] buffer, ref int offset);
         protected abstract void PackValue(byte[] buffer, T value, ref int offset);
+        protected abstract int CalcMaxPairSize(T value);
     }
 }

@@ -10,6 +10,7 @@ namespace Engine
     {
         void Visit(ResultColumnDouble column);
         void Visit(ResultColumnInteger column);
+        void Visit(ResultColumnBigInt column);
         void Visit(ResultColumnString column);
     }
 }

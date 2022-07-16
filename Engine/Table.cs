@@ -36,6 +36,9 @@ namespace Engine
                 case "int":
                     AddColumn(new ColumnInteger(tablePath, name));
                     break;
+                case "bigint":
+                    AddColumn(new ColumnBigInt(tablePath, name));
+                    break;
                 case "float":
                 case "double":
                     AddColumn(new ColumnDouble(tablePath, name));
@@ -195,9 +198,7 @@ namespace Engine
             }
 
             for (int j = 0; j < columnsToQuery.Count; ++j)
-            {
                 result.Add(columnsToQuery[j].Get(rows, storage));
-            }
 
             return result;
         }

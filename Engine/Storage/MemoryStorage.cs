@@ -52,6 +52,22 @@ namespace Engine.Storage
             }
         }
 
+        public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, Condition<long> cond, int limit)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                return BigIntPage.Instance.Select(stream, cond, limit);
+            }
+        }
+
+        public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                return BigIntPage.Instance.Select(stream, indices);
+            }
+        }
+
         public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, Condition<double> cond, int limit)
         {
             using (var stream = PrepareStream(fileName))
@@ -93,6 +109,15 @@ namespace Engine.Storage
             }
         }
 
+        public void UpdateBigInts(string fileName, long idx, long val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                BigIntPage.Instance.Update(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
         public void UpdateDoubles(string fileName, long idx, double val)
         {
             using (var stream = PrepareStream(fileName))
@@ -120,6 +145,15 @@ namespace Engine.Storage
             }
         }
 
+        public void InsertBigInts(string fileName, long idx, long val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                BigIntPage.Instance.Insert(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
         public void InsertDoubles(string fileName, long idx, double val)
         {
             using (var stream = PrepareStream(fileName))
@@ -143,6 +177,15 @@ namespace Engine.Storage
             using (var stream = PrepareStream(fileName))
             {
                 IntPage.Instance.Delete(stream, indices);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void DeleteBigInts(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                BigIntPage.Instance.Delete(stream, indices);
                 buffers[fileName] = stream.ToArray();
             }
         }
