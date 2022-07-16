@@ -6,9 +6,8 @@ namespace Engine
 {
     public class ColumnBigInt: ColumnBase<long>
     {
-        public const string TypeName = "BigInt";
         public override string DefaultValue => "0";
-        public override string TypeNameP => TypeName;
+        public override string TypeNameP => ResultColumnBigInt.TypeTag;
 
         public ColumnBigInt(string tablePath, string name)
             : base(tablePath, name)

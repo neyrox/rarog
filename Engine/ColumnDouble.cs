@@ -6,9 +6,8 @@ namespace Engine
 {
     public class ColumnDouble: ColumnBase<double>
     {
-        public const string TypeName = "Dbl";
         public override string DefaultValue => "0";
-        public override string TypeNameP => TypeName;
+        public override string TypeNameP => ResultColumnDouble.TypeTag;
 
         public ColumnDouble(string tablePath, string name)
             : base(tablePath, name)

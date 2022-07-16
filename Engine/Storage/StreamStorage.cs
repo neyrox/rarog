@@ -35,11 +35,13 @@ namespace Engine.Storage
 
             switch (columnType)
             {
-                case "Int":
+                case ResultColumnInteger.TypeTag:
                     return new ColumnInteger(tablePath, name);
-                case "Dbl":
+                case ResultColumnBigInt.TypeTag:
+                    return new ColumnBigInt(tablePath, name);
+                case ResultColumnDouble.TypeTag:
                     return new ColumnDouble(tablePath, name);
-                case "Str":
+                case ResultColumnString.TypeTag:
                     return new ColumnVarChar(tablePath, name);
             }
 

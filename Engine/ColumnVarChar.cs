@@ -6,10 +6,8 @@ namespace Engine
 {
     public class ColumnVarChar: ColumnBase<string>
     {
-        public const string TypeName = "Str";
-
         public int MaxLength = 65535;
-        public override string TypeNameP => TypeName;
+        public override string TypeNameP => ResultColumnString.TypeTag;
 
         public override string DefaultValue => "";
 

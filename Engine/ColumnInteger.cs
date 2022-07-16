@@ -6,9 +6,8 @@ namespace Engine
 {
     public class ColumnInteger: ColumnBase<int>
     {
-        public const string TypeName = "Int";
         public override string DefaultValue => "0";
-        public override string TypeNameP => TypeName;
+        public override string TypeNameP => ResultColumnInteger.TypeTag;
 
         public ColumnInteger(string tablePath, string name)
             : base(tablePath, name)
