@@ -73,27 +73,36 @@ namespace Engine.Serialization
 
             switch (columnType)
             {
-                case "Int":
+                case ResultColumnInteger.TypeTag:
                 {
-                    int[] items = new int[itemsCount];
+                    var items = new int[itemsCount];
                     for (int i = 0; i < itemsCount; ++i)
                     {
                         items[i] = columnVals[i].To<int>();
                     }
                     return new ResultColumnInteger(columnName, items);
                 }
-                case "Dbl":
+                case ResultColumnBigInt.TypeTag:
                 {
-                    double[] items = new double[itemsCount];
+                    var items = new long[itemsCount];
+                    for (int i = 0; i < itemsCount; ++i)
+                    {
+                        items[i] = columnVals[i].To<long>();
+                    }
+                    return new ResultColumnBigInt(columnName, items);
+                }
+                case ResultColumnDouble.TypeTag:
+                {
+                    var items = new double[itemsCount];
                     for (int i = 0; i < itemsCount; ++i)
                     {
                         items[i] = columnVals[i].To<double>();
                     }
                     return new ResultColumnDouble(columnName, items);
                 }
-                case "Str":
+                case ResultColumnString.TypeTag:
                 {
-                    string[] items = new string[itemsCount];
+                    var items = new string[itemsCount];
                     for (int i = 0; i < itemsCount; ++i)
                     {
                         items[i] = columnVals[i].To<string>();
@@ -116,7 +125,7 @@ namespace Engine.Serialization
             var col = new MPackMap
             {
                 {"Name", column.Name},
-                {"Type", "Dbl"},
+                {"Type", ResultColumnDouble.TypeTag},
                 {"Vals", vals}
             };
 
@@ -134,7 +143,25 @@ namespace Engine.Serialization
             var col = new MPackMap
             {
                 {"Name", column.Name},
-                {"Type", "Int"},
+                {"Type", ResultColumnInteger.TypeTag},
+                {"Vals", vals}
+            };
+
+            _arr.Add(col);
+        }
+
+        public void Visit(ResultColumnBigInt column)
+        {
+            var vals = new MPackArray();
+            for (int i = 0; i < column.Count; ++i)
+            {
+                vals.Add(MPack.From(column[i]));
+            }
+
+            var col = new MPackMap
+            {
+                {"Name", column.Name},
+                {"Type", ResultColumnBigInt.TypeTag},
                 {"Vals", vals}
             };
 
@@ -152,7 +179,7 @@ namespace Engine.Serialization
             var col = new MPackMap
             {
                 {"Name", column.Name},
-                {"Type", "Str"},
+                {"Type", ResultColumnString.TypeTag},
                 {"Vals", vals}
             };
 

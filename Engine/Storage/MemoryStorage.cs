@@ -36,11 +36,11 @@ namespace Engine.Storage
             }
         }
 
-        public IReadOnlyDictionary<long, int> SelectInts(string fileName, ConditionInteger cond, int limit)
+        public IReadOnlyDictionary<long, int> SelectInts(string fileName, Condition<int> cond, int limit)
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectInts(stream, cond, limit);
+                return IntPage.Instance.Select(stream, cond, limit);
             }
         }
 
@@ -48,15 +48,31 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectInts(stream, indices);
+                return IntPage.Instance.Select(stream, indices);
             }
         }
 
-        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, ConditionDouble cond, int limit)
+        public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, Condition<long> cond, int limit)
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectDoubles(stream, cond, limit);
+                return BigIntPage.Instance.Select(stream, cond, limit);
+            }
+        }
+
+        public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                return BigIntPage.Instance.Select(stream, indices);
+            }
+        }
+
+        public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, Condition<double> cond, int limit)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                return DoublePage.Instance.Select(stream, cond, limit);
             }
         }
 
@@ -64,15 +80,15 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectDoubles(stream, indices);
+                return DoublePage.Instance.Select(stream, indices);
             }
         }
 
-        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, ConditionString cond, int limit)
+        public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, Condition<string> cond, int limit)
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectVarChars(stream, cond, limit);
+                return VarCharPage.Instance.Select(stream, cond, limit);
             }
         }
 
@@ -80,7 +96,7 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                return StreamStorage.SelectVarChars(stream, indices);
+                return VarCharPage.Instance.Select(stream, indices);
             }
         }
 
@@ -88,7 +104,16 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.UpdateInts(stream, idx, val);
+                IntPage.Instance.Update(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void UpdateBigInts(string fileName, long idx, long val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                BigIntPage.Instance.Update(stream, idx, val);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -97,7 +122,7 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.UpdateDoubles(stream, idx, val);
+                DoublePage.Instance.Update(stream, idx, val);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -106,7 +131,7 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.UpdateVarChars(stream, idx, val);
+                VarCharPage.Instance.Update(stream, idx, val);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -115,7 +140,16 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.InsertInts(stream, idx, val);
+                IntPage.Instance.Insert(stream, idx, val);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void InsertBigInts(string fileName, long idx, long val)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                BigIntPage.Instance.Insert(stream, idx, val);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -124,7 +158,7 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.InsertDoubles(stream, idx, val);
+                DoublePage.Instance.Insert(stream, idx, val);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -133,7 +167,7 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.InsertVarChars(stream, idx, val);
+                VarCharPage.Instance.Insert(stream, idx, val);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -142,7 +176,16 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.DeleteInts(stream, indices);
+                IntPage.Instance.Delete(stream, indices);
+                buffers[fileName] = stream.ToArray();
+            }
+        }
+
+        public void DeleteBigInts(string fileName, SortedSet<long> indices)
+        {
+            using (var stream = PrepareStream(fileName))
+            {
+                BigIntPage.Instance.Delete(stream, indices);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -151,7 +194,7 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.DeleteDoubles(stream, indices);
+                DoublePage.Instance.Delete(stream, indices);
                 buffers[fileName] = stream.ToArray();
             }
         }
@@ -160,7 +203,7 @@ namespace Engine.Storage
         {
             using (var stream = PrepareStream(fileName))
             {
-                StreamStorage.DeleteVarChars(stream, indices);
+                VarCharPage.Instance.Delete(stream, indices);
                 buffers[fileName] = stream.ToArray();
             }
         }

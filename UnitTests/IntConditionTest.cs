@@ -9,7 +9,7 @@ namespace UnitTests
         [TestMethod]
         public void IntEqualToInt()
         {
-            var condition = new ConditionIntegerEqual("5");
+            var condition = new ConditionEqual<int>("5");
             Assert.IsFalse(condition.Satisfies(4));
             Assert.IsFalse(condition.Satisfies(-3));
             Assert.IsTrue(condition.Satisfies(5));
@@ -20,7 +20,7 @@ namespace UnitTests
         [TestMethod]
         public void IntNotEqualToInt()
         {
-            var condition = new ConditionIntegerNotEqual("5");
+            var condition = new ConditionNotEqual<int>("5");
             Assert.IsTrue(condition.Satisfies(-4));
             Assert.IsTrue(condition.Satisfies(3));
             Assert.IsFalse(condition.Satisfies(5));
@@ -31,7 +31,7 @@ namespace UnitTests
         [TestMethod]
         public void IntLessThenInt()
         {
-            var condition = new ConditionIntegerLess("5");
+            var condition = new ConditionLess<int>("5");
             Assert.IsTrue(condition.Satisfies(4));
             Assert.IsFalse(condition.Satisfies(5));
             Assert.IsFalse(condition.Satisfies(6));
@@ -40,7 +40,7 @@ namespace UnitTests
         [TestMethod]
         public void IntLessOrEqualToInt()
         {
-            var condition = new ConditionIntegerLessOrEqual("5");
+            var condition = new ConditionLessOrEqual<int>("5");
             Assert.IsTrue(condition.Satisfies(4));
             Assert.IsTrue(condition.Satisfies(5));
             Assert.IsFalse(condition.Satisfies(6));
@@ -49,7 +49,7 @@ namespace UnitTests
         [TestMethod]
         public void IntGreaterThenInt()
         {
-            var condition = new ConditionIntegerGreater("5");
+            var condition = new ConditionGreater<int>("5");
             Assert.IsTrue(condition.Satisfies(6));
             Assert.IsFalse(condition.Satisfies(5));
             Assert.IsFalse(condition.Satisfies(4));
@@ -58,7 +58,7 @@ namespace UnitTests
         [TestMethod]
         public void IntGreaterOrEqualToInt()
         {
-            var condition = new ConditionIntegerGreaterOrEqual("5");
+            var condition = new ConditionGreaterOrEqual<int>("5");
             Assert.IsTrue(condition.Satisfies(6));
             Assert.IsTrue(condition.Satisfies(5));
             Assert.IsFalse(condition.Satisfies(4));

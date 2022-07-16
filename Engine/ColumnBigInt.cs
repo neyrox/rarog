@@ -4,59 +4,59 @@ using Engine.Storage;
 
 namespace Engine
 {
-    public class ColumnDouble: ColumnBase<double>
+    public class ColumnBigInt: ColumnBase<long>
     {
         public override string DefaultValue => "0";
-        public override string TypeNameP => ResultColumnDouble.TypeTag;
+        public override string TypeNameP => ResultColumnBigInt.TypeTag;
 
-        public ColumnDouble(string tablePath, string name)
+        public ColumnBigInt(string tablePath, string name)
             : base(tablePath, name)
         {
         }
 
         public override void Update(long idx, string value, IStorage storage)
         {
-            var val = double.Parse(value);
+            long val = long.Parse(value);
             idxValues[idx] = val;
 
-            storage.UpdateDoubles(GetDataFileName(TablePath, Name), idx, val);
+            storage.UpdateBigInts(GetDataFileName(TablePath, Name), idx, val);
         }
 
         public override void Insert(long idx, string value, IStorage storage)
         {
-            var val = double.Parse(value ?? DefaultValue);
+            long val = long.Parse(value ?? DefaultValue);
             idxValues.Add(idx, val);
             // TODO: cleanup cache
-
-            storage.InsertDoubles(GetDataFileName(TablePath, Name), idx, val);
+            
+            storage.InsertBigInts(GetDataFileName(TablePath, Name), idx, val);
         }
 
         public override ResultColumn Get(List<long> indices, IStorage storage)
         {
             var stored = indices == null
-                ? storage.SelectDoubles(GetDataFileName(TablePath, Name), ConditionAny<double>.Instance,0) 
-                : storage.SelectDoubles(GetDataFileName(TablePath, Name), GetIndicesToLoad(indices));
+                ? storage.SelectBigInts(GetDataFileName(TablePath, Name), ConditionAny<long>.Instance,0)
+                : storage.SelectBigInts(GetDataFileName(TablePath, Name), GetIndicesToLoad(indices));
 
             foreach (var iv in stored)
                 idxValues[iv.Key] = iv.Value;
 
             if (indices == null)
-                return new ResultColumnDouble(Name, idxValues.Values.ToArray());
+                return new ResultColumnBigInt(Name, idxValues.Values.ToArray());
 
-            var resultValues = new double[indices.Count];
+            var resultValues = new long[indices.Count];
             for (int i = 0; i < indices.Count; ++i)
                 resultValues[i] = idxValues[indices[i]];
             // TODO: cleanup cache
 
-            return new ResultColumnDouble(Name, resultValues);
+            return new ResultColumnBigInt(Name, resultValues);
         }
 
         public override List<long> AllIndices(IStorage storage, int limit)
         {
             var result = new List<long>();
 
-            var stored = storage.SelectDoubles(
-                GetDataFileName(TablePath, Name), ConditionAny<double>.Instance, limit);
+            var stored = storage.SelectBigInts(
+                GetDataFileName(TablePath, Name), ConditionAny<long>.Instance, limit);
 
             foreach (var iv in stored)
             {
@@ -69,13 +69,13 @@ namespace Engine
 
         public override List<long> Filter(string op, string value, IStorage storage, int limit)
         {
-            var condition = Condition<double>.Transform(op, value);
-
             var result = new List<long>();
 
-            var stored = storage.SelectDoubles(
-                GetDataFileName(TablePath, Name), condition, limit);
+            var condition = Condition<long>.Transform(op, value);
+            if (condition == null)
+                return result;
 
+            var stored = storage.SelectBigInts(GetDataFileName(TablePath, Name), condition, limit);
             foreach (var iv in stored)
             {
                 idxValues[iv.Key] = iv.Value;
@@ -85,9 +85,9 @@ namespace Engine
             return result;
         }
 
-        public override void DeleteInternal(List<long> indicesToDelete, IStorage storage)
+        public override void DeleteInternal(List<long> rowsToDelete, IStorage storage)
         {
-            storage.DeleteDoubles(GetDataFileName(TablePath, Name), new SortedSet<long>(indicesToDelete));
+            storage.DeleteBigInts(GetDataFileName(TablePath, Name), new SortedSet<long>(rowsToDelete));
         }
     }
 }

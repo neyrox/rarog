@@ -1,10 +1,10 @@
 ﻿namespace Engine
 {
-    public class ResultColumnInteger: ResultColumnBase<int>
+    public class ResultColumnBigInt: ResultColumnBase<long>
     {
-        public const string TypeTag = "Int";
+        public const string TypeTag = "BigInt";
 
-        public ResultColumnInteger(string name, int[] vals)
+        public ResultColumnBigInt(string name, long[] vals)
             : base(name, vals)
         {
         }

@@ -6,10 +6,8 @@ namespace Engine
 {
     public class ColumnVarChar: ColumnBase<string>
     {
-        public const string TypeName = "Str";
-
         public int MaxLength = 65535;
-        public override string TypeNameP => TypeName;
+        public override string TypeNameP => ResultColumnString.TypeTag;
 
         public override string DefaultValue => "";
 
@@ -36,7 +34,7 @@ namespace Engine
         public override ResultColumn Get(List<long> indices, IStorage storage)
         {
             var stored = indices == null
-                ? storage.SelectVarChars(GetDataFileName(TablePath, Name), new ConditionStringAny(), 0) 
+                ? storage.SelectVarChars(GetDataFileName(TablePath, Name), new ConditionAny<string>(), 0) 
                 : storage.SelectVarChars(GetDataFileName(TablePath, Name), GetIndicesToLoad(indices));
 
             foreach (var iv in stored)
@@ -58,7 +56,7 @@ namespace Engine
             var result = new List<long>();
 
             var stored = storage.SelectVarChars(
-                GetDataFileName(TablePath, Name), new ConditionStringAny(), limit);
+                GetDataFileName(TablePath, Name), new ConditionAny<string>(), limit);
 
             foreach (var iv in stored)
             {
@@ -82,11 +80,9 @@ namespace Engine
 
         public override List<long> Filter(string operation, string value, IStorage storage, int limit)
         {
-            var result = new List<long>();
+            var condition = Condition<string>.Transform(operation, value);
 
-            var condition = ConditionString.Transform(operation, value);
-            if (condition == null)
-                return result;
+            var result = new List<long>();
 
             var stored = storage.SelectVarChars(
                 GetDataFileName(TablePath, Name), condition, limit);
