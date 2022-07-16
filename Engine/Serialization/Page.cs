@@ -85,14 +85,8 @@ namespace Engine.Storage
             idxVals[idx] = val;
             // TODO: reuse buffer
             page = Serialize(idxVals, out var tail);
-            if (tail != null)
-            {
-                var extraPage = Serialize(idxVals, out var tailAgain);
-                stream.Seek(0, SeekOrigin.End);
-                StreamStorage.Write(stream, extraPage);
-            }
-
             StreamStorage.WriteBack(stream, page);
+            AppendTail(stream, tail);
         }
 
         public void Insert(Stream stream, long idx, T val)
@@ -112,12 +106,7 @@ namespace Engine.Storage
             idxVals.Add(idx, val);
             page = Serialize(idxVals, out var tail);
             StreamStorage.Write(stream, page);
-            if (tail != null)
-            {
-                var extraPage = Serialize(idxVals, out var tailAgain);
-                stream.Seek(0, SeekOrigin.End);
-                StreamStorage.Write(stream, extraPage);
-            }
+            AppendTail(stream, tail);
         }
 
         public void Delete(Stream stream, SortedSet<long> indices)
@@ -139,6 +128,17 @@ namespace Engine.Storage
                 return;
             }
         }
+
+        private void AppendTail(Stream stream, SortedDictionary<long, T> tail)
+        {
+            if (tail != null)
+            {
+                var extraPage = Serialize(tail, out var tailAgain);
+                stream.Seek(0, SeekOrigin.End);
+                StreamStorage.Write(stream, extraPage);
+            }
+        }
+
 
         private byte[] Serialize(SortedDictionary<long, T> idxVals, out SortedDictionary<long, T> tail)
         {
