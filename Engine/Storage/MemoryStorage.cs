@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Engine.Statement;
 
 namespace Engine.Storage
 {
@@ -100,38 +101,38 @@ namespace Engine.Storage
             }
         }
 
-        public void UpdateInts(string fileName, long idx, int val)
+        public void UpdateInts(string fileName, long idx, OperationGeneric<int> op)
         {
             using (var stream = PrepareStream(fileName))
             {
-                IntPage.Instance.Update(stream, idx, val);
+                IntPage.Instance.Update(stream, idx, op);
                 buffers[fileName] = stream.ToArray();
             }
         }
 
-        public void UpdateBigInts(string fileName, long idx, long val)
+        public void UpdateBigInts(string fileName, long idx, OperationGeneric<long> op)
         {
             using (var stream = PrepareStream(fileName))
             {
-                BigIntPage.Instance.Update(stream, idx, val);
+                BigIntPage.Instance.Update(stream, idx, op);
                 buffers[fileName] = stream.ToArray();
             }
         }
 
-        public void UpdateDoubles(string fileName, long idx, double val)
+        public void UpdateDoubles(string fileName, long idx, OperationGeneric<double> op)
         {
             using (var stream = PrepareStream(fileName))
             {
-                DoublePage.Instance.Update(stream, idx, val);
+                DoublePage.Instance.Update(stream, idx, op);
                 buffers[fileName] = stream.ToArray();
             }
         }
 
-        public void UpdateVarChars(string fileName, long idx, string val)
+        public void UpdateVarChars(string fileName, long idx, OperationGeneric<string> op)
         {
             using (var stream = PrepareStream(fileName))
             {
-                VarCharPage.Instance.Update(stream, idx, val);
+                VarCharPage.Instance.Update(stream, idx, op);
                 buffers[fileName] = stream.ToArray();
             }
         }

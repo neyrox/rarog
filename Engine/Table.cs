@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Engine.Statement;
 using Engine.Storage;
 
 namespace Engine
@@ -71,20 +72,21 @@ namespace Engine
             }
         }
 
-        public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
+        public void Update(List<string> columnNames, List<OperationNode> ops, ConditionNode condition)
         {
             var rowsToUpdate = condition.GetRowsThatSatisfy(this, storage, 0);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
                 var columnName = columnNames[i];
-                var value = values[i];
+                var op = ops[i];
 
+                // TODO: batch it
                 for (int j = 0; j < rowsToUpdate.Count; ++j)
                 {
                     long row = rowsToUpdate[j];
                     var column = columns[columnName];
-                    column.Update(row, value, storage);
+                    column.Update(row, op, storage);
                 }
             }
         }

@@ -12,6 +12,7 @@ namespace Bench
     {
         private Connection dbConn;
         private Options options;
+        private Random rnd;
 
         public class Options
         {
@@ -47,13 +48,24 @@ namespace Bench
                 dbConn = new Connection("localhost", port);
                 Console.WriteLine("Connected");
 
-                if (options.Init)
-                    Init();
-                else
-                    Benchmark();
+                rnd = new Random(DateTime.UtcNow.ToFileTimeUtc().GetHashCode());
 
-                // Close everything.
-                dbConn.Close();
+                try
+                {
+                    if (options.Init)
+                        Init();
+                    else
+                        Benchmark();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                finally
+                {
+                    // Close everything.
+                    dbConn.Close();
+                }
             }
             catch (ArgumentNullException e)
             {
@@ -67,8 +79,6 @@ namespace Bench
         
         private void Init()
         {
-            var rnd = new Random(DateTime.UtcNow.ToFileTimeUtc().GetHashCode());
-
             Console.WriteLine("Dropping tables");
             var dropTable1 = Perform("DROP TABLE bench_accounts;");
             if (!dropTable1.IsOK)
@@ -145,7 +155,10 @@ namespace Bench
 
         private void Benchmark()
         {
-            //var result = dbConn.Perform("CREATE TABLE bench_accounts (aid int, bid int, abalance int, filler varchar(255);");
+            int aid = rnd.Next(10000);
+            int delta = rnd.Next(10000) - 5000;
+
+            var update = Perform($"UPDATE bench_accounts SET abalance = abalance + {delta} WHERE aid = {aid};");
         }
 
         private void RunTransaction()

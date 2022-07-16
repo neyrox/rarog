@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Engine.Statement;
 using Engine.Storage;
 
 namespace Engine
@@ -14,12 +15,13 @@ namespace Engine
         {
         }
 
-        public override void Update(long idx, string value, IStorage storage)
+        public override void Update(long idx, OperationNode opNode, IStorage storage)
         {
-            long val = long.Parse(value);
-            idxValues[idx] = val;
+            var op = OperationBigInt.Transform(opNode);
+            if (idxValues.ContainsKey(idx))
+                idxValues[idx] = op.Perform(idxValues[idx]);
 
-            storage.UpdateBigInts(GetDataFileName(TablePath, Name), idx, val);
+            storage.UpdateBigInts(GetDataFileName(TablePath, Name), idx, op);
         }
 
         public override void Insert(long idx, string value, IStorage storage)

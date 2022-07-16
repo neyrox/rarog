@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Engine.Statement;
 using Engine.Storage;
 
 namespace Engine
@@ -16,11 +17,14 @@ namespace Engine
         {
         }
 
-        public override void Update(long idx, string value, IStorage storage)
+        public override void Update(long idx, OperationNode opNode, IStorage storage)
         {
-            idxValues[idx] = Clamp(value);
+            var op = OperationString.Transform(opNode);
+            if (idxValues.ContainsKey(idx))
+                idxValues[idx] = op.Perform(idxValues[idx]);
 
-            storage.UpdateVarChars(GetDataFileName(TablePath, Name), idx, value);
+            // TODO: cache new values via data callback
+            storage.UpdateVarChars(GetDataFileName(TablePath, Name), idx, op);
         }
 
         public override void Insert(long idx, string value, IStorage storage)

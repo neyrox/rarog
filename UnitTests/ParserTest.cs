@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Engine.Statement;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
@@ -167,8 +168,9 @@ namespace UnitTests
             Assert.AreEqual("Customers", update.TableName);
             Assert.AreEqual(1, update.ColumnNames.Count);
             Assert.AreEqual("ContactName", update.ColumnNames[0]);
-            Assert.AreEqual(1, update.Values.Count);
-            Assert.AreEqual("Alfred", update.Values[0]);
+            Assert.AreEqual(1, update.Ops.Count);
+            Assert.AreEqual(OperationNode.Assign, update.Ops[0].Op);
+            Assert.AreEqual("Alfred", update.Ops[0].Value);
             Assert.IsNull(update.Condition);
         }
 
@@ -184,9 +186,11 @@ namespace UnitTests
             Assert.AreEqual(2, update.ColumnNames.Count);
             Assert.AreEqual("ContactName", update.ColumnNames[0]);
             Assert.AreEqual("City", update.ColumnNames[1]);
-            Assert.AreEqual(2, update.Values.Count);
-            Assert.AreEqual("Alfred", update.Values[0]);
-            Assert.AreEqual("Frankfurt", update.Values[1]);
+            Assert.AreEqual(2, update.Ops.Count);
+            Assert.AreEqual(OperationNode.Assign, update.Ops[0].Op);
+            Assert.AreEqual("Alfred", update.Ops[0].Value);
+            Assert.AreEqual(OperationNode.Assign, update.Ops[0].Op);
+            Assert.AreEqual("Frankfurt", update.Ops[1].Value);
             Assert.IsNotNull(update.Condition);
             var columnCondition = update.Condition as ColumnConditionNode;
             Assert.AreEqual("CustomerID", columnCondition.ColumnName);

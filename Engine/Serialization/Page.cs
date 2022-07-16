@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Engine.Serialization;
+using Engine.Statement;
 
 namespace Engine.Storage
 {
@@ -76,13 +77,13 @@ namespace Engine.Storage
             return result;
         }
 
-        public void Update(Stream stream, long idx, T val)
+        public void Update(Stream stream, long idx, OperationGeneric<T> op)
         {
             if (!StreamStorage.FindPage(stream, idx, out var header, out var page))
                 return;
 
             var idxVals = Load(header, page);
-            idxVals[idx] = val;
+            idxVals[idx] = op.Perform(idxVals[idx]);
             // TODO: reuse buffer
             page = Serialize(idxVals, out var tail);
             StreamStorage.WriteBack(stream, page);

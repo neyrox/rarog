@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Engine.Statement;
 using Engine.Storage;
 
 namespace Engine
@@ -24,7 +25,7 @@ namespace Engine
             Name = name;
         }
 
-        public abstract void Update(long idx, string value, IStorage storage);
+        public abstract void Update(long idx, OperationNode op, IStorage storage);
 
         public abstract void Insert(long idx, string value, IStorage storage);
 
