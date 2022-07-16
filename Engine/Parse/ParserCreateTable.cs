@@ -25,12 +25,17 @@ namespace Engine
             if (ParserCommon.AssertToken("(", tokens, pos))
                 ++pos;
             else
-                return null;
+                throw new Exception("Failed to find opening parenthesis at start of columns list");
 
             var columnNames = new List<string>();
             var dataTypes = new List<string>();
             var lengths = new List<int>();
             ConvertColumns(tokens, columnNames, dataTypes, lengths, ref pos);
+
+            if (ParserCommon.AssertToken(")", tokens, pos))
+                ++pos;
+            else
+                throw new Exception("Failed to find closing parenthesis at the end of columns list");
 
             if (ParserCommon.AssertToken(";", tokens, pos))
                 ++pos;
@@ -44,12 +49,6 @@ namespace Engine
         {
             while (pos < tokens.Length)
             {
-                if (ParserCommon.AssertToken(")", tokens, pos))
-                {
-                    ++pos;
-                    break;
-                }
-
                 columnNames.Add(tokens[pos]);  // TODO: check column names
                 ++pos;
                 if (pos >= tokens.Length)
@@ -70,13 +69,15 @@ namespace Engine
                     if (ParserCommon.AssertToken(")", tokens, pos))
                         ++pos;
                     else
-                        break;
+                        throw new Exception("Failed to find closing parenthesis at the field length");
                 }
                 else
                     lengths.Add(0);
 
                 if (ParserCommon.AssertToken(",", tokens, pos))
                     ++pos;
+                else
+                    break;
             }
         }
     }
