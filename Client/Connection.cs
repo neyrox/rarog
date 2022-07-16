@@ -39,7 +39,7 @@ namespace Rarog
             var body = new byte[bodyLength];
 
             bytes = _stream.Read(body, 0, body.Length);
-            Console.WriteLine("Received: {0} bytes", bytes);
+            //Console.WriteLine("Received: {0} bytes", bytes);
 
             //var resultBytes = new byte[bytes];
             // TODO: get rid of copying here
