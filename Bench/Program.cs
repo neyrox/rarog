@@ -1,24 +1,57 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Sockets;
 using Engine;
+using Microsoft.Extensions.Configuration;
 using Rarog;
 
 namespace Bench
 {
     class Program
     {
+        private Connection dbConn;
+        private Options options;
+
+        public class Options
+        {
+            public static readonly Dictionary<string, string> CommandLineMap = new Dictionary<string, string>
+            {
+                {"-i", "init"},
+            };
+
+            public bool Init { get; set; }
+        }
+        
         static void Main(string[] args)
+        {
+            var program = new Program(args);
+            program.Run();
+        }
+
+        private Program(string[] args)
+        {
+            var config = new ConfigurationBuilder()
+                .AddCommandLine(args, Options.CommandLineMap)
+                .Build();
+
+            options = new Options();
+            config.Bind(options);
+        }
+
+        public void Run()
         {
             try
             {
                 int port = 33777;
-                var dbConn = new Connection("localhost", port);
+                dbConn = new Connection("localhost", port);
                 Console.WriteLine("Connected");
 
-                Init(dbConn);
+                if (options.Init)
+                    Init();
+                else
+                    Benchmark();
 
-                Benchmark(dbConn);
-                
                 // Close everything.
                 dbConn.Close();
             }
@@ -31,38 +64,101 @@ namespace Bench
                 Console.WriteLine("SocketException: {0}", e);
             }
         }
-
-        static void Init(Connection dbConn)
+        
+        private void Init()
         {
-            var testTable1 = dbConn.Perform("SELECT * FROM TABLE bench_accounts LIMIT 1;");
-            if (testTable1.IsOK)
-                return;
+            var rnd = new Random(DateTime.UtcNow.ToFileTimeUtc().GetHashCode());
 
-            var createTable1 = dbConn.Perform("CREATE TABLE bench_accounts (aid int, bid int, abalance int, filler varchar(84);");
+            Console.WriteLine("Dropping tables");
+            var dropTable1 = Perform("DROP TABLE bench_accounts;");
+            if (!dropTable1.IsOK)
+                throw new Exception("Failed to drop database bench_accounts");
+            var dropTable2 = Perform("DROP TABLE bench_branches;");
+            if (!dropTable2.IsOK)
+                throw new Exception("Failed to drop database bench_branches");
+            var dropTable3 = Perform("DROP TABLE bench_history;");
+            if (!dropTable3.IsOK)
+                throw new Exception("Failed to drop database bench_history");
+            var dropTable4 = Perform("DROP TABLE bench_tellers;");
+            if (!dropTable4.IsOK)
+                throw new Exception("Failed to drop database bench_tellers");
+
+            var createTable1 = Perform("CREATE TABLE bench_accounts (aid int, bid int, abalance int, filler varchar(96));");
             if (!createTable1.IsOK)
-                throw new Exception("Failed to initialize database");
+                throw new Exception("Failed to initialize database bench_accounts");
 
-            var createTable2 = dbConn.Perform("CREATE TABLE bench_branches (bid int, bbalance int, filler varchar(88);");
+            var createTable2 = Perform("CREATE TABLE bench_branches (bid int, bbalance int, filler varchar(88));");
             if (!createTable2.IsOK)
-                throw new Exception("Failed to initialize database");
+                throw new Exception("Failed to initialize database bench_branches");
 
-            var createTable3 = dbConn.Perform("CREATE TABLE bench_history (tid int, bid int, aid int, delta int, mtime long, filler varchar(88);");
+            var createTable3 = Perform("CREATE TABLE bench_history (tid int, bid int, aid int, delta int, mtime bigint, filler varchar(88));");
             if (!createTable3.IsOK)
-                throw new Exception("Failed to initialize database");
+                throw new Exception("Failed to initialize database bench_history");
 
-            var createTable4 = dbConn.Perform("CREATE TABLE bench_tellers (tid int, bid int, tbalance int, filler varchar(88);");
+            var createTable4 = Perform("CREATE TABLE bench_tellers (tid int, bid int, tbalance int, filler varchar(88));");
             if (!createTable4.IsOK)
-                throw new Exception("Failed to initialize database");
+                throw new Exception("Failed to initialize database bench_tellers");
+
+            var fillBuff = new byte[32];
+            var sw = new Stopwatch();
+            sw.Start();
+            for (int aid = 0; aid < 10000; ++aid)
+            {
+                int bid = rnd.Next(1);
+                //int tid = rnd.Next(10);
+                rnd.NextBytes(fillBuff);
+                var filler = BitConverter.ToString(fillBuff);
+                var insert = Perform($"INSERT INTO bench_accounts (aid, bid, abalance, filler) VALUES ({aid}, {bid}, 0, {filler});");
+                if (!insert.IsOK)
+                    throw new Exception("Failed to insert account");
+
+                if (aid % 1000 == 999)
+                {
+                    var elapsedSeconds = sw.ElapsedMilliseconds * 0.001;
+                    sw.Restart();
+                    var qps = 1000 / elapsedSeconds;
+                    Console.WriteLine($"Insert: {qps} Queries per second");
+                }
+            }
+
+            for (int bid = 0; bid < 1; ++bid)
+            {
+                //int bid = rnd.Next(1);
+                //int tid = rnd.Next(10);
+                rnd.NextBytes(fillBuff);
+                var filler = BitConverter.ToString(fillBuff);
+                var insert = Perform($"INSERT INTO bench_branches (bid, bbalance, filler) VALUES ({bid}, 0, {filler});");
+                if (!insert.IsOK)
+                    throw new Exception("Failed to insert branch");
+            }
+
+            for (int tid = 0; tid < 10; ++tid)
+            {
+                int bid = rnd.Next(1);
+                rnd.NextBytes(fillBuff);
+                var filler = BitConverter.ToString(fillBuff);
+                var insert = Perform($"INSERT INTO bench_tellers (tid, bid, tbalance, filler) VALUES ({tid}, {bid}, 0, {filler});");
+                if (!insert.IsOK)
+                    throw new Exception("Failed to insert teller");
+            }
         }
 
-        static void Benchmark(Connection dbConn)
+        private void Benchmark()
         {
             //var result = dbConn.Perform("CREATE TABLE bench_accounts (aid int, bid int, abalance int, filler varchar(255);");
         }
 
-        static void RunTransaction(Connection dbConn)
+        private void RunTransaction()
         {
             //var result = dbConn.Perform("CREATE TABLE bench_accounts (aid int, bid int, abalance int, filler varchar(255);");
+        }
+
+        private Result Perform(string query)
+        {
+            var result = dbConn.Perform(query);
+            if (!result.IsOK)
+                Console.WriteLine(result.Error);
+            return result;
         }
     }
 }
