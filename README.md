@@ -15,4 +15,4 @@ insert, update, select, delete
 =, >, <, >=, <=, <>, and, or
 
 ## supported column types
-int, float(same as double), double, varchar
+int, bigint, float(same as double), double, varchar
