@@ -6,15 +6,13 @@ namespace Engine
 {
     public class ColumnVarChar: ColumnBase<string>
     {
-        public const string TypeName = "Str";
-
         public int MaxLength = 65535;
-        public override string TypeNameP => TypeName;
+        public override string TypeNameP => ResultColumnString.TypeTag;
 
         public override string DefaultValue => "";
 
-        public ColumnVarChar(string tablePath, string name, SortedDictionary<long, string> idxValues = null)
-            : base(tablePath, name, idxValues)
+        public ColumnVarChar(string tablePath, string name)
+            : base(tablePath, name)
         {
         }
 
@@ -35,9 +33,10 @@ namespace Engine
 
         public override ResultColumn Get(List<long> indices, IStorage storage)
         {
-            var indicesToLoad = GetIndicesToLoad(indices);
+            var stored = indices == null
+                ? storage.SelectVarChars(GetDataFileName(TablePath, Name), new ConditionAny<string>(), 0) 
+                : storage.SelectVarChars(GetDataFileName(TablePath, Name), GetIndicesToLoad(indices));
 
-            var stored = storage.SelectVarChars(GetDataFileName(TablePath, Name), indicesToLoad);
             foreach (var iv in stored)
                 idxValues[iv.Key] = iv.Value;
 
@@ -52,6 +51,22 @@ namespace Engine
             return new ResultColumnString(Name, resultValues);
         }
 
+        public override List<long> AllIndices(IStorage storage, int limit)
+        {
+            var result = new List<long>();
+
+            var stored = storage.SelectVarChars(
+                GetDataFileName(TablePath, Name), new ConditionAny<string>(), limit);
+
+            foreach (var iv in stored)
+            {
+                idxValues[iv.Key] = iv.Value;
+                result.Add(iv.Key);
+            }
+
+            return result;
+        }
+
         private string Clamp(string value)
         {
             if (value.Length < MaxLength)
@@ -63,15 +78,15 @@ namespace Engine
             return value.Substring(0, MaxLength);
         }
 
-        public override List<long> Filter(string operation, string value, IStorage storage)
+        public override List<long> Filter(string operation, string value, IStorage storage, int limit)
         {
+            var condition = Condition<string>.Transform(operation, value);
+
             var result = new List<long>();
 
-            var condition = ConditionString.Transform(operation, value);
-            if (condition == null)
-                return result;
+            var stored = storage.SelectVarChars(
+                GetDataFileName(TablePath, Name), condition, limit);
 
-            var stored = storage.SelectVarChars(GetDataFileName(TablePath, Name), condition);
             foreach (var iv in stored)
             {
                 idxValues[iv.Key] = iv.Value;

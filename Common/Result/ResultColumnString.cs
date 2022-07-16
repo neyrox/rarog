@@ -2,6 +2,8 @@
 {
     public class ResultColumnString: ResultColumnBase<string>
     {
+        public const string TypeTag = "Str";
+
         public ResultColumnString(string name, string[] vals)
             : base(name, vals)
         {

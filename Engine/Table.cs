@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Engine.Storage;
 
 namespace Engine
 {
     public class Table
     {
+        private const int MaxColumnNameLength = 64;
         public const string MetaFileExtension = ".meta";
         public const string TableDirExtension = ".data";
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
@@ -20,6 +22,8 @@ namespace Engine
             this.storage = storage;
         }
 
+        public Column FirstColumn => columns.First().Value;
+
         public Column GetColumn(string name)
         {
             return columns[name];
@@ -27,11 +31,17 @@ namespace Engine
 
         public void AddColumn(string name, string type, int length)
         {
+            if (name.Length > MaxColumnNameLength)
+                throw new Exception($"Column name {name} is too long. Maximum column name length is {MaxColumnNameLength}");
+
             var tablePath = GetTableDir();
             switch (type.ToLowerInvariant())
             {
                 case "int":
                     AddColumn(new ColumnInteger(tablePath, name));
+                    break;
+                case "bigint":
+                    AddColumn(new ColumnBigInt(tablePath, name));
                     break;
                 case "float":
                 case "double":
@@ -63,7 +73,7 @@ namespace Engine
 
         public void Update(List<string> columnNames, List<string> values, ConditionNode condition)
         {
-            var rowsToUpdate = condition.GetRowsThatSatisfy(this, storage);
+            var rowsToUpdate = condition.GetRowsThatSatisfy(this, storage, 0);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -103,14 +113,9 @@ namespace Engine
             AddRow();
         }
 
-        public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition)
+        public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition, int limit)
         {
-            List<long> rowsToSelect = null;
-            // TODO: replace with empty condition?
-            if (condition != null)
-            {
-                rowsToSelect = condition.GetRowsThatSatisfy(this, storage);
-            }
+            var rowsToSelect = condition.GetRowsThatSatisfy(this, storage, limit);
 
             return Select(columnNames, rowsToSelect);
         }
@@ -121,7 +126,7 @@ namespace Engine
             // TODO: replace with empty condition?
             if (condition != null)
             {
-                rowsToDelete = condition.GetRowsThatSatisfy(this, storage);
+                rowsToDelete = condition.GetRowsThatSatisfy(this, storage, 0);
             }
 
             foreach (var column in columns)
@@ -168,14 +173,9 @@ namespace Engine
         {
             if (columns.Count > 0)
             {
-                using (var enumerator = columns.GetEnumerator())
-                {
-                    enumerator.MoveNext();
-                    var firstColumn = enumerator.Current.Value;
-                    var indices = firstColumn.Indices;
-                    foreach (var idx in indices)
-                        column.Insert(idx, column.DefaultValue, storage);
-                }
+                // TODO: optimize
+                foreach (var idx in FirstColumn.AllIndices(storage, 0))
+                    column.Insert(idx, column.DefaultValue, storage);
             }
 
             columns.Add(column.Name, column);
@@ -202,9 +202,7 @@ namespace Engine
             }
 
             for (int j = 0; j < columnsToQuery.Count; ++j)
-            {
                 result.Add(columnsToQuery[j].Get(rows, storage));
-            }
 
             return result;
         }

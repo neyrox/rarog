@@ -6,12 +6,11 @@ namespace Engine
 {
     public class ColumnInteger: ColumnBase<int>
     {
-        public const string TypeName = "Int";
         public override string DefaultValue => "0";
-        public override string TypeNameP => TypeName;
+        public override string TypeNameP => ResultColumnInteger.TypeTag;
 
-        public ColumnInteger(string tablePath, string name, SortedDictionary<long, int> idxValues = null)
-            : base(tablePath, name, idxValues)
+        public ColumnInteger(string tablePath, string name)
+            : base(tablePath, name)
         {
         }
 
@@ -34,9 +33,10 @@ namespace Engine
 
         public override ResultColumn Get(List<long> indices, IStorage storage)
         {
-            var indicesToLoad = GetIndicesToLoad(indices);
+            var stored = indices == null
+                ? storage.SelectInts(GetDataFileName(TablePath, Name), ConditionAny<int>.Instance,0)
+                : storage.SelectInts(GetDataFileName(TablePath, Name), GetIndicesToLoad(indices));
 
-            var stored = storage.SelectInts(GetDataFileName(TablePath, Name), indicesToLoad);
             foreach (var iv in stored)
                 idxValues[iv.Key] = iv.Value;
 
@@ -51,15 +51,31 @@ namespace Engine
             return new ResultColumnInteger(Name, resultValues);
         }
 
-        public override List<long> Filter(string op, string value, IStorage storage)
+        public override List<long> AllIndices(IStorage storage, int limit)
         {
             var result = new List<long>();
 
-            var condition = ConditionInteger.Transform(op, value);
+            var stored = storage.SelectInts(
+                GetDataFileName(TablePath, Name), ConditionAny<int>.Instance, limit);
+
+            foreach (var iv in stored)
+            {
+                idxValues[iv.Key] = iv.Value;
+                result.Add(iv.Key);
+            }
+
+            return result;
+        }
+
+        public override List<long> Filter(string op, string value, IStorage storage, int limit)
+        {
+            var result = new List<long>();
+
+            var condition = Condition<int>.Transform(op, value);
             if (condition == null)
                 return result;
 
-            var stored = storage.SelectInts(GetDataFileName(TablePath, Name), condition);
+            var stored = storage.SelectInts(GetDataFileName(TablePath, Name), condition, limit);
             foreach (var iv in stored)
             {
                 idxValues[iv.Key] = iv.Value;

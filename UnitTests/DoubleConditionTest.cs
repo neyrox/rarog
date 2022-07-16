@@ -9,7 +9,7 @@ namespace UnitTests
         [TestMethod]
         public void DoubleLessThenDouble()
         {
-            var condition = new ConditionDoubleLess("5");
+            var condition = new ConditionLess<double>("5");
             Assert.IsTrue(condition.Satisfies(4));
             Assert.IsTrue(condition.Satisfies(4.999));
             Assert.IsFalse(condition.Satisfies(5));
@@ -20,7 +20,7 @@ namespace UnitTests
         [TestMethod]
         public void DoubleLessOrEqualToDouble()
         {
-            var condition = new ConditionDoubleLessOrEqual("5");
+            var condition = new ConditionLessOrEqual<double>("5");
             Assert.IsTrue(condition.Satisfies(4));
             Assert.IsTrue(condition.Satisfies(4.999));
             Assert.IsTrue(condition.Satisfies(5));
@@ -31,7 +31,7 @@ namespace UnitTests
         [TestMethod]
         public void DoubleGreaterThenDouble()
         {
-            var condition = new ConditionDoubleGreater("5");
+            var condition = new ConditionGreater<double>("5");
             Assert.IsTrue(condition.Satisfies(6));
             Assert.IsTrue(condition.Satisfies(5.001));
             Assert.IsFalse(condition.Satisfies(5));
@@ -42,7 +42,7 @@ namespace UnitTests
         [TestMethod]
         public void DoubleGreaterOrEqualToDouble()
         {
-            var condition = new ConditionDoubleGreaterOrEqual("5");
+            var condition = new ConditionGreaterOrEqual<double>("5");
             Assert.IsTrue(condition.Satisfies(6));
             Assert.IsTrue(condition.Satisfies(5.001));
             Assert.IsTrue(condition.Satisfies(5));

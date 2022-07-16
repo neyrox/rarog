@@ -11,7 +11,8 @@ namespace Engine.Serialization
         {
             ColumnInteger = 1,
             ColumnDouble = 2,
-            ColumnString = 3
+            ColumnString = 3,
+            ColumnBigInt = 4,
         }
 
         public byte[] PackResult(Result res, out int length)
@@ -70,16 +71,25 @@ namespace Engine.Serialization
             {
                 case ColumnType.ColumnInteger:
                 {
-                    int[] items = new int[itemsCount];
+                    var items = new int[itemsCount];
                     for (int i = 0; i < itemsCount; ++i)
                     {
                         items[i] = BytePacker.UnpackSInt32(buffer, ref offset);
                     }
                     return new ResultColumnInteger(name, items);
                 }
+                case ColumnType.ColumnBigInt:
+                {
+                    var items = new long[itemsCount];
+                    for (int i = 0; i < itemsCount; ++i)
+                    {
+                        items[i] = BytePacker.UnpackSInt64(buffer, ref offset);
+                    }
+                    return new ResultColumnBigInt(name, items);
+                }
                 case ColumnType.ColumnDouble:
                 {
-                    double[] items = new double[itemsCount];
+                    var items = new double[itemsCount];
                     for (int i = 0; i < itemsCount; ++i)
                     {
                         items[i] = BytePacker.UnpackDouble(buffer, ref offset);
@@ -88,7 +98,7 @@ namespace Engine.Serialization
                 }
                 case ColumnType.ColumnString:
                 {
-                    string[] items = new string[itemsCount];
+                    var items = new string[itemsCount];
                     for (int i = 0; i < itemsCount; ++i)
                     {
                         items[i] = BytePacker.UnpackString16(buffer, ref offset);
@@ -115,6 +125,15 @@ namespace Engine.Serialization
             for (int i = 0; i < column.Count; ++i)
             {
                 BytePacker.PackSInt32(_buffer, column[i], ref _offset);
+            }
+        }
+
+        public void Visit(ResultColumnBigInt column)
+        {
+            BytePacker.PackUInt8(_buffer, (byte)ColumnType.ColumnBigInt, ref _offset);
+            for (int i = 0; i < column.Count; ++i)
+            {
+                BytePacker.PackSInt64(_buffer, column[i], ref _offset);
             }
         }
 

@@ -4,6 +4,8 @@ namespace Engine
 {
     public class ResultColumnDouble: ResultColumnBase<double>
     {
+        public const string TypeTag = "Dbl";
+
         public ResultColumnDouble(string name, double[] vals)
             : base(name, vals)
         {

@@ -1,46 +1,27 @@
-using System;
-using System.Collections.Generic;
+using System.Text;
 using Engine.Serialization;
 
 namespace Engine.Storage
 {
-    public class VarCharPage
+    public class VarCharPage : PageBase<string>
     {
-        public static SortedDictionary<long, string> Load(PageHeader header, byte[] buffer)
-        {
-            var result = new SortedDictionary<long, string>();
-            int offset = PageHeader.DataOffset;
-            for (int i = 0; i < header.Count; ++i)
-            {
-                var idx = BytePacker.UnpackSInt64(buffer, ref offset);
-                string val = BytePacker.UnpackString16(buffer, ref offset);
-                result.Add(idx, val);
-            }
+        public static VarCharPage Instance => new VarCharPage();
 
-            return result;
+        protected override string UnpackValue(byte[] buffer, ref int offset)
+        {
+            return BytePacker.UnpackString16(buffer, ref offset);
         }
 
-        public static byte[] Serialize(SortedDictionary<long, string> idxVals)
+        protected override void PackValue(byte[] buffer, string value, ref int offset)
         {
-            // TODO: split pages
-            var buffer = new byte[PageDesc.Size];
-            long minIdx = Int64.MaxValue;
-            long maxIdx = Int64.MinValue;
-            int offset = PageHeader.DataOffset;
-            foreach (var idxVal in idxVals)
-            {
-                if (idxVal.Key < minIdx)
-                    minIdx = idxVal.Key;
-                if (idxVal.Key > maxIdx)
-                    maxIdx = idxVal.Key;
+            BytePacker.PackString16(buffer, value, ref offset);
+        }
 
-                BytePacker.PackSInt64(buffer, idxVal.Key, ref offset);
-                BytePacker.PackString16(buffer, idxVal.Value, ref offset);
-            }
-            var header = new PageHeader(minIdx, maxIdx, idxVals.Count);
-            header.Serialize(buffer);
-
-            return buffer;
+        protected override int CalcMaxPairSize(string value)
+        {
+            // Leave 64Kb space for updates to longer strings
+            return sizeof(long) + sizeof(ushort) + value.Length * 4 + 65536;
+            //Encoding.UTF8.GetByteCount(value);
         }
     }
 }
