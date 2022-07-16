@@ -7,6 +7,7 @@ namespace Engine
 {
     public class Table
     {
+        private const int MaxColumnNameLength = 64;
         public const string MetaFileExtension = ".meta";
         public const string TableDirExtension = ".data";
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
@@ -30,6 +31,9 @@ namespace Engine
 
         public void AddColumn(string name, string type, int length)
         {
+            if (name.Length > MaxColumnNameLength)
+                throw new Exception($"Column name {name} is too long. Maximum column name length is {MaxColumnNameLength}");
+
             var tablePath = GetTableDir();
             switch (type.ToLowerInvariant())
             {
