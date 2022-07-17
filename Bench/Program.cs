@@ -155,15 +155,34 @@ namespace Bench
 
         private void Benchmark()
         {
-            int aid = rnd.Next(10000);
-            int delta = rnd.Next(10000) - 5000;
+            var sw = new Stopwatch();
+            sw.Start();
 
-            var update = Perform($"UPDATE bench_accounts SET abalance = abalance + {delta} WHERE aid = {aid};");
+            for (int i = 0; i < 10; ++i)
+            {
+                for (int j = 0; j < 100; j++)
+                    RunTransaction();
+
+                var elapsedSeconds = sw.ElapsedMilliseconds * 0.001;
+                sw.Restart();
+                var qps = 5 * 100 / elapsedSeconds;
+                Console.WriteLine($"Benchmark: {qps} queries per second");
+            }
         }
 
         private void RunTransaction()
         {
-            //var result = dbConn.Perform("CREATE TABLE bench_accounts (aid int, bid int, abalance int, filler varchar(255);");
+            int aid = rnd.Next(10000);
+            int bid = rnd.Next(1);
+            int tid = rnd.Next(10);
+            int delta = rnd.Next(10000) - 5000;
+            var mtime = DateTime.UtcNow.ToFileTimeUtc();
+
+            var update1 = Perform($"UPDATE bench_accounts SET abalance = abalance + {delta} WHERE aid = {aid};");
+            var select = Perform($"SELECT abalance FROM bench_accounts WHERE aid = {aid};");
+            var update2 = Perform($"UPDATE bench_tellers SET tbalance = tbalance + {delta} WHERE tid = {tid};");
+            var update3 = Perform($"UPDATE bench_branches SET bbalance = bbalance + {delta} WHERE bid = {bid};");
+            var insert = Perform($"INSERT INTO bench_history (tid, bid, aid, delta, mtime) VALUES ({tid}, {bid}, {aid}, {delta}, {mtime});");
         }
 
         private Result Perform(string query)

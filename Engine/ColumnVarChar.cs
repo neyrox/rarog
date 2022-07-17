@@ -29,10 +29,11 @@ namespace Engine
 
         public override void Insert(long idx, string value, IStorage storage)
         {
-            idxValues.Add(idx, value == null ? DefaultValue : Clamp(value));
+            var val = value == null ? DefaultValue : Clamp(value);
+            idxValues.Add(idx, val);
             // TODO: cleanup cache
 
-            storage.InsertVarChars(GetDataFileName(TablePath, Name), idx, value);
+            storage.InsertVarChars(GetDataFileName(TablePath, Name), idx, val);
         }
 
         public override ResultColumn Get(List<long> indices, IStorage storage)
