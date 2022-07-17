@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace Engine
 {
     public static class ParserCommon
@@ -10,6 +12,11 @@ namespace Engine
         public static bool AssertToken(string expected, string[] tokens, int pos)
         {
             return pos < tokens.Length && tokens[pos] == expected;
+        }
+
+        public static bool AssertToken(HashSet<string> expected, string[] tokens, int pos)
+        {
+            return pos < tokens.Length && expected.Contains(tokens[pos]);
         }
     }
 }

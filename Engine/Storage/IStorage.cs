@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Engine.Statement;
 
 namespace Engine.Storage
 {
@@ -19,10 +20,10 @@ namespace Engine.Storage
         IReadOnlyDictionary<long, string> SelectVarChars(string fileName, Condition<string> cond, int limit);
         IReadOnlyDictionary<long, string> SelectVarChars(string fileName, SortedSet<long> indices);
 
-        void UpdateInts(string fileName, long idx, int val);
-        void UpdateBigInts(string fileName, long idx, long val);
-        void UpdateDoubles(string fileName, long idx, double val);
-        void UpdateVarChars(string fileName, long idx, string val);
+        void UpdateInts(string fileName, long idx, OperationGeneric<int> op);
+        void UpdateBigInts(string fileName, long idx, OperationGeneric<long> op);
+        void UpdateDoubles(string fileName, long idx, OperationGeneric<double> op);
+        void UpdateVarChars(string fileName, long idx, OperationGeneric<string> op);
 
         void InsertInts(string fileName, long idx, int val);
         void InsertBigInts(string fileName, long idx, long val);

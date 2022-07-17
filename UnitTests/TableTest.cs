@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using Engine.Statement;
 using Engine.Storage;
 
 namespace UnitTests
@@ -100,8 +101,9 @@ namespace UnitTests
         public void RowWhereIntEqualUpdated()
         {
             var condition = new ColumnConditionNode("c1", "=", "4");
+            var ops = new List<OperationNode> {new OperationNode {Op = OperationNode.Assign, Value = "10.1"}};
 
-            table.Update(new List<string> { "c2" }, new List<string> { "10.1" }, condition);
+            table.Update(new List<string> { "c2" }, ops, condition);
 
             var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
             Assert.AreEqual(4, result.Count);
@@ -115,8 +117,9 @@ namespace UnitTests
         public void RowWhereStringEqualUpdated()
         {
             var condition = new ColumnConditionNode("c4", "=", "a");
+            var ops = new List<OperationNode> {new OperationNode {Op = OperationNode.Assign, Value = "10.2"}};
 
-            table.Update(new List<string> { "c2" }, new List<string> { "10.2" }, condition);
+            table.Update(new List<string> { "c2" }, ops, condition);
 
             var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
             Assert.AreEqual(4, result.Count);

@@ -1,0 +1,32 @@
+﻿using System;
+
+namespace Engine.Statement
+{
+    public class OperationNode
+    {
+        public const string Assign = "assign";
+        
+        public string Op;
+        public string Value;
+    }
+
+    public abstract class OperationGeneric<T>
+    {
+        public abstract T Perform(T source);
+    }
+
+    public class OperationAssignGeneric<T> : OperationGeneric<T>
+    {
+        private readonly T value;
+
+        public OperationAssignGeneric(string value)
+        {
+            this.value = (T)Convert.ChangeType(value, typeof(T));
+        }
+
+        public override T Perform(T source)
+        {
+            return value;
+        }
+    }
+}

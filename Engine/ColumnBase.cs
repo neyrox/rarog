@@ -10,7 +10,7 @@ namespace Engine
         public override int Count => idxValues.Count;
 
         public override IReadOnlyCollection<long> Indices => idxValues.Keys;
-        
+
         protected ColumnBase(string tablePath, string name)
             : base(tablePath, name)
         {

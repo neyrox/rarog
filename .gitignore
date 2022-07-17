@@ -31,3 +31,5 @@ packages
 /UnitTests/obj
 /Rarog/bin
 /Rarog/obj
+/Bench/bin
+/Bench/obj

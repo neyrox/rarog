@@ -36,11 +36,18 @@ namespace UnitTests
             CollectionAssert.AreEqual(new List<string> { "a" }, select1.Columns[2].All());
 
             shell.Execute("UPDATE t1 SET c2 = 8 WHERE c1 = 1;");
-            var select2 = shell.Execute("SELECT * FROM t1;");
-            Assert.AreEqual(3, select2.Columns.Count);
-            CollectionAssert.AreEqual(new List<string> { "1", "3" }, select2.Columns[0].All());
-            CollectionAssert.AreEqual(new List<string> { "8", "2" }, select2.Columns[1].All());
-            CollectionAssert.AreEqual(new List<string> { "a", "b" }, select2.Columns[2].All());
+            var select20 = shell.Execute("SELECT * FROM t1;");
+            Assert.AreEqual(3, select20.Columns.Count);
+            CollectionAssert.AreEqual(new List<string> { "1", "3" }, select20.Columns[0].All());
+            CollectionAssert.AreEqual(new List<string> { "8", "2" }, select20.Columns[1].All());
+            CollectionAssert.AreEqual(new List<string> { "a", "b" }, select20.Columns[2].All());
+
+            shell.Execute("UPDATE t1 SET c2 = c2 + 2 WHERE c1 = 1;");
+            var select21 = shell.Execute("SELECT * FROM t1;");
+            Assert.AreEqual(3, select21.Columns.Count);
+            CollectionAssert.AreEqual(new List<string> { "1", "3" }, select21.Columns[0].All());
+            CollectionAssert.AreEqual(new List<string> { "10", "2" }, select21.Columns[1].All());
+            CollectionAssert.AreEqual(new List<string> { "a", "b" }, select21.Columns[2].All());
 
             var delete = shell.Execute("DELETE FROM t1 WHERE c1 = 1;");
             var select3 = shell.Execute("SELECT * FROM t1;");

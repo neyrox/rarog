@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Engine.Serialization;
+using Engine.Statement;
 
 namespace Engine.Storage
 {
@@ -146,47 +147,47 @@ namespace Engine.Storage
             }
         }
 
-        public void UpdateInts(string fileName, long idx, int val)
+        public void UpdateInts(string fileName, long idx, OperationGeneric<int> op)
         {
             if (!File.Exists(fileName))
                 return;
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                IntPage.Instance.Update(file, idx, val);
+                IntPage.Instance.Update(file, idx, op);
             }
         }
 
-        public void UpdateBigInts(string fileName, long idx, long val)
+        public void UpdateBigInts(string fileName, long idx, OperationGeneric<long> op)
         {
             if (!File.Exists(fileName))
                 return;
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                BigIntPage.Instance.Update(file, idx, val);
+                BigIntPage.Instance.Update(file, idx, op);
             }
         }
 
-        public void UpdateDoubles(string fileName, long idx, double val)
+        public void UpdateDoubles(string fileName, long idx, OperationGeneric<double> op)
         {
             if (!File.Exists(fileName))
                 return;
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                DoublePage.Instance.Update(file, idx, val);
+                DoublePage.Instance.Update(file, idx, op);
             }
         }
 
-        public void UpdateVarChars(string fileName, long idx, string val)
+        public void UpdateVarChars(string fileName, long idx, OperationGeneric<string> op)
         {
             if (!File.Exists(fileName))
                 return;
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                VarCharPage.Instance.Update(file, idx, val);
+                VarCharPage.Instance.Update(file, idx, op);
             }
         }
 

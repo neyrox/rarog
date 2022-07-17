@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Engine.Statement;
 
 namespace Engine
 {
@@ -6,14 +7,14 @@ namespace Engine
     {
         public string TableName;
         public List<string> ColumnNames;
-        public List<string> Values;
+        public List<OperationNode> Ops;
         public ConditionNode Condition;
 
-        public UpdateNode(string tableName, List<string> columnNames, List<string> values, ConditionNode condition)
+        public UpdateNode(string tableName, List<string> columnNames, List<OperationNode> ops, ConditionNode condition)
         {
             TableName = tableName;
             ColumnNames = columnNames;
-            Values = values;
+            Ops = ops;
             Condition = condition;
         }
 
@@ -22,7 +23,7 @@ namespace Engine
             if (!db.ContainsTable(TableName))
                 return Result.TableNotFound(TableName);
 
-            db.GetTable(TableName).Update(ColumnNames, Values, Condition);
+            db.GetTable(TableName).Update(ColumnNames, Ops, Condition);
 
             return Result.OK;
         }

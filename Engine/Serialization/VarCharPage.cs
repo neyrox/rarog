@@ -19,8 +19,9 @@ namespace Engine.Storage
 
         protected override int CalcMaxPairSize(string value)
         {
+            var maxValueLength = value?.Length * 4 ?? 0;
             // Leave 64Kb space for updates to longer strings
-            return sizeof(long) + sizeof(ushort) + value.Length * 4 + 65536;
+            return sizeof(long) + sizeof(ushort) + maxValueLength + 65536;
             //Encoding.UTF8.GetByteCount(value);
         }
     }

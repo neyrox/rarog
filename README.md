@@ -11,6 +11,10 @@ create table, drop table, alter table add/drop column
 
 insert, update, select, delete
 
+## supported operations on update
++ (all types)
+-, *, / (only numeric)
+
 ## supported conditions
 =, >, <, >=, <=, <>, and, or
 
