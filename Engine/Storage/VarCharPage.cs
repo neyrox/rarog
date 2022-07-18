@@ -3,7 +3,7 @@ using Engine.Serialization;
 
 namespace Engine.Storage
 {
-    public class VarCharPage : PageBase<string>
+    public class VarCharPage : PageStorage<string>
     {
         public static VarCharPage Instance => new VarCharPage();
 

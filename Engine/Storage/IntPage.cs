@@ -2,7 +2,7 @@ using Engine.Serialization;
 
 namespace Engine.Storage
 {
-    public class IntPage : PageBase<int>
+    public class IntPage : PageStorage<int>
     {
         public static IntPage Instance => new IntPage();
 

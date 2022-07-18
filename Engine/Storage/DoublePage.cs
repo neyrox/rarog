@@ -2,7 +2,7 @@ using Engine.Serialization;
 
 namespace Engine.Storage
 {
-    public class DoublePage : PageBase<double>
+    public class DoublePage : PageStorage<double>
     {
         public static DoublePage Instance => new DoublePage();
 

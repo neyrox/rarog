@@ -2,7 +2,7 @@ using Engine.Serialization;
 
 namespace Engine.Storage
 {
-    public class BigIntPage : PageBase<long>
+    public class BigIntPage : PageStorage<long>
     {
         public static BigIntPage Instance => new BigIntPage();
 

@@ -8,6 +8,11 @@ namespace Engine.Storage
 {
     public class FileStorage : IStorage
     {
+        private readonly PageStorage<int> intStorage = new IntPage();
+        private readonly PageStorage<long> bigIntStorage = new  BigIntPage();
+        private readonly PageStorage<double> doubleStorage = new DoublePage();
+        private readonly PageStorage<string> strStorage = new VarCharPage();
+
         // Full scan
         public void StoreTableMeta(string fileName, long nextIdx)
         {
@@ -54,7 +59,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return IntPage.Instance.Select(file, cond, limit);
+                return intStorage.Select(file, cond, limit);
             }
         }
 
@@ -68,7 +73,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return IntPage.Instance.Select(file, indices);
+                return intStorage.Select(file, indices);
             }
         }
 
@@ -79,7 +84,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return BigIntPage.Instance.Select(file, cond, limit);
+                return bigIntStorage.Select(file, cond, limit);
             }
         }
 
@@ -93,7 +98,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return BigIntPage.Instance.Select(file, indices);
+                return bigIntStorage.Select(file, indices);
             }
         }
 
@@ -104,7 +109,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return DoublePage.Instance.Select(file, cond, limit);
+                return doubleStorage.Select(file, cond, limit);
             }
         }
 
@@ -118,7 +123,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return DoublePage.Instance.Select(file, indices);
+                return doubleStorage.Select(file, indices);
             }
         }
 
@@ -129,7 +134,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return VarCharPage.Instance.Select(file, cond, limit);
+                return strStorage.Select(file, cond, limit);
             }
         }
 
@@ -143,7 +148,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
-                return VarCharPage.Instance.Select(file, indices);
+                return strStorage.Select(file, indices);
             }
         }
 
@@ -154,7 +159,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                IntPage.Instance.Update(file, idx, op);
+                intStorage.Update(file, idx, op);
             }
         }
 
@@ -165,7 +170,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                BigIntPage.Instance.Update(file, idx, op);
+                bigIntStorage.Update(file, idx, op);
             }
         }
 
@@ -176,7 +181,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                DoublePage.Instance.Update(file, idx, op);
+                doubleStorage.Update(file, idx, op);
             }
         }
 
@@ -187,7 +192,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                VarCharPage.Instance.Update(file, idx, op);
+                strStorage.Update(file, idx, op);
             }
         }
 
@@ -195,7 +200,7 @@ namespace Engine.Storage
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                IntPage.Instance.Insert(file, idx, val);
+                intStorage.Insert(file, idx, val);
             }
         }
 
@@ -203,7 +208,7 @@ namespace Engine.Storage
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                BigIntPage.Instance.Insert(file, idx, val);
+                bigIntStorage.Insert(file, idx, val);
             }
         }
 
@@ -211,7 +216,7 @@ namespace Engine.Storage
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                DoublePage.Instance.Insert(file, idx, val);
+                doubleStorage.Insert(file, idx, val);
             }
         }
 
@@ -230,7 +235,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                IntPage.Instance.Delete(file, indices);
+                intStorage.Delete(file, indices);
             }
         }
 
@@ -241,7 +246,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                BigIntPage.Instance.Delete(file, indices);
+                bigIntStorage.Delete(file, indices);
             }
         }
 
@@ -252,7 +257,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                DoublePage.Instance.Delete(file, indices);
+                doubleStorage.Delete(file, indices);
             }
         }
 
@@ -263,7 +268,7 @@ namespace Engine.Storage
 
             using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
-                VarCharPage.Instance.Delete(file, indices);
+                strStorage.Delete(file, indices);
             }
         }
 
