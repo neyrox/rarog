@@ -31,9 +31,6 @@ namespace UnitTests
             var whole1 = column1.Get(null, storage);
             var whole2 = column2.Get(null, storage);
 
-            Assert.AreEqual(column1.Count, column2.Count);
-            Assert.AreEqual(whole1.Count, whole2.Count);
-            CollectionAssert.AreEqual(column1.Indices.ToArray(), column2.Indices.ToArray());
             CollectionAssert.AreEqual(whole1.All(), whole2.All());
         }
     }

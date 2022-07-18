@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Engine.Statement;
 using Engine.Storage;
 
 namespace Engine
 {
-    public abstract class ColumnBase<T>: Column
+    public abstract class ColumnBase<T>: Column where T: IComparable<T>
     {
-        protected SortedDictionary<long, T> idxValues = new SortedDictionary<long, T>();
-
-        public override int Count => idxValues.Count;
-
-        public override IReadOnlyCollection<long> Indices => idxValues.Keys;
-
         protected ColumnBase(string tablePath, string name)
             : base(tablePath, name)
         {
@@ -18,32 +15,50 @@ namespace Engine
 
         protected SortedSet<long> GetIndicesToLoad(List<long> indices)
         {
-            var indicesToLoad = new SortedSet<long>();
-            foreach (var idx in indices)
-            {
-                if (idxValues.ContainsKey(idx))
-                    continue;
-
-                indicesToLoad.Add(idx);
-            }
-
-            return indicesToLoad;
+            return new SortedSet<long>(indices);
         }
-        
-        // Precondition: rowsToDelete is a sorted list of indices
-        public override void Delete(List<long> rowsToDelete, IStorage storage)
+
+        public override List<long> AllIndices(IStorage storage, int limit)
+        {
+            var stored = SelectInternal(ConditionAny<T>.Instance, limit, storage);
+
+            return stored.Keys.ToList();
+        }
+
+        public override List<long> Filter(string op, string value, IStorage storage, int limit)
+        {
+            var condition = Condition<T>.Transform(op, value);
+
+            var result = new List<long>();
+
+            var stored = SelectInternal(condition, limit, storage);
+            foreach (var iv in stored)
+                result.Add(iv.Key);
+
+            return result;
+        }
+
+
+        public override void Update(long idx, OperationNode opNode, IStorage storage)
+        {
+            UpdateInternal(idx, Transform(opNode), storage);
+        }
+
+        // rowsToDelete is a sorted set of indices
+        public override void Delete(SortedSet<long> rowsToDelete, IStorage storage)
         {
             if (rowsToDelete == null)
             {
-                idxValues.Clear();
                 storage.DeleteFile(GetDataFileName(TablePath, Name));
                 return;
             }
 
-            for (int i = 0; i < rowsToDelete.Count; ++i)
-                idxValues.Remove(rowsToDelete[i]);
-            
             DeleteInternal(rowsToDelete, storage);
         }
+
+        protected abstract IReadOnlyDictionary<long, T> SelectInternal(Condition<T> cond, int limit, IStorage storage);
+
+        protected abstract OperationGeneric<T> Transform(OperationNode opNode);
+        protected abstract void UpdateInternal(long idx, OperationGeneric<T> op, IStorage storage);
     }
 }

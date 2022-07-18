@@ -124,17 +124,15 @@ namespace Engine
 
         public void Delete(ConditionNode condition)
         {
-            List<long> rowsToDelete = null;
-            // TODO: replace with empty condition?
+            List<long> rowsToDelete;
             if (condition != null)
-            {
                 rowsToDelete = condition.GetRowsThatSatisfy(this, storage, 0);
-            }
+            else
+                // TODO: implement truncate
+                rowsToDelete = FirstColumn.AllIndices(storage, 0);
 
-            foreach (var column in columns)
-            {
-                column.Value.Delete(rowsToDelete, storage);
-            }
+            foreach (var column in columns.Values)
+                column.Delete(new SortedSet<long>(rowsToDelete), storage);
         }
 
         public void Load()

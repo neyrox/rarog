@@ -116,6 +116,7 @@ namespace Engine.Storage
             {
                 var page = StreamStorage.NextPage(stream);
                 var header = new PageHeader(page);
+                // Read only headers before going further
                 if (!StreamStorage.Overlap(header.MinIdx, header.MaxIdx, indices.Min, indices.Max))
                     continue;
 
@@ -139,7 +140,6 @@ namespace Engine.Storage
                 StreamStorage.Write(stream, extraPage);
             }
         }
-
 
         private byte[] Serialize(SortedDictionary<long, T> idxVals, out SortedDictionary<long, T> tail)
         {
