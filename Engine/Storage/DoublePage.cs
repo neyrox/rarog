@@ -4,7 +4,10 @@ namespace Engine.Storage
 {
     public class DoublePage : PageStorage<double>
     {
-        public static DoublePage Instance => new DoublePage();
+        public DoublePage(IStreamProvider streams)
+            : base(streams)
+        {
+        }
 
         protected override double UnpackValue(byte[] buffer, ref int offset)
         {

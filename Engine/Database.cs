@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Engine.Storage;
 
 namespace Engine
@@ -7,7 +8,7 @@ namespace Engine
     public class Database
     {
         public readonly object SyncObject = new object();
-        private readonly Dictionary<string, Table> tables = new Dictionary<string, Table>();
+        private readonly SortedList<string, Table> tables = new SortedList<string, Table>();
         private readonly IStorage storage;
 
         public Database(IStorage storage)
@@ -60,6 +61,18 @@ namespace Engine
                 var table = new Table(tableName, storage);
                 table.Load();
                 tables.Add(table.Name, table);
+            }
+        }
+
+        public void Flush()
+        {
+            try
+            {
+                storage.Flush();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }

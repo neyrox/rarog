@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Engine
 {
@@ -11,7 +12,7 @@ namespace Engine
             if (ParserCommon.AssertUpperToken("TABLE", tokens, pos))
                 ++pos;  // skip "TABLE"
             else
-                return null;
+                throw new Exception($"Unexpected token {tokens[pos]}");
 
             var tableName = string.Empty;
             if (pos < tokens.Length)
@@ -20,14 +21,24 @@ namespace Engine
                 ++pos;
             }
             else
-                return null;
+            {
+                throw new Exception("Unexpected end of query");
+            }
+
+            bool ifExists = false;
+            if (ParserCommon.AssertUpperToken("IF", tokens, pos) &&
+                ParserCommon.AssertUpperToken("EXISTS", tokens, pos + 1))
+            {
+                ifExists = true;
+                pos += 2;
+            }
 
             if (ParserCommon.AssertToken(";", tokens, pos))
                 ++pos;
             else
-                return null;
+                throw new Exception("Failed to find \';\' at the end of query");
 
-            return new DropTableNode(tableName);
+            return new DropTableNode(tableName, ifExists);
         }
     }
 }

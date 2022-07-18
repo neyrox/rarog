@@ -91,6 +91,7 @@ namespace Engine
             }
         }
 
+        // TODO: lock all columns
         public void Insert(List<string> columnNames, List<string> values)
         {
             var allColumnNames = new HashSet<string>(columns.Keys);
@@ -122,6 +123,7 @@ namespace Engine
             return Select(columnNames, rowsToSelect);
         }
 
+        // TODO: lock all columns
         public void Delete(ConditionNode condition)
         {
             List<long> rowsToDelete;

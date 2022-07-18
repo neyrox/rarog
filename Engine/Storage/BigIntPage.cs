@@ -4,7 +4,10 @@ namespace Engine.Storage
 {
     public class BigIntPage : PageStorage<long>
     {
-        public static BigIntPage Instance => new BigIntPage();
+        public BigIntPage(IStreamProvider streams)
+            : base(streams)
+        {
+        }
 
         protected override long UnpackValue(byte[] buffer, ref int offset)
         {

@@ -7,9 +7,9 @@ namespace Engine.Storage
     {
         public const int DataOffset = Page.HeaderSize;
 
-        public readonly long MinIdx;
-        public readonly long MaxIdx;
-        public readonly int Count;
+        public long MinIdx;
+        public long MaxIdx;
+        public int Count;
 
         private byte flags;
         /*

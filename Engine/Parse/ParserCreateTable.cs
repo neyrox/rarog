@@ -20,7 +20,9 @@ namespace Engine
                 ++pos;
             }
             else
+            {
                 throw new Exception("Unexpected end of query");
+            }
 
             if (ParserCommon.AssertToken("(", tokens, pos))
                 ++pos;

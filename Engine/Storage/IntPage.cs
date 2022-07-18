@@ -4,7 +4,10 @@ namespace Engine.Storage
 {
     public class IntPage : PageStorage<int>
     {
-        public static IntPage Instance => new IntPage();
+        public IntPage(IStreamProvider streams)
+            : base(streams)
+        {
+        }
 
         protected override int UnpackValue(byte[] buffer, ref int offset)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Engine.Statement;
 using Engine.Storage;
@@ -35,10 +36,11 @@ namespace Engine
 
         private string Clamp(string value)
         {
+            if (value == null)
+                return string.Empty;
+
             if (value.Length < MaxLength)
-            {
                 return value;
-            }
 
             // TODO: produce warning if string is too long
             return value.Substring(0, MaxLength);

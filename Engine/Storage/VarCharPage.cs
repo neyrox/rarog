@@ -5,7 +5,10 @@ namespace Engine.Storage
 {
     public class VarCharPage : PageStorage<string>
     {
-        public static VarCharPage Instance => new VarCharPage();
+        public VarCharPage(IStreamProvider streams)
+            : base(streams)
+        {
+        }
 
         protected override string UnpackValue(byte[] buffer, ref int offset)
         {

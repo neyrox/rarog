@@ -44,5 +44,7 @@ namespace Engine.Storage
         void DeleteFile(string fileName);
 
         void DeleteDirectory(string tableDir);
+
+        void Flush();
     }
 }
