@@ -122,7 +122,7 @@ namespace Server
             {
                 _db.Flush();
 
-                if (_stopping.WaitOne(60000))
+                if (_stopping.WaitOne(10000))
                     break;
             }
         }

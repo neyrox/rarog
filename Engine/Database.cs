@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using Engine.Storage;
 
 namespace Engine
@@ -18,49 +17,64 @@ namespace Engine
 
         public bool ContainsTable(string tableName)
         {
-            return tables.ContainsKey(tableName);
+            lock (SyncObject)
+            {
+                return tables.ContainsKey(tableName);
+            }
         }
 
         public Table GetTable(string tableName)
         {
-            return tables[tableName];
+            lock (SyncObject)
+            {
+                return tables[tableName];
+            }
         }
 
         public Table CreateTable(string tableName)
         {
-            var table = new Table(tableName, storage);
-            table.Store();
-            tables.Add(tableName, table);
-            return table;
+            lock (SyncObject)
+            {
+                var table = new Table(tableName, storage);
+                table.Store();
+                tables.Add(tableName, table);
+                return table;
+            }
         }
 
         public bool RemoveTable(string tableName)
         {
-            var result = tables.TryGetValue(tableName, out var table);
-            if (!result)
-                return false;
+            lock (SyncObject)
+            {
+                var result = tables.TryGetValue(tableName, out var table);
+                if (!result)
+                    return false;
 
-            tables.Remove(tableName);
+                tables.Remove(tableName);
 
-            var tableDir = table.GetTableDir();
-            var columnFiles = storage.GetColumnFiles(tableDir);
-            foreach (var columnFile in columnFiles)
-                storage.DeleteFile(columnFile);
+                var tableDir = table.GetTableDir();
+                var columnFiles = storage.GetColumnFiles(tableDir);
+                foreach (var columnFile in columnFiles)
+                    storage.DeleteFile(columnFile);
 
-            storage.DeleteDirectory(table.GetTableDir());
-            storage.DeleteFile(table.GetTableMetaFile());
+                storage.DeleteDirectory(table.GetTableDir());
+                storage.DeleteFile(table.GetTableMetaFile());
 
-            return true;
+                return true;
+            }
         }
 
         public void Load()
         {
-            foreach (var tableName in storage.GetTableNames())
+            lock (SyncObject)
             {
-                Console.WriteLine($"Loading table {tableName}");
-                var table = new Table(tableName, storage);
-                table.Load();
-                tables.Add(table.Name, table);
+                foreach (var tableName in storage.GetTableNames())
+                {
+                    Console.WriteLine($"Loading table {tableName}");
+                    var table = new Table(tableName, storage);
+                    table.Load();
+                    tables.Add(table.Name, table);
+                }
             }
         }
 
@@ -68,7 +82,10 @@ namespace Engine
         {
             try
             {
-                storage.Flush();
+                lock (SyncObject)
+                {
+                    storage.Flush();
+                }
             }
             catch (Exception e)
             {

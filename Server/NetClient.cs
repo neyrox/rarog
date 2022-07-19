@@ -74,7 +74,7 @@ namespace Server
         private void EndSendBody(IAsyncResult result)
         {
             var buffer = (byte[])result.AsyncState;
-            Console.WriteLine("Sent {0} bytes to client", buffer.Length);
+            //Console.WriteLine("Sent {0} bytes to client", buffer.Length);
             BeginRead();
         }
     }
