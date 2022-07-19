@@ -176,21 +176,21 @@ namespace Engine.Storage
         {
             long maxRowIdx = -1;
             int insPageIdx = -1;
-            int pageIdx = -1;
+            int tmpPageIdx = -1;
             Stream stream = null;
 
             try
             {
                 while (true)
                 {
-                    pageIdx++;
-                    if (!GetPageCache(name, pageIdx, ref stream, out var tmpPageCache))
+                    tmpPageIdx++;
+                    if (!GetPageCache(name, tmpPageIdx, ref stream, out var tmpPageCache))
                         break;
 
                     if (tmpPageCache.Header.MaxIdx > maxRowIdx)
                     {
                         maxRowIdx = tmpPageCache.Header.MaxIdx;
-                        insPageIdx = pageIdx;
+                        insPageIdx = tmpPageIdx;
                     }
                 }
 
@@ -209,7 +209,7 @@ namespace Engine.Storage
 
                 var pageCache = cache[name].Pages[insPageIdx];
 
-                LoadPageData(name, pageIdx, pageCache, ref stream);
+                LoadPageData(name, insPageIdx, pageCache, ref stream);
                 pageCache.Data.Add(idx, val);
                 pageCache.Header.MinIdx = Math.Min(pageCache.Header.MinIdx, idx);  // Maybe we don't need it?
                 pageCache.Header.MaxIdx = Math.Max(pageCache.Header.MaxIdx, idx);
