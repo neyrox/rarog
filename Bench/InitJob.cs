@@ -45,9 +45,10 @@ namespace Bench
             var fillBuff = new byte[32];
             var sw = new Stopwatch();
             sw.Start();
-            for (int aid = 0; aid < 10000; ++aid)
+            var scale = options.Scale;
+            for (int aid = 0; aid < 10000 * scale; ++aid)
             {
-                int bid = rnd.Next(1);
+                int bid = rnd.Next(scale);
                 //int tid = rnd.Next(10);
                 rnd.NextBytes(fillBuff);
                 var filler = BitConverter.ToString(fillBuff);
@@ -64,10 +65,8 @@ namespace Bench
                 }
             }
 
-            for (int bid = 0; bid < 1; ++bid)
+            for (int bid = 0; bid < scale; ++bid)
             {
-                //int bid = rnd.Next(1);
-                //int tid = rnd.Next(10);
                 rnd.NextBytes(fillBuff);
                 var filler = BitConverter.ToString(fillBuff);
                 var insert = Perform($"INSERT INTO bench_branches (bid, bbalance, filler) VALUES ({bid}, 0, {filler});");
@@ -75,9 +74,9 @@ namespace Bench
                     throw new Exception("Failed to insert branch");
             }
 
-            for (int tid = 0; tid < 10; ++tid)
+            for (int tid = 0; tid < 10 * scale; ++tid)
             {
-                int bid = rnd.Next(1);
+                int bid = rnd.Next(scale);
                 rnd.NextBytes(fillBuff);
                 var filler = BitConverter.ToString(fillBuff);
                 var insert = Perform($"INSERT INTO bench_tellers (tid, bid, tbalance, filler) VALUES ({tid}, {bid}, 0, {filler});");

@@ -8,9 +8,11 @@ namespace Bench
         {
             {"-i", "init"},
             {"-j", "jobs"},
+            {"-s", "scale"},
         };
 
         public bool Init { get; set; }
+        public int Scale { get; set; } = 1;
         public int Jobs { get; set; } = 1;
     }
 }

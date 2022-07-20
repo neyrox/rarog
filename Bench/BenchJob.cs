@@ -32,9 +32,11 @@ namespace Bench
 
         private void RunTransaction()
         {
-            int aid = rnd.Next(10000);
-            int bid = rnd.Next(1);
-            int tid = rnd.Next(10);
+            var scale = options.Scale;
+
+            int aid = rnd.Next(10000 * scale);
+            int bid = rnd.Next(scale);
+            int tid = rnd.Next(10 * scale);
             int delta = rnd.Next(10000) - 5000;
             var mtime = DateTime.UtcNow.ToFileTimeUtc();
 
