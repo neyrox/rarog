@@ -4,8 +4,8 @@ namespace Engine.Storage
 {
     public class IntPage : PageStorage<int>
     {
-        public IntPage(IStreamProvider streams)
-            : base(streams)
+        public IntPage(IStreamProvider streams, CacheHost cacheHost)
+            : base(streams, cacheHost)
         {
         }
 

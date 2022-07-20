@@ -131,7 +131,6 @@ namespace UnitTests
 
             var select3 = shell.Execute("SELECT * FROM t1;");
             Assert.IsFalse(select1.IsOK);
-
         }
 
         private List<string> ToList(string item)

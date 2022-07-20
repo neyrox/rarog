@@ -52,13 +52,7 @@ namespace Engine
 
                 tables.Remove(tableName);
 
-                var tableDir = table.GetTableDir();
-                var columnFiles = storage.GetColumnFiles(tableDir);
-                foreach (var columnFile in columnFiles)
-                    storage.DeleteFile(columnFile);
-
-                storage.DeleteDirectory(table.GetTableDir());
-                storage.DeleteFile(table.GetTableMetaFile());
+                table.DeleteSelf();
 
                 return true;
             }

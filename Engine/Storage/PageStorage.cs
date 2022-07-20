@@ -7,50 +7,18 @@ using Engine.Statement;
 
 namespace Engine.Storage
 {
-    public class PageCache<T>
-    {
-        public PageHeader Header;
-
-        public SortedDictionary<long, T> Data;
-            //new SortedDictionary<long, T>();
-
-        public bool Dirty;
-    }
-
-    public class PagesCache<T>
-    {
-        public SortedList<int, PageCache<T>> Pages =
-            new SortedList<int, PageCache<T>>();
-
-        public int PagesCount;
-    }
-
-    
     public abstract class PageStorage<T> where T: IComparable<T>
     {
         private readonly SortedList<string, PagesCache<T>> cache =
             new SortedList<string, PagesCache<T>>();
 
         private IStreamProvider streams;
+        private CacheHost cacheHost;
 
-        protected PageStorage(IStreamProvider streams)
+        protected PageStorage(IStreamProvider streams, CacheHost cacheHost)
         {
             this.streams = streams;
-        }
-
-        public SortedDictionary<long, T> Load(PageHeader header, byte[] buffer)
-        {
-            var result = new SortedDictionary<long, T>();
-            int offset = PageHeader.DataOffset;
-            // TODO: compress
-            for (int i = 0; i < header.Count; ++i)
-            {
-                var idx = BytePacker.UnpackSInt64(buffer, ref offset);
-                var val = UnpackValue(buffer, ref offset);
-                result.Add(idx, val);
-            }
-
-            return result;
+            this.cacheHost = cacheHost;
         }
 
         public SortedDictionary<long, T> LoadData(PageHeader header, byte[] buffer)
@@ -62,7 +30,14 @@ namespace Engine.Storage
             {
                 var idx = BytePacker.UnpackSInt64(buffer, ref offset);
                 var val = UnpackValue(buffer, ref offset);
-                result.Add(idx, val);
+                try
+                {
+                    result.Add(idx, val);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
 
             return result;
@@ -178,6 +153,7 @@ namespace Engine.Storage
             int insPageIdx = -1;
             int tmpPageIdx = -1;
             Stream stream = null;
+            PageCache<T> pageCache = null;
 
             try
             {
@@ -191,23 +167,24 @@ namespace Engine.Storage
                     {
                         maxRowIdx = tmpPageCache.Header.MaxIdx;
                         insPageIdx = tmpPageIdx;
+                        pageCache = tmpPageCache;
                     }
                 }
 
                 if (insPageIdx < 0)
                 {
                     insPageIdx = 0;
-                    cache[name].Pages.Add(insPageIdx, new PageCache<T>
+                    pageCache = new PageCache<T>(name, insPageIdx)
                     {
                         Header = new PageHeader(idx, idx, 1),
                         Data = new SortedDictionary<long, T> { {idx, val} },
                         Dirty = true
-                    });
+                    };
+                    cache[name].Pages.Add(insPageIdx, pageCache);
                     cache[name].PagesCount++;
+                    cacheHost.Up(pageCache);
                     return;
                 }
-
-                var pageCache = cache[name].Pages[insPageIdx];
 
                 LoadPageData(name, insPageIdx, pageCache, ref stream);
                 pageCache.Data.Add(idx, val);
@@ -278,10 +255,10 @@ namespace Engine.Storage
                     if (stream == null)
                         stream = streams.OpenReadWrite(name);
 
-                    var page = Serialize(pageCache.Data, out var tail);
+                    var page = Serialize(pageCache.Header, pageCache.Data, out var tail);
                     StreamStorage.Write(stream, page, pagesCache.Pages.Keys[j]);
                     pageCache.Dirty = false;
-                    AppendTail(stream, pagesCache, tail);
+                    AppendTail(name, stream, pagesCache, tail);
                 }
 
                 if (stream != null)
@@ -293,24 +270,35 @@ namespace Engine.Storage
             }
         }
 
-        private void AppendTail(Stream stream, PagesCache<T> pagesCache, SortedDictionary<long, T> tail)
+        public void Delete(string name)
+        {
+            foreach (var pagesCache in cache[name].Pages)
+                cacheHost.Remove(pagesCache.Value.Id);
+
+            cache.Remove(name);
+        }
+        
+        private void AppendTail(string name, Stream stream, PagesCache<T> pagesCache, SortedDictionary<long, T> tail)
         {
             if (tail == null)
                 return;
 
             var tailIdx = (int)(stream.Length / Page.Size);
             var header = new PageHeader(tail.Keys.First(), tail.Keys.Last(), tail.Count);
-            pagesCache.Pages[tailIdx] = new PageCache<T> { Header = header, Data = tail};
+            
+            var pageCache = new PageCache<T>(name, tailIdx) { Header = header, Data = tail};
+            pagesCache.Pages[tailIdx] = pageCache;
             pagesCache.PagesCount++;
+            cacheHost.Up(pageCache);
 
-            var extraPage = Serialize(tail, out var tailAgain);
+            var extraPage = Serialize(header, tail, out var tailAgain);
             stream.Seek(0, SeekOrigin.End);
             StreamStorage.Write(stream, extraPage);
 
-            AppendTail(stream, pagesCache, tailAgain);
+            AppendTail(name, stream, pagesCache, tailAgain);
         }
 
-        private byte[] Serialize(SortedDictionary<long, T> idxVals, out SortedDictionary<long, T> tail)
+        private byte[] Serialize(PageHeader header, SortedDictionary<long, T> idxVals, out SortedDictionary<long, T> tail)
         {
             tail = null;
             var buffer = new byte[Page.Size];
@@ -320,7 +308,7 @@ namespace Engine.Storage
             bool split = false;
             foreach (var idxVal in idxVals)
             {
-                if (offset + CalcMaxPairSize(idxVal.Value) >= buffer.Length)
+                if (!split && offset + CalcMaxPairSize(idxVal.Value) >= buffer.Length)
                 {
                     split = true;
                     tail = new SortedDictionary<long, T>();
@@ -348,8 +336,10 @@ namespace Engine.Storage
                 foreach (var idxVal in tail)
                     idxVals.Remove(idxVal.Key);
             }
-            
-            var header = new PageHeader(minIdx, maxIdx, idxVals.Count);
+
+            header.MinIdx = minIdx;
+            header.MaxIdx = maxIdx;
+            header.Count = idxVals.Count;
             header.Serialize(buffer);
 
             return buffer;
@@ -381,7 +371,7 @@ namespace Engine.Storage
                 var headerBuffer = StreamStorage.ReadHeader(stream);
                 var header = new PageHeader(headerBuffer);
 
-                pageCache = new PageCache<T> {Header = header};
+                pageCache = new PageCache<T>(name, pageIdx) {Header = header};
                 pagesCache.Pages.Add(pageIdx, pageCache);
             }
 
@@ -391,7 +381,10 @@ namespace Engine.Storage
         private void LoadPageData(string name, int pageIdx, PageCache<T> pageCache, ref Stream stream)
         {
             if (pageCache.Data != null)
+            {
+                cacheHost.Up(pageCache);
                 return;
+            }
 
             if (stream == null)
                 stream = streams.OpenRead(name);
@@ -400,6 +393,7 @@ namespace Engine.Storage
 
             var dataBuffer = StreamStorage.ReadPageData(stream);
             pageCache.Data = LoadData(pageCache.Header, dataBuffer);
+            cacheHost.Up(pageCache);
         }
 
         protected abstract T UnpackValue(byte[] buffer, ref int offset);

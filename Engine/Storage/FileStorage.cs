@@ -8,6 +8,7 @@ namespace Engine.Storage
 {
     public class FileStorage : IStorage, IStreamProvider
     {
+        private readonly CacheHost cacheHost = new CacheHost();
         private readonly PageStorage<int> intStorage;
         private readonly PageStorage<long> bigIntStorage;
         private readonly PageStorage<double> doubleStorage;
@@ -15,10 +16,10 @@ namespace Engine.Storage
 
         public FileStorage()
         {
-            intStorage = new IntPage(this);
-            bigIntStorage = new  BigIntPage(this);
-            doubleStorage = new DoublePage(this);
-            strStorage = new VarCharPage(this);
+            intStorage = new IntPage(this, cacheHost);
+            bigIntStorage = new  BigIntPage(this, cacheHost);
+            doubleStorage = new DoublePage(this, cacheHost);
+            strStorage = new VarCharPage(this, cacheHost);
         }
 
         public void StoreTableMeta(string fileName, long nextIdx)
@@ -171,6 +172,30 @@ namespace Engine.Storage
             strStorage.Delete(fileName, indices);
         }
 
+        public void DeleteIntColumn(string fileName)
+        {
+            intStorage.Delete(fileName);
+            File.Delete(fileName);
+        }
+
+        public void DeleteBigIntColumn(string fileName)
+        {
+            bigIntStorage.Delete(fileName);
+            File.Delete(fileName);
+        }
+
+        public void DeleteDoubleColumn(string fileName)
+        {
+            doubleStorage.Delete(fileName);
+            File.Delete(fileName);
+        }
+
+        public void DeleteVarCharColumn(string fileName)
+        {
+            strStorage.Delete(fileName);
+            File.Delete(fileName);
+        }
+
         public string[] GetTableNames()
         {
             var path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
@@ -237,6 +262,8 @@ namespace Engine.Storage
             bigIntStorage.Flush();
             doubleStorage.Flush();
             strStorage.Flush();
+
+            Console.WriteLine($"There are {cacheHost.Count} pages in cache");
         }
 
         public Stream OpenRead(string name)

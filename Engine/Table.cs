@@ -171,6 +171,16 @@ namespace Engine
             return Name + MetaFileExtension;
         }
 
+        public void DeleteSelf()
+        {
+            storage.DeleteFile(GetTableMetaFile());
+
+            foreach (var column in columns)
+                column.Value.DeleteSelf(storage);
+
+            storage.DeleteDirectory(GetTableDir());
+        }
+        
         private void AddColumn(Column column)
         {
             if (columns.Count > 0)

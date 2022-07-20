@@ -4,8 +4,8 @@ namespace Engine.Storage
 {
     public class DoublePage : PageStorage<double>
     {
-        public DoublePage(IStreamProvider streams)
-            : base(streams)
+        public DoublePage(IStreamProvider streams, CacheHost cacheHost)
+            : base(streams, cacheHost)
         {
         }
 

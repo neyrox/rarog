@@ -7,9 +7,48 @@ namespace Engine.Storage
     {
         public const int DataOffset = Page.HeaderSize;
 
-        public long MinIdx;
-        public long MaxIdx;
-        public int Count;
+        
+        
+        private long minIdx;
+        private long maxIdx;
+        private int count;
+
+        public long MinIdx
+        {
+            get => minIdx;
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Wrong header");
+                minIdx = value;  
+            }
+        }
+
+        public long MaxIdx
+        {
+            get => maxIdx;
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Wrong header");
+                maxIdx = value;  
+            }
+        }
+
+        public int Count
+        {
+            get => count;
+            set
+            {
+                if (value < 0)
+                    throw new Exception("Wrong header");
+                
+                if (value > MaxIdx - MinIdx + 1)
+                    throw new Exception("Wrong header");
+
+                count = value;  
+            }
+        }
 
         private byte flags;
         /*

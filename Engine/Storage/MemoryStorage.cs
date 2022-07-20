@@ -27,6 +27,7 @@ namespace Engine.Storage
     {
         private readonly Dictionary<string, byte[]> buffers = new Dictionary<string, byte[]>();
 
+        private readonly CacheHost cacheHost = new CacheHost();
         private readonly PageStorage<int> intStorage;
         private readonly PageStorage<long> bigIntStorage;
         private readonly PageStorage<double> doubleStorage;
@@ -36,10 +37,10 @@ namespace Engine.Storage
 
         public MemoryStorage()
         {
-            intStorage = new IntPage(this);
-            bigIntStorage = new  BigIntPage(this);
-            doubleStorage = new DoublePage(this);
-            strStorage = new VarCharPage(this);
+            intStorage = new IntPage(this, cacheHost);
+            bigIntStorage = new  BigIntPage(this, cacheHost);
+            doubleStorage = new DoublePage(this, cacheHost);
+            strStorage = new VarCharPage(this, cacheHost);
         }
 
         public void StoreTableMeta(string fileName, long nextIdx)
@@ -169,6 +170,30 @@ namespace Engine.Storage
             strStorage.Delete(fileName, indices);
         }
 
+        public void DeleteIntColumn(string fileName)
+        {
+            intStorage.Delete(fileName);
+            buffers.Remove(fileName);
+        }
+
+        public void DeleteBigIntColumn(string fileName)
+        {
+            bigIntStorage.Delete(fileName);
+            buffers.Remove(fileName);
+        }
+
+        public void DeleteDoubleColumn(string fileName)
+        {
+            doubleStorage.Delete(fileName);
+            buffers.Remove(fileName);
+        }
+
+        public void DeleteVarCharColumn(string fileName)
+        {
+            strStorage.Delete(fileName);
+            buffers.Remove(fileName);
+        }
+
         public string[] GetTableNames()
         {
             return new string[0];
@@ -185,6 +210,7 @@ namespace Engine.Storage
 
         public void DeleteFile(string fileName)
         {
+            buffers.Remove(fileName);
         }
 
         public void DeleteDirectory(string tableDir)

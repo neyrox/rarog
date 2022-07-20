@@ -32,8 +32,16 @@ namespace Engine
         public abstract List<long> Filter(string op, string value, IStorage storage, int limit);
 
         public abstract void Delete(SortedSet<long> indicesToDelete, IStorage storage);
+
+        public void DeleteSelf(IStorage storage)
+        {
+            storage.DeleteFile(GetMetaFileName(TablePath, Name));
+
+            DeleteSelfInternal(storage);
+        }
+
         protected abstract void DeleteInternal(SortedSet<long> indicesToDelete, IStorage storage);
-        
+        protected abstract void DeleteSelfInternal(IStorage storage);
 
         public static string GetMetaFileName(string path, string name)
         {

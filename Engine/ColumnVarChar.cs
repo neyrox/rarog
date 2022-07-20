@@ -51,6 +51,11 @@ namespace Engine
             storage.DeleteVarChars(GetDataFileName(TablePath, Name), new SortedSet<long>(idxsToDelete));
         }
 
+        protected override void DeleteSelfInternal(IStorage storage)
+        {
+            storage.DeleteVarCharColumn(GetDataFileName(TablePath, Name));
+        }
+
         protected override IReadOnlyDictionary<long, string> SelectInternal(Condition<string> cond, int limit, IStorage storage)
         {
             return storage.SelectVarChars(GetDataFileName(TablePath, Name), cond, limit);

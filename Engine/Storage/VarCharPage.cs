@@ -5,8 +5,8 @@ namespace Engine.Storage
 {
     public class VarCharPage : PageStorage<string>
     {
-        public VarCharPage(IStreamProvider streams)
-            : base(streams)
+        public VarCharPage(IStreamProvider streams, CacheHost cacheHost)
+            : base(streams, cacheHost)
         {
         }
 
