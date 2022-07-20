@@ -18,9 +18,7 @@ namespace Engine.Storage
             get => minIdx;
             set
             {
-                if (value < 0)
-                    throw new Exception("Wrong header");
-                minIdx = value;  
+                minIdx = value;
             }
         }
 
@@ -29,8 +27,6 @@ namespace Engine.Storage
             get => maxIdx;
             set
             {
-                if (value < 0)
-                    throw new Exception("Wrong header");
                 maxIdx = value;  
             }
         }

@@ -225,10 +225,33 @@ namespace Engine.Storage
                             deleted.Add(idx);
                     }
 
+                    // TODO: optimize
+                    if (pageCache.Data.Count > 0)
+                    {
+                        long minIdx = long.MaxValue;
+                        long maxIdx = long.MinValue;
+
+                        foreach (var iv in pageCache.Data)
+                        {
+                            if (iv.Key < minIdx)
+                                minIdx = iv.Key;
+                            if (iv.Key > maxIdx)
+                                maxIdx = iv.Key;
+                        }
+                        pageCache.Header.MinIdx = minIdx;
+                        pageCache.Header.MaxIdx = maxIdx;
+                    }
+                    else
+                    {
+                        pageCache.Header.MinIdx = -1;
+                        pageCache.Header.MaxIdx = -1;
+                    }
+
                     foreach (var idx in deleted)
                         indices.Remove(idx);
                     deleted.Clear();
 
+                    pageCache.Header.Count = pageCache.Data.Count;
                     pageCache.Dirty = true;
                 }
             }
@@ -272,6 +295,9 @@ namespace Engine.Storage
 
         public void Delete(string name)
         {
+            if (!cache.ContainsKey(name))
+                return;
+
             foreach (var pagesCache in cache[name].Pages)
                 cacheHost.Remove(pagesCache.Value.Id);
 

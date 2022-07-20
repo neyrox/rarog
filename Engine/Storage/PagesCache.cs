@@ -6,7 +6,7 @@ namespace Engine.Storage
     public interface ICached
     {
         string Id { get; }
-        void Evict();
+        bool Evict();
 
         void Validate();
     }
@@ -36,12 +36,15 @@ namespace Engine.Storage
                 throw new Exception("Wrong header");
         }
 
-        public void Evict()
+        public bool Evict()
         {
             // TODO: Flush?
             if (Dirty)
-                return;
+                return false;
+
             Data = null;
+
+            return true;
         }
     }
 
@@ -49,8 +52,7 @@ namespace Engine.Storage
     {
         private const int MaxPages = 1000;
         private readonly object syncObject = new object();
-        private readonly Dictionary<string, ICached> pages = new Dictionary<string, ICached>();
-        private readonly SortedList<string, long> priority = new SortedList<string, long>();
+        private readonly LinkedDictionary<string, ICached> pq = new LinkedDictionary<string, ICached>();
 
         public void Up(ICached page)
         {
@@ -60,30 +62,24 @@ namespace Engine.Storage
             {
                 //Console.WriteLine($"Using page {page.Id}");
 
-                if (!pages.ContainsKey(page.Id))
-                    pages.Add(page.Id, page);
-
-                priority[page.Id] = DateTime.UtcNow.ToFileTimeUtc();
-                
-                if (pages.Count <= MaxPages)
-                    return;
-
-                // TODO: implement priority queue
-                string oldestPageId = priority.Keys[0];
-                var oldestTime = priority.Values[0];
-                for (int i = 1; i < priority.Count; ++i)
+                if (pq.Contains(page.Id))
                 {
-                    if (priority.Values[i] < oldestTime)
+                    pq.Remove(page.Id);
+                    pq.AddFirst(page.Id, page);
+                }
+                else
+                {
+                    pq.AddFirst(page.Id, page);
+                    
+                    if (pq.Count > MaxPages)
                     {
-                        oldestPageId = priority.Keys[i];
-                        oldestTime = priority.Values[i];
+                        var oldestPage = pq.Last;
+                        if (oldestPage.Value.Evict())
+                        {
+                            pq.Remove(oldestPage.Key);
+                        }
                     }
                 }
-
-                var oldestPage = pages[oldestPageId];
-                oldestPage.Evict();
-                pages.Remove(oldestPageId);
-                priority.Remove(oldestPageId);
             }
         }
 
@@ -91,8 +87,7 @@ namespace Engine.Storage
         {
             lock (syncObject)
             {
-                pages.Remove(id);
-                priority.Remove(id);
+                pq.Remove(id);
             }
         }
 
@@ -102,7 +97,7 @@ namespace Engine.Storage
             {
                 lock (syncObject)
                 {
-                    return pages.Count;
+                    return pq.Count;
                 }
             }
         }
