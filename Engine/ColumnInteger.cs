@@ -32,7 +32,7 @@ namespace Engine
             return new ResultColumnInteger(Name, stored.Values.ToArray());
         }
 
-        protected override void DeleteSelfInternal(IStorage storage)
+        protected override void DropInternal(IStorage storage)
         {
             storage.DeleteIntColumn(GetDataFileName(TablePath, Name));
         }

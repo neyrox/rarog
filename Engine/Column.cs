@@ -33,15 +33,15 @@ namespace Engine
 
         public abstract void Delete(SortedSet<long> indicesToDelete, IStorage storage);
 
-        public void DeleteSelf(IStorage storage)
+        public void Drop(IStorage storage)
         {
             storage.DeleteFile(GetMetaFileName(TablePath, Name));
 
-            DeleteSelfInternal(storage);
+            DropInternal(storage);
         }
 
         protected abstract void DeleteInternal(SortedSet<long> indicesToDelete, IStorage storage);
-        protected abstract void DeleteSelfInternal(IStorage storage);
+        protected abstract void DropInternal(IStorage storage);
 
         public static string GetMetaFileName(string path, string name)
         {

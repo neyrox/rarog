@@ -52,7 +52,7 @@ namespace Engine
 
                 tables.Remove(tableName);
 
-                table.DeleteSelf();
+                table.Drop();
 
                 return true;
             }
