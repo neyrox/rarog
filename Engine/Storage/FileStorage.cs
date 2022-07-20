@@ -175,25 +175,25 @@ namespace Engine.Storage
         public void DeleteIntColumn(string fileName)
         {
             intStorage.Delete(fileName);
-            File.Delete(fileName);
+            DeleteFile(fileName);
         }
 
         public void DeleteBigIntColumn(string fileName)
         {
             bigIntStorage.Delete(fileName);
-            File.Delete(fileName);
+            DeleteFile(fileName);
         }
 
         public void DeleteDoubleColumn(string fileName)
         {
             doubleStorage.Delete(fileName);
-            File.Delete(fileName);
+            DeleteFile(fileName);
         }
 
         public void DeleteVarCharColumn(string fileName)
         {
             strStorage.Delete(fileName);
-            File.Delete(fileName);
+            DeleteFile(fileName);
         }
 
         public string[] GetTableNames()
@@ -247,7 +247,8 @@ namespace Engine.Storage
 
         public void DeleteFile(string fileName)
         {
-            File.Delete(fileName);
+            if (File.Exists(fileName))
+                File.Delete(fileName);
         }
 
         public void DeleteDirectory(string tableDir)
