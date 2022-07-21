@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,8 +10,9 @@ namespace Engine.Storage
 {
     public abstract class PageStorage<T> where T: IComparable<T>
     {
-        private readonly SortedList<string, PagesCache<T>> cache =
-            new SortedList<string, PagesCache<T>>();
+        // Here can be pages from multiple tables
+        private readonly ConcurrentDictionary<string, PagesCache<T>> cache =
+            new ConcurrentDictionary<string, PagesCache<T>>();
 
         private IStreamProvider streams;
         private CacheHost cacheHost;
@@ -264,10 +266,11 @@ namespace Engine.Storage
 
         public void Flush()
         {
-            for (int i = 0; i < cache.Count; i++)
+            foreach (var c in cache)
             {
-                var name = cache.Keys[i];
-                var pagesCache = cache.Values[i];
+                var name = c.Key;
+                var pagesCache = c.Value;
+
                 Stream stream = null;
                 for (int j = 0; j < pagesCache.Pages.Count; j++)
                 {
@@ -301,7 +304,7 @@ namespace Engine.Storage
             foreach (var pagesCache in cache[name].Pages)
                 cacheHost.Remove(pagesCache.Value.Id);
 
-            cache.Remove(name);
+            cache.TryRemove(name, out var removed);
         }
         
         private void AppendTail(string name, Stream stream, PagesCache<T> pagesCache, SortedDictionary<long, T> tail)
@@ -376,7 +379,7 @@ namespace Engine.Storage
             if (!cache.TryGetValue(name, out var pagesCache))
             {
                 pagesCache = new PagesCache<T>();
-                cache.Add(name, pagesCache);
+                cache.TryAdd(name, pagesCache);
             }
 
             if (!pagesCache.Pages.TryGetValue(pageIdx, out pageCache))

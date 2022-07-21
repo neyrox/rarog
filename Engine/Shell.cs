@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Threading;
 
 namespace Engine
 {
     public class Shell
     {
         private readonly Database db;
-        private readonly TimeSpan lockTimeout = new TimeSpan(0, 1, 0);
 
         public Shell(Database database)
         {
@@ -25,18 +23,7 @@ namespace Engine
                 if (command == null)
                     throw new Exception("wrong query");
 
-                if (Monitor.TryEnter(db.SyncObject, lockTimeout))
-                {
-                    try
-                    {
-                        return command.Execute(db);
-                    }
-                    finally
-                    {
-                        Monitor.Exit(db.SyncObject);
-                    }
-                }
-                throw new Exception("failed to get database lock");
+                return command.Execute(db);
             }
             catch (Exception e)
             {

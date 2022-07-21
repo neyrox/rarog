@@ -17,10 +17,23 @@ namespace Engine
             Error = error;
             Columns = columns;
         }
+    }
 
-        public static Result TableNotFound(string tableName)
+    public static class Exceptions
+    {
+        public static Exception FailedToLockDb()
         {
-            return new Result(null, $"Table \'{tableName}\' was not found");
+            return new Exception($"Failed to acquire database lock");
+        }
+
+        public static Exception TableNotFound(string tableName)
+        {
+            return new Exception($"Table \'{tableName}\' was not found");
+        }
+
+        public static Exception FailedToLockTable(string tableName)
+        {
+            return new Exception($"Failed to acquire table \'{tableName}\' lock");
         }
     }
 }

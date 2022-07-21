@@ -2,26 +2,21 @@
 
 namespace Engine
 {
-    public class InsertNode: Node
+    public class InsertNode: BaseTableNode
     {
-        public string TableName;
         public List<string> ColumnNames;
         public List<string> Values;
 
         public InsertNode(string tableName, List<string> columnNames, List<string> values)
+            : base(tableName)
         {
-            TableName = tableName;
             ColumnNames = columnNames;
             Values = values;
         }
 
-        public override Result Execute(Database db)
+        protected override Result ExecuteInternal(Table table)
         {
-            if (!db.ContainsTable(TableName))
-                return Result.TableNotFound(TableName);
-
-            db.GetTable(TableName).Insert(ColumnNames, Values);
-
+            table.Insert(ColumnNames, Values);
             return Result.OK;
         }
     }

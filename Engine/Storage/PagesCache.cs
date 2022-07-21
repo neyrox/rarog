@@ -105,6 +105,8 @@ namespace Engine.Storage
 
     public class PagesCache<T>
     {
+        // Here may be pages from one table only, so...
+        // this map is protected by table locks
         public readonly SortedList<int, PageCache<T>> Pages =
             new SortedList<int, PageCache<T>>();
 

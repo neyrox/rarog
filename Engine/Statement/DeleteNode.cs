@@ -1,25 +1,18 @@
-﻿using System.Collections.Generic;
-
-namespace Engine
+﻿namespace Engine
 {
-    public class DeleteNode: Node
+    public class DeleteNode: BaseTableNode
     {
-        public string TableName;
         public ConditionNode Condition;
 
         public DeleteNode(string tableName, ConditionNode condition)
+            : base(tableName)
         {
-            TableName = tableName;
             Condition = condition;
         }
 
-        public override Result Execute(Database db)
+        protected override Result ExecuteInternal(Table table)
         {
-            if (!db.ContainsTable(TableName))
-                return Result.TableNotFound(TableName);
-
-            db.GetTable(TableName).Delete(Condition);
-
+            table.Delete(Condition);
             return Result.OK;
         }
     }

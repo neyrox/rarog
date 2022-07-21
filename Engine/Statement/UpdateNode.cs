@@ -3,28 +3,23 @@ using Engine.Statement;
 
 namespace Engine
 {
-    public class UpdateNode: Node
+    public class UpdateNode: BaseTableNode
     {
-        public string TableName;
         public List<string> ColumnNames;
         public List<OperationNode> Ops;
         public ConditionNode Condition;
 
         public UpdateNode(string tableName, List<string> columnNames, List<OperationNode> ops, ConditionNode condition)
+            : base(tableName)
         {
-            TableName = tableName;
             ColumnNames = columnNames;
             Ops = ops;
             Condition = condition;
         }
 
-        public override Result Execute(Database db)
+        protected override Result ExecuteInternal(Table table)
         {
-            if (!db.ContainsTable(TableName))
-                return Result.TableNotFound(TableName);
-
-            db.GetTable(TableName).Update(ColumnNames, Ops, Condition);
-
+            table.Update(ColumnNames, Ops, Condition);
             return Result.OK;
         }
     }

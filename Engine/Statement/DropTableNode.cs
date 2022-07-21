@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Threading;
 
 namespace Engine
 {
@@ -15,13 +16,23 @@ namespace Engine
 
         public override Result Execute(Database db)
         {
-            if (db.RemoveTable(TableName))
-                return Result.OK;
+            if (!Monitor.TryEnter(db.SyncObject, LockTimeout))
+                throw Exceptions.FailedToLockDb();
 
-            if (IfExists)
-                return Result.OK;
+            try
+            {
+                if (db.RemoveTable(TableName))
+                    return Result.OK;
 
-            return Result.TableNotFound(TableName);
+                if (IfExists)
+                    return Result.OK;
+            }
+            finally
+            {
+                Monitor.Exit(db.SyncObject);
+            }
+
+            throw Exceptions.TableNotFound(TableName);
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Engine
 {
     public class Parser
@@ -33,14 +35,15 @@ namespace Engine
                     case "DROP":
                         root = ParserDropTable.Convert(tokens, ref pos);
                         break;
+                    case "FLUSH":
+                        root = ParserFlush.Convert(tokens, ref pos);
+                        break;
                     default:
-                        // TODO: log unknown token
-                        return null;
+                        throw new Exception($"Unexpected token {tokens[pos]}");
                 }
             }
 
             return root;
         }
-
     }
 }

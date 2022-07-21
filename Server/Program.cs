@@ -115,12 +115,12 @@ namespace Server
             // Signal the calling thread to continue.
             _tcpClientConnected.Set();
         }
-        
+
         private static void Flush()
         {
             while (!_stopping.WaitOne(0))
             {
-                _db.Flush();
+                _shell.Execute("FLUSH;");
 
                 if (_stopping.WaitOne(10000))
                     break;

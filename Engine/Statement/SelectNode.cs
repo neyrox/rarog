@@ -2,27 +2,23 @@
 
 namespace Engine
 {
-    public class SelectNode: Node
+    public class SelectNode: BaseTableNode
     {
         public List<string> What;
-        public string TableName;
         public ConditionNode Condition;
         public int Limit;
 
         public SelectNode(List<string> what, string tableName, ConditionNode condition, int limit)
+            : base(tableName)
         {
             What = what;
-            TableName = tableName;
             Condition = condition;
             Limit = limit;
         }
 
-        public override Result Execute(Database db)
+        protected override Result ExecuteInternal(Table table)
         {
-            if (!db.ContainsTable(TableName))
-                return Result.TableNotFound(TableName);
-
-            var rows = db.GetTable(TableName).Select(What, Condition, Limit);
+            var rows = table.Select(What, Condition, Limit);
             return new Result(rows);
         }
     }

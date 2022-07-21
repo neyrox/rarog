@@ -1,21 +1,18 @@
 ﻿namespace Engine
 {
-    public class AlterTableDropColumnNode: Node
+    public class AlterTableDropColumnNode: BaseTableNode
     {
-        public string TableName;
         public string ColumnName;
 
         public AlterTableDropColumnNode(string tableName, string columnName)
+            : base(tableName)
         {
-            TableName = tableName;
             ColumnName = columnName;
         }
 
-        public override Result Execute(Database db)
+        protected override Result ExecuteInternal(Table table)
         {
-            var table = db.GetTable(TableName);
             table.DropColumn(ColumnName);
-
             return Result.OK;
         }
     }

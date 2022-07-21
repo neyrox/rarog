@@ -8,6 +8,8 @@ namespace Engine
 {
     public class Table
     {
+        public readonly object SyncObject = new object();
+
         private const int MaxColumnNameLength = 64;
         public const string MetaFileExtension = ".meta";
         public const string TableDirExtension = ".data";

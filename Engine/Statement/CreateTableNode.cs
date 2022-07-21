@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace Engine
 {
@@ -22,12 +23,34 @@ namespace Engine
 
         public override Result Execute(Database db)
         {
-            if (IfNotExists && db.ContainsTable(TableName))
-                return Result.OK;
+            Table table;
+            if (!Monitor.TryEnter(db.SyncObject, LockTimeout))
+                throw Exceptions.FailedToLockDb();
 
-            var table = db.CreateTable(TableName);
-            for (int i = 0; i < ColumnNames.Count; ++i)
-                table.AddColumn(ColumnNames[i], DataTypes[i], Lengths[i]);
+            try
+            {
+                if (IfNotExists && db.ContainsTable(TableName))
+                    return Result.OK;
+
+                table = db.CreateTable(TableName);
+            }
+            finally
+            {
+                Monitor.Exit(db.SyncObject);
+            }
+
+            if (!Monitor.TryEnter(table.SyncObject, LockTimeout))
+                throw Exceptions.FailedToLockTable(TableName);
+
+            try
+            {
+                for (int i = 0; i < ColumnNames.Count; ++i)
+                    table.AddColumn(ColumnNames[i], DataTypes[i], Lengths[i]);
+            }
+            finally
+            {
+                Monitor.Exit(table.SyncObject);
+            }
 
             return Result.OK;
         }
