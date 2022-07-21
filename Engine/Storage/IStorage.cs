@@ -35,6 +35,11 @@ namespace Engine.Storage
         void DeleteDoubles(string fileName, SortedSet<long> indices);
         void DeleteVarChars(string fileName, SortedSet<long> indices);
 
+        void DeleteIntColumn(string fileName);
+        void DeleteBigIntColumn(string fileName);
+        void DeleteDoubleColumn(string fileName);
+        void DeleteVarCharColumn(string fileName);
+
         string[] GetTableNames();
 
         string[] GetColumnFiles(string tableDir);
@@ -44,5 +49,7 @@ namespace Engine.Storage
         void DeleteFile(string fileName);
 
         void DeleteDirectory(string tableDir);
+
+        void Flush();
     }
 }

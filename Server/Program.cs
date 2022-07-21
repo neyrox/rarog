@@ -16,6 +16,8 @@ namespace Server
         private static readonly Shell _shell = new Shell(_db);
         // TODO: implement removal on disconnect
         private static readonly ConcurrentBag<NetClient> _clients = new ConcurrentBag<NetClient>();
+        private static readonly ManualResetEvent _stopping = new ManualResetEvent(false);
+        private static Thread _flushThread;
 
         static void Main(string[] args)
         {
@@ -48,7 +50,10 @@ namespace Server
                 Console.WriteLine("Server Failed to Start");
                 return;
             }
-            
+
+            _flushThread = new Thread(Flush) {IsBackground = true};
+            _flushThread.Start();
+
             try
             {
                 // Enter the listening loop.
@@ -63,8 +68,12 @@ namespace Server
             }
             finally
             {
+                _stopping.Set();
+
                 // Stop listening for new clients.
                 server.Stop();
+
+                _flushThread.Join();
             }
         }
 
@@ -105,6 +114,17 @@ namespace Server
 
             // Signal the calling thread to continue.
             _tcpClientConnected.Set();
+        }
+        
+        private static void Flush()
+        {
+            while (!_stopping.WaitOne(0))
+            {
+                _db.Flush();
+
+                if (_stopping.WaitOne(10000))
+                    break;
+            }
         }
     }
 }

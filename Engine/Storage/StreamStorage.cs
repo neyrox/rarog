@@ -48,44 +48,59 @@ namespace Engine.Storage
             return null;
         }
 
-        public static byte[] NextPage(Stream stream)
+        public static void SeekToPage(Stream stream, int pageIdx)
+        {
+            try
+            {
+                stream.Seek(Page.Size * pageIdx, SeekOrigin.Begin);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        public static void SeekToPageData(Stream stream, int pageIdx)
+        {
+            try
+            {
+                stream.Seek(Page.Size * pageIdx + Page.HeaderSize, SeekOrigin.Begin);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        public static void SkipPage(Stream stream)
+        {
+            stream.Seek(Page.Size, SeekOrigin.Current);
+        }
+
+        public static void SkipPageData(Stream stream)
+        {
+            stream.Seek(Page.Size - Page.HeaderSize, SeekOrigin.Current);
+        }
+
+        public static byte[] ReadHeader(Stream stream)
+        {
+            var buf = new byte[Page.HeaderSize];
+            stream.Read(buf, 0, buf.Length);
+            return buf;
+        }
+
+        public static byte[] ReadPage(Stream stream)
         {
             var buf = new byte[Page.Size];
             stream.Read(buf, 0, buf.Length);
             return buf;
         }
 
-        public static bool FindPage(Stream stream, long idx, out PageHeader header, out byte[] page)
+        public static byte[] ReadPageData(Stream stream)
         {
-            header = null;
-            page = null;
-
-            while (stream.Position < stream.Length)
-            {
-                page = NextPage(stream);
-                header = new PageHeader(page);
-                if (header.Include(idx))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static bool FindPageForInsert(Stream stream, long idx, out PageHeader header, out byte[] page)
-        {
-            header = null;
-            page = null;
-
-            if (stream.Length < Page.Size)
-                return false;
-
-            // Always last
-            // TODO: rework?
-            stream.Seek(-Page.Size, SeekOrigin.End);
-            page = NextPage(stream);
-            header = new PageHeader(page);
-
-            return true;
+            var buf = new byte[Page.Size - Page.HeaderSize];
+            stream.Read(buf, 0, buf.Length);
+            return buf;
         }
 
         public static void Write(Stream fs, byte[] buf)
@@ -93,10 +108,17 @@ namespace Engine.Storage
             fs.Write(buf, 0, buf.Length);
         }
 
-        public static void WriteBack(Stream stream, byte[] page)
+        public static void Write(Stream stream, byte[] page, int pageIdx)
         {
-            stream.Seek(-Page.Size, SeekOrigin.Current);
-            stream.Write(page, 0, page.Length);
+            try
+            {
+                stream.Seek(Page.Size * pageIdx, SeekOrigin.Begin);
+                stream.Write(page, 0, page.Length);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public static bool Overlap(long start1, long end1, long start2, long end2)

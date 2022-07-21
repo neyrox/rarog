@@ -36,6 +36,11 @@ namespace Engine
             storage.DeleteBigInts(GetDataFileName(TablePath, Name), new SortedSet<long>(rowsToDelete));
         }
 
+        protected override void DropInternal(IStorage storage)
+        {
+            storage.DeleteBigIntColumn(GetDataFileName(TablePath, Name));
+        }
+
         protected override IReadOnlyDictionary<long, long> SelectInternal(Condition<long> cond, int limit, IStorage storage)
         {
             return storage.SelectBigInts(GetDataFileName(TablePath, Name), cond, limit);

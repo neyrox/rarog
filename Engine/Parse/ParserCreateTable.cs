@@ -13,12 +13,18 @@ namespace Engine
             else
                 throw new Exception($"Unexpected token {tokens[pos]}");
 
+            bool ifNotExists = false;
+            if (ParserCommon.AssertUpperToken("IF", tokens, pos) &&
+                ParserCommon.AssertUpperToken("NOT", tokens, pos + 1) &&
+                ParserCommon.AssertUpperToken("EXISTS", tokens, pos + 2))
+            {
+                ifNotExists = true;
+                pos += 3;
+            }
+
             string tableName;
             if (pos < tokens.Length)
-            {
-                tableName = tokens[pos];
-                ++pos;
-            }
+                tableName = tokens[pos++];
             else
                 throw new Exception("Unexpected end of query");
 
@@ -42,7 +48,7 @@ namespace Engine
             else
                 throw new Exception("Failed to find \';\' at the end of query");
 
-            return new CreateTableNode(tableName, columnNames, dataTypes, lengths);
+            return new CreateTableNode(tableName, columnNames, dataTypes, lengths, ifNotExists);
         }
 
         private static void ConvertColumns(string[] tokens, List<string> columnNames, List<string> dataTypes, List<int> lengths, ref int pos)

@@ -32,6 +32,11 @@ namespace Engine
             return new ResultColumnInteger(Name, stored.Values.ToArray());
         }
 
+        protected override void DropInternal(IStorage storage)
+        {
+            storage.DeleteIntColumn(GetDataFileName(TablePath, Name));
+        }
+
         protected override void DeleteInternal(SortedSet<long> rowsToDelete, IStorage storage)
         {
             storage.DeleteInts(GetDataFileName(TablePath, Name), new SortedSet<long>(rowsToDelete));

@@ -6,14 +6,22 @@ using Engine.Statement;
 
 namespace Engine.Storage
 {
-    public class FileStorage : IStorage
+    public class FileStorage : IStorage, IStreamProvider
     {
-        private readonly PageStorage<int> intStorage = new IntPage();
-        private readonly PageStorage<long> bigIntStorage = new  BigIntPage();
-        private readonly PageStorage<double> doubleStorage = new DoublePage();
-        private readonly PageStorage<string> strStorage = new VarCharPage();
+        private readonly CacheHost cacheHost = new CacheHost();
+        private readonly PageStorage<int> intStorage;
+        private readonly PageStorage<long> bigIntStorage;
+        private readonly PageStorage<double> doubleStorage;
+        private readonly PageStorage<string> strStorage;
 
-        // Full scan
+        public FileStorage()
+        {
+            intStorage = new IntPage(this, cacheHost);
+            bigIntStorage = new  BigIntPage(this, cacheHost);
+            doubleStorage = new DoublePage(this, cacheHost);
+            strStorage = new VarCharPage(this, cacheHost);
+        }
+
         public void StoreTableMeta(string fileName, long nextIdx)
         {
             using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.Write))
@@ -54,13 +62,7 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, int> SelectInts(string fileName, Condition<int> cond, int limit)
         {
-            if (!File.Exists(fileName))
-                return new Dictionary<long, int>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return intStorage.Select(file, cond, limit);
-            }
+            return intStorage.Select(fileName, cond, limit);
         }
 
         public IReadOnlyDictionary<long, int> SelectInts(string fileName, SortedSet<long> indices)
@@ -68,24 +70,12 @@ namespace Engine.Storage
             if (indices != null && indices.Count == 0)
                 return new Dictionary<long, int>();
             
-            if (!File.Exists(fileName))
-                return new Dictionary<long, int>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return intStorage.Select(file, indices);
-            }
+            return intStorage.Select(fileName, indices);
         }
 
         public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, Condition<long> cond, int limit)
         {
-            if (!File.Exists(fileName))
-                return new Dictionary<long, long>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return bigIntStorage.Select(file, cond, limit);
-            }
+            return bigIntStorage.Select(fileName, cond, limit);
         }
 
         public IReadOnlyDictionary<long, long> SelectBigInts(string fileName, SortedSet<long> indices)
@@ -93,24 +83,12 @@ namespace Engine.Storage
             if (indices != null && indices.Count == 0)
                 return new Dictionary<long, long>();
             
-            if (!File.Exists(fileName))
-                return new Dictionary<long, long>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return bigIntStorage.Select(file, indices);
-            }
+            return bigIntStorage.Select(fileName, indices);
         }
 
         public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, Condition<double> cond, int limit)
         {
-            if (!File.Exists(fileName))
-                return new Dictionary<long, double>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return doubleStorage.Select(file, cond, limit);
-            }
+            return doubleStorage.Select(fileName, cond, limit);
         }
 
         public IReadOnlyDictionary<long, double> SelectDoubles(string fileName, SortedSet<long> indices)
@@ -118,24 +96,12 @@ namespace Engine.Storage
             if (indices != null && indices.Count == 0)
                 return new Dictionary<long, double>();
 
-            if (!File.Exists(fileName))
-                return new Dictionary<long, double>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return doubleStorage.Select(file, indices);
-            }
+            return doubleStorage.Select(fileName, indices);
         }
 
         public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, Condition<string> cond, int limit)
         {
-            if (!File.Exists(fileName))
-                return new Dictionary<long, string>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return strStorage.Select(file, cond, limit);
-            }
+            return strStorage.Select(fileName, cond, limit);
         }
 
         public IReadOnlyDictionary<long, string> SelectVarChars(string fileName, SortedSet<long> indices)
@@ -143,133 +109,91 @@ namespace Engine.Storage
             if (indices != null && indices.Count == 0)
                 return new Dictionary<long, string>();
 
-            if (!File.Exists(fileName))
-                return new Dictionary<long, string>();
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
-            {
-                return strStorage.Select(file, indices);
-            }
+            return strStorage.Select(fileName, indices);
         }
 
         public void UpdateInts(string fileName, long idx, OperationGeneric<int> op)
         {
-            if (!File.Exists(fileName))
-                return;
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                intStorage.Update(file, idx, op);
-            }
+            intStorage.Update(fileName, idx, op);
         }
 
         public void UpdateBigInts(string fileName, long idx, OperationGeneric<long> op)
         {
-            if (!File.Exists(fileName))
-                return;
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                bigIntStorage.Update(file, idx, op);
-            }
+            bigIntStorage.Update(fileName, idx, op);
         }
 
         public void UpdateDoubles(string fileName, long idx, OperationGeneric<double> op)
         {
-            if (!File.Exists(fileName))
-                return;
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                doubleStorage.Update(file, idx, op);
-            }
+            doubleStorage.Update(fileName, idx, op);
         }
 
         public void UpdateVarChars(string fileName, long idx, OperationGeneric<string> op)
         {
-            if (!File.Exists(fileName))
-                return;
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                strStorage.Update(file, idx, op);
-            }
+            strStorage.Update(fileName, idx, op);
         }
 
         public void InsertInts(string fileName, long idx, int val)
         {
-            using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                intStorage.Insert(file, idx, val);
-            }
+            intStorage.Insert(fileName, idx, val);
         }
 
         public void InsertBigInts(string fileName, long idx, long val)
         {
-            using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                bigIntStorage.Insert(file, idx, val);
-            }
+            bigIntStorage.Insert(fileName, idx, val);
         }
 
         public void InsertDoubles(string fileName, long idx, double val)
         {
-            using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                doubleStorage.Insert(file, idx, val);
-            }
+            doubleStorage.Insert(fileName, idx, val);
         }
 
         public void InsertVarChars(string fileName, long idx, string val)
         {
-            using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                VarCharPage.Instance.Insert(file, idx, val);
-            }
+            strStorage.Insert(fileName, idx, val);
         }
 
         public void DeleteInts(string fileName, SortedSet<long> indices)
         {
-            if (!File.Exists(fileName))
-                return;
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                intStorage.Delete(file, indices);
-            }
+            intStorage.Delete(fileName, indices);
         }
 
         public void DeleteBigInts(string fileName, SortedSet<long> indices)
         {
-            if (!File.Exists(fileName))
-                return;
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                bigIntStorage.Delete(file, indices);
-            }
+            bigIntStorage.Delete(fileName, indices);
         }
 
         public void DeleteDoubles(string fileName, SortedSet<long> indices)
         {
-            if (!File.Exists(fileName))
-                return;
-
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                doubleStorage.Delete(file, indices);
-            }
+            doubleStorage.Delete(fileName, indices);
         }
 
         public void DeleteVarChars(string fileName, SortedSet<long> indices)
         {
-            if (!File.Exists(fileName))
-                return;
+            strStorage.Delete(fileName, indices);
+        }
 
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
-            {
-                strStorage.Delete(file, indices);
-            }
+        public void DeleteIntColumn(string fileName)
+        {
+            intStorage.Delete(fileName);
+            DeleteFile(fileName);
+        }
+
+        public void DeleteBigIntColumn(string fileName)
+        {
+            bigIntStorage.Delete(fileName);
+            DeleteFile(fileName);
+        }
+
+        public void DeleteDoubleColumn(string fileName)
+        {
+            doubleStorage.Delete(fileName);
+            DeleteFile(fileName);
+        }
+
+        public void DeleteVarCharColumn(string fileName)
+        {
+            strStorage.Delete(fileName);
+            DeleteFile(fileName);
         }
 
         public string[] GetTableNames()
@@ -323,13 +247,54 @@ namespace Engine.Storage
 
         public void DeleteFile(string fileName)
         {
-            File.Delete(fileName);
+            if (File.Exists(fileName))
+                File.Delete(fileName);
         }
 
         public void DeleteDirectory(string tableDir)
         {
             if (Directory.Exists(tableDir))
                 Directory.Delete(tableDir);
+        }
+
+        public void Flush()
+        {
+            intStorage.Flush();
+            bigIntStorage.Flush();
+            doubleStorage.Flush();
+            strStorage.Flush();
+
+            Console.WriteLine($"There are {cacheHost.Count} pages in cache");
+        }
+
+        public Stream OpenRead(string name)
+        {
+            try
+            {
+                Console.WriteLine($"Opening {name} to read");
+                return File.Open(name, FileMode.OpenOrCreate, FileAccess.Read);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return null;
+        }
+
+        public Stream OpenReadWrite(string name)
+        {
+            try
+            {
+                Console.WriteLine($"Opening {name} to read and write");
+                return File.Open(name, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return null;
         }
     }
 }

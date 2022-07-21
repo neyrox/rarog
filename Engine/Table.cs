@@ -91,6 +91,7 @@ namespace Engine
             }
         }
 
+        // TODO: lock all columns
         public void Insert(List<string> columnNames, List<string> values)
         {
             var allColumnNames = new HashSet<string>(columns.Keys);
@@ -122,6 +123,7 @@ namespace Engine
             return Select(columnNames, rowsToSelect);
         }
 
+        // TODO: lock all columns
         public void Delete(ConditionNode condition)
         {
             List<long> rowsToDelete;
@@ -169,6 +171,16 @@ namespace Engine
             return Name + MetaFileExtension;
         }
 
+        public void Drop()
+        {
+            storage.DeleteFile(GetTableMetaFile());
+
+            foreach (var column in columns)
+                column.Value.Drop(storage);
+
+            storage.DeleteDirectory(GetTableDir());
+        }
+        
         private void AddColumn(Column column)
         {
             if (columns.Count > 0)

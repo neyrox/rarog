@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Engine.Statement;
 using Engine.Storage;
@@ -35,10 +36,11 @@ namespace Engine
 
         private string Clamp(string value)
         {
+            if (value == null)
+                return string.Empty;
+
             if (value.Length < MaxLength)
-            {
                 return value;
-            }
 
             // TODO: produce warning if string is too long
             return value.Substring(0, MaxLength);
@@ -47,6 +49,11 @@ namespace Engine
         protected override void DeleteInternal(SortedSet<long> idxsToDelete, IStorage storage)
         {
             storage.DeleteVarChars(GetDataFileName(TablePath, Name), new SortedSet<long>(idxsToDelete));
+        }
+
+        protected override void DropInternal(IStorage storage)
+        {
+            storage.DeleteVarCharColumn(GetDataFileName(TablePath, Name));
         }
 
         protected override IReadOnlyDictionary<long, string> SelectInternal(Condition<string> cond, int limit, IStorage storage)

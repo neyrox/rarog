@@ -36,6 +36,11 @@ namespace Engine
             storage.DeleteDoubles(GetDataFileName(TablePath, Name), new SortedSet<long>(indicesToDelete));
         }
 
+        protected override void DropInternal(IStorage storage)
+        {
+            storage.DeleteDoubleColumn(GetDataFileName(TablePath, Name));
+        }
+
         protected override IReadOnlyDictionary<long, double> SelectInternal(Condition<double> cond, int limit, IStorage storage)
         {
             return storage.SelectDoubles(GetDataFileName(TablePath, Name), cond, limit);
