@@ -13,16 +13,16 @@ namespace Bench
         protected override void RunInternal()
         {
             Console.WriteLine("Dropping tables");
-            var dropTable1 = Perform("DROP TABLE bench_accounts IF EXISTS;");
+            var dropTable1 = Perform("DROP TABLE IF EXISTS bench_accounts;");
             if (!dropTable1.IsOK)
                 throw new Exception("Failed to drop database bench_accounts");
-            var dropTable2 = Perform("DROP TABLE bench_branches IF EXISTS;");
+            var dropTable2 = Perform("DROP TABLE IF EXISTS bench_branches;");
             if (!dropTable2.IsOK)
                 throw new Exception("Failed to drop database bench_branches");
-            var dropTable3 = Perform("DROP TABLE bench_history IF EXISTS;");
+            var dropTable3 = Perform("DROP TABLE IF EXISTS bench_history;");
             if (!dropTable3.IsOK)
                 throw new Exception("Failed to drop database bench_history");
-            var dropTable4 = Perform("DROP TABLE bench_tellers IF EXISTS;");
+            var dropTable4 = Perform("DROP TABLE IF EXISTS bench_tellers;");
             if (!dropTable4.IsOK)
                 throw new Exception("Failed to drop database bench_tellers");
 

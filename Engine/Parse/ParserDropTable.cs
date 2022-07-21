@@ -7,23 +7,11 @@ namespace Engine
     {
         public static Node Convert(string[] tokens, ref int pos)
         {
-            var what = new List<string>();
             ++pos;  // skip "DROP"
             if (ParserCommon.AssertUpperToken("TABLE", tokens, pos))
                 ++pos;  // skip "TABLE"
             else
                 throw new Exception($"Unexpected token {tokens[pos]}");
-
-            var tableName = string.Empty;
-            if (pos < tokens.Length)
-            {
-                tableName = tokens[pos];
-                ++pos;
-            }
-            else
-            {
-                throw new Exception("Unexpected end of query");
-            }
 
             bool ifExists = false;
             if (ParserCommon.AssertUpperToken("IF", tokens, pos) &&
@@ -32,6 +20,12 @@ namespace Engine
                 ifExists = true;
                 pos += 2;
             }
+
+            string tableName;
+            if (pos < tokens.Length)
+                tableName = tokens[pos++];
+            else
+                throw new Exception("Unexpected end of query");
 
             if (ParserCommon.AssertToken(";", tokens, pos))
                 ++pos;
