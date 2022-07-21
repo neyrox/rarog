@@ -49,7 +49,6 @@ namespace Bench
             for (int aid = 0; aid < 10000 * scale; ++aid)
             {
                 int bid = rnd.Next(scale);
-                //int tid = rnd.Next(10);
                 rnd.NextBytes(fillBuff);
                 var filler = BitConverter.ToString(fillBuff);
                 var insert = Perform($"INSERT INTO bench_accounts (aid, bid, abalance, filler) VALUES ({aid}, {bid}, 0, {filler});");
