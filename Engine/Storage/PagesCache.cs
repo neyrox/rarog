@@ -42,6 +42,7 @@ namespace Engine.Storage
             if (Dirty)
                 return false;
 
+            Data.Clear();
             Data = null;
 
             return true;
