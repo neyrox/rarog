@@ -22,26 +22,26 @@ namespace Engine
             Name = name;
         }
 
-        public abstract void Update(long idx, OperationNode op, IStorage storage);
+        public abstract void Update(long idx, OperationNode op);
 
-        public abstract void Insert(long idx, string val, IStorage storage);
+        public abstract void Insert(long idx, string val);
 
-        public abstract ResultColumn Get(List<long> indices, IStorage storage);
+        public abstract ResultColumn Get(List<long> indices);
 
-        public abstract List<long> AllIndices(IStorage storage, int limit);
-        public abstract List<long> Filter(string op, string value, IStorage storage, int limit);
+        public abstract List<long> AllIndices(int limit);
+        public abstract List<long> Filter(string op, string value, int limit);
 
         public abstract void Delete(SortedSet<long> indicesToDelete, IStorage storage);
 
         public void Drop(IStorage storage)
         {
-            DropInternal(storage);
+            DropInternal();
 
             storage.DeleteFile(GetMetaFileName(TablePath, Name));
             storage.DeleteFile(GetDataFileName(TablePath, Name));
         }
 
-        protected abstract void DropInternal(IStorage storage);
+        protected abstract void DropInternal();
 
         public static string GetMetaFileName(string path, string name)
         {

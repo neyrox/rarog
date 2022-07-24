@@ -76,7 +76,7 @@ namespace Engine
 
         public void Update(List<string> columnNames, List<OperationNode> ops, ConditionNode condition)
         {
-            var rowsToUpdate = condition.GetRowsThatSatisfy(this, storage, 0);
+            var rowsToUpdate = condition.GetRowsThatSatisfy(this, 0);
 
             for (int i = 0; i < columnNames.Count; ++i)
             {
@@ -88,7 +88,7 @@ namespace Engine
                 {
                     long row = rowsToUpdate[j];
                     var column = columns[columnName];
-                    column.Update(row, op, storage);
+                    column.Update(row, op);
                 }
             }
         }
@@ -104,7 +104,7 @@ namespace Engine
                 if (insertingColumnNames.Contains(columnName))
                     continue;
 
-                columns[columnName].Insert(nextIdx, null, storage);
+                columns[columnName].Insert(nextIdx, null);
             }
 
             for (int i = 0; i < columnNames.Count; ++i)
@@ -112,7 +112,7 @@ namespace Engine
                 var columnName = columnNames[i];
                 var value = values[i];
 
-                columns[columnName].Insert(nextIdx, value, storage);
+                columns[columnName].Insert(nextIdx, value);
             }
 
             AddRow();
@@ -120,7 +120,7 @@ namespace Engine
 
         public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition, int limit)
         {
-            var rowsToSelect = condition.GetRowsThatSatisfy(this, storage, limit);
+            var rowsToSelect = condition.GetRowsThatSatisfy(this, limit);
 
             return Select(columnNames, rowsToSelect);
         }
@@ -130,10 +130,10 @@ namespace Engine
         {
             List<long> rowsToDelete;
             if (condition != null)
-                rowsToDelete = condition.GetRowsThatSatisfy(this, storage, 0);
+                rowsToDelete = condition.GetRowsThatSatisfy(this, 0);
             else
                 // TODO: implement truncate
-                rowsToDelete = FirstColumn.AllIndices(storage, 0);
+                rowsToDelete = FirstColumn.AllIndices(0);
 
             foreach (var column in columns.Values)
                 column.Delete(new SortedSet<long>(rowsToDelete), storage);
@@ -188,8 +188,8 @@ namespace Engine
             if (columns.Count > 0)
             {
                 // TODO: optimize
-                foreach (var idx in FirstColumn.AllIndices(storage, 0))
-                    column.Insert(idx, column.DefaultValue, storage);
+                foreach (var idx in FirstColumn.AllIndices(0))
+                    column.Insert(idx, column.DefaultValue);
             }
 
             columns.Add(column.Name, column);
@@ -216,7 +216,7 @@ namespace Engine
             }
 
             for (int j = 0; j < columnsToQuery.Count; ++j)
-                result.Add(columnsToQuery[j].Get(rows, storage));
+                result.Add(columnsToQuery[j].Get(rows));
 
             return result;
         }

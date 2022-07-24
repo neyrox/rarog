@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Engine.Storage;
 
 namespace Engine
 {
@@ -16,9 +15,9 @@ namespace Engine
             Value = value;
         }
 
-        public override List<long> GetRowsThatSatisfy(Table table, IStorage storage, int limit)
+        public override List<long> GetRowsThatSatisfy(Table table, int limit)
         {
-            return table.GetColumn(ColumnName).Filter(Operation, Value, storage, limit);
+            return table.GetColumn(ColumnName).Filter(Operation, Value, limit);
         }
     }
 }

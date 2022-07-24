@@ -24,18 +24,18 @@ namespace UnitTests
         [TestMethod]
         public void TestFitNotClamped()
         {
-            column1.Insert(0, "aaa", storage);
+            column1.Insert(0, "aaa");
 
-            var row = column1.Get(new List<long> {0}, storage);
+            var row = column1.Get(new List<long> {0});
             Assert.AreEqual("aaa", row.Get(0));
         }
         
         [TestMethod]
         public void TestNotFitClamped()
         {
-            column1.Insert(0, "fatty", storage);
+            column1.Insert(0, "fatty");
 
-            var row = column1.Get(new List<long> {0}, storage);
+            var row = column1.Get(new List<long> {0});
             Assert.AreEqual("fat", row.Get(0));
         }
     }

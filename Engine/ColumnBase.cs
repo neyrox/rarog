@@ -20,7 +20,7 @@ namespace Engine
             this.maxLength = maxLength;
         }
 
-        public override ResultColumn Get(List<long> indices, IStorage storage)
+        public override ResultColumn Get(List<long> indices)
         {
             var stored = indices == null
                 ? traits.PageStorage.Select(GetDataFileName(TablePath, Name), new ConditionAny<T>(), 0) 
@@ -29,21 +29,21 @@ namespace Engine
             return traits.Results.Create(Name, stored.Values.ToArray());
         }
 
-        public override void Insert(long idx, string value, IStorage storage)
+        public override void Insert(long idx, string value)
         {
             var val = traits.Converter.FromString(value, maxLength);
 
             traits.PageStorage.Insert(GetDataFileName(TablePath, Name), idx, val);
         }
 
-        public override List<long> AllIndices(IStorage storage, int limit)
+        public override List<long> AllIndices(int limit)
         {
             var stored = traits.PageStorage.Select(GetDataFileName(TablePath, Name), ConditionAny<T>.Instance, limit);
 
             return stored.Keys.ToList();
         }
 
-        public override List<long> Filter(string op, string value, IStorage storage, int limit)
+        public override List<long> Filter(string op, string value, int limit)
         {
             var condition = Condition<T>.Transform(op, value);
 
@@ -56,7 +56,7 @@ namespace Engine
             return result;
         }
 
-        public override void Update(long idx, OperationNode opNode, IStorage storage)
+        public override void Update(long idx, OperationNode opNode)
         {
             traits.PageStorage.Update(GetDataFileName(TablePath, Name), idx, traits.Operations.Transform(opNode));
         }
@@ -73,7 +73,7 @@ namespace Engine
             traits.PageStorage.Delete(GetDataFileName(TablePath, Name), new SortedSet<long>(rowsToDelete));
         }
 
-        protected override void DropInternal(IStorage storage)
+        protected override void DropInternal()
         {
             traits.PageStorage.Delete(GetDataFileName(TablePath, Name));
         }

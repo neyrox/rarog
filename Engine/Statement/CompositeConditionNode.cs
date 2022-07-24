@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Engine.Storage;
 
 namespace Engine
 {
@@ -18,20 +17,20 @@ namespace Engine
             Right = right;
         }
 
-        public override List<long> GetRowsThatSatisfy(Table table, IStorage storage, int limit)
+        public override List<long> GetRowsThatSatisfy(Table table, int limit)
         {
             HashSet<long> resultSet;
             if (Operation == "AND")
             {
                 // TODO: optimize with streaming
-                resultSet = new HashSet<long>(Left.GetRowsThatSatisfy(table, storage, 0));
-                var rightRows = Right.GetRowsThatSatisfy(table, storage, 0);
+                resultSet = new HashSet<long>(Left.GetRowsThatSatisfy(table, 0));
+                var rightRows = Right.GetRowsThatSatisfy(table, 0);
                 resultSet.IntersectWith(rightRows);
             }
             else if (Operation == "OR")
             {
-                resultSet = new HashSet<long>(Left.GetRowsThatSatisfy(table, storage, limit));
-                var rightRows = Right.GetRowsThatSatisfy(table, storage, limit);
+                resultSet = new HashSet<long>(Left.GetRowsThatSatisfy(table, limit));
+                var rightRows = Right.GetRowsThatSatisfy(table, limit);
                 resultSet.UnionWith(rightRows);
             }
             else

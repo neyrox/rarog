@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
-using Engine.Storage;
 
 namespace Engine
 {
     public class AnyConditionNode: ConditionNode
     {
-        public override List<long> GetRowsThatSatisfy(Table table, IStorage storage, int limit)
+        public override List<long> GetRowsThatSatisfy(Table table, int limit)
         {
-            return table.FirstColumn.AllIndices(storage, limit);
+            return table.FirstColumn.AllIndices(limit);
         }
     }
 }

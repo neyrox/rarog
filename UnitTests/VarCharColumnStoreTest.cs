@@ -18,19 +18,19 @@ namespace UnitTests
             registry = new Registry(storage);
 
             column1 = new ColumnBase<string>("t1", "c1", registry.StrTraits);
-            column1.Insert(0, "000", storage);
-            column1.Insert(1, "aaa", storage);
-            column1.Insert(2, "bbb", storage);
-            column1.Insert(5, "eee", storage);
-            column1.Insert(7, "ggg", storage);
+            column1.Insert(0, "000");
+            column1.Insert(1, "aaa");
+            column1.Insert(2, "bbb");
+            column1.Insert(5, "eee");
+            column1.Insert(7, "ggg");
         }
 
         [TestMethod]
         public void StoredAndLoaded()
         {
             var column2 = new ColumnBase<string>("t1", "c1", registry.StrTraits);
-            var whole1 = column1.Get(null, storage);
-            var whole2 = column2.Get(null, storage);
+            var whole1 = column1.Get(null);
+            var whole2 = column2.Get(null);
 
             CollectionAssert.AreEqual(whole1.All(), whole2.All());
         }
