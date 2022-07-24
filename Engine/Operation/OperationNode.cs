@@ -10,6 +10,12 @@ namespace Engine.Statement
         public string Value;
     }
 
+    public interface IOperationTransformer<T>
+    {
+        OperationGeneric<T> Transform(OperationNode opNode);
+    }
+
+
     public abstract class OperationGeneric<T>
     {
         public abstract T Perform(T source);

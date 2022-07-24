@@ -15,14 +15,16 @@ namespace Engine
         public const string TableDirExtension = ".data";
         private readonly Dictionary<string, Column> columns = new Dictionary<string, Column>();
         private readonly IStorage storage;
+        private readonly Registry registry;
         private long nextIdx = 0;
 
         public string Name { get; }
 
-        public Table(string name, IStorage storage)
+        public Table(string name, IStorage storage, Registry registry)
         {
             Name = name;
             this.storage = storage;
+            this.registry = registry;
         }
 
         public Column FirstColumn => columns.First().Value;
@@ -41,22 +43,20 @@ namespace Engine
             switch (type.ToLowerInvariant())
             {
                 case "int":
-                    AddColumn(new ColumnInteger(tablePath, name));
+                    AddColumn(new ColumnBase<int>(tablePath, name, registry.IntTraits));
                     break;
                 case "bigint":
-                    AddColumn(new ColumnBigInt(tablePath, name));
+                    AddColumn(new ColumnBase<long>(tablePath, name, registry.BigIntTraits));
                     break;
                 case "float":
                 case "double":
-                    AddColumn(new ColumnDouble(tablePath, name));
+                    AddColumn(new ColumnBase<double>(tablePath, name, registry.DoubleTraits));
                     break;
                 case "varchar":
-                    var column = new ColumnVarChar(tablePath, name);
-                    column.MaxLength = length;
-                    AddColumn(column);
+                    AddColumn(new ColumnBase<string>(tablePath, name, registry.StrTraits, length));
                     break;
                 default:
-                    throw new Exception($"Unknown type {type}");
+                    throw new Exception($"Unknown column type {type}");
             }
         }
 
@@ -148,7 +148,7 @@ namespace Engine
                 if (!columnFile.EndsWith(Column.MetaFileExtension))
                     continue;
 
-                var column = storage.LoadColumnMeta(tableDir, columnFile);
+                var column = storage.LoadColumnMeta(tableDir, columnFile, registry);
                 if (column != null)
                     columns.Add(column.Name, column);
             }

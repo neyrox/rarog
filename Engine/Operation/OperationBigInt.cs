@@ -2,9 +2,9 @@ using System;
 
 namespace Engine.Statement
 {
-    public static class OperationBigInt
+    public class OperationBigInt : IOperationTransformer<long>
     {
-        public static OperationGeneric<long> Transform(OperationNode opNode)
+        public OperationGeneric<long> Transform(OperationNode opNode)
         {
             switch (opNode.Op)
             {

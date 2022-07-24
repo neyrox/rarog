@@ -6,21 +6,39 @@ using Engine.Storage;
 
 namespace Engine
 {
-    public abstract class ColumnBase<T>: Column where T: IComparable<T>
+    public class ColumnBase<T>: Column where T: IComparable<T>
     {
-        protected ColumnBase(string tablePath, string name)
+        public override string TypeNameP => traits.TypeName;
+        public override string DefaultValue => traits.DefaultValue;
+        private readonly TypeTraits<T> traits;
+        private readonly int maxLength;
+
+        public ColumnBase(string tablePath, string name, TypeTraits<T> traits, int maxLength = 0)
             : base(tablePath, name)
         {
+            this.traits = traits;
+            this.maxLength = maxLength;
         }
 
-        protected SortedSet<long> GetIndicesToLoad(List<long> indices)
+        public override ResultColumn Get(List<long> indices, IStorage storage)
         {
-            return new SortedSet<long>(indices);
+            var stored = indices == null
+                ? traits.PageStorage.Select(GetDataFileName(TablePath, Name), new ConditionAny<T>(), 0) 
+                : traits.PageStorage.Select(GetDataFileName(TablePath, Name), new SortedSet<long>(indices));
+
+            return traits.Results.Create(Name, stored.Values.ToArray());
+        }
+
+        public override void Insert(long idx, string value, IStorage storage)
+        {
+            var val = traits.Converter.FromString(value, maxLength);
+
+            traits.PageStorage.Insert(GetDataFileName(TablePath, Name), idx, val);
         }
 
         public override List<long> AllIndices(IStorage storage, int limit)
         {
-            var stored = SelectInternal(ConditionAny<T>.Instance, limit, storage);
+            var stored = traits.PageStorage.Select(GetDataFileName(TablePath, Name), ConditionAny<T>.Instance, limit);
 
             return stored.Keys.ToList();
         }
@@ -31,17 +49,16 @@ namespace Engine
 
             var result = new List<long>();
 
-            var stored = SelectInternal(condition, limit, storage);
+            var stored = traits.PageStorage.Select(GetDataFileName(TablePath, Name), condition, limit);
             foreach (var iv in stored)
                 result.Add(iv.Key);
 
             return result;
         }
 
-
         public override void Update(long idx, OperationNode opNode, IStorage storage)
         {
-            UpdateInternal(idx, Transform(opNode), storage);
+            traits.PageStorage.Update(GetDataFileName(TablePath, Name), idx, traits.Operations.Transform(opNode));
         }
 
         // rowsToDelete is a sorted set of indices
@@ -53,12 +70,12 @@ namespace Engine
                 return;
             }
 
-            DeleteInternal(rowsToDelete, storage);
+            traits.PageStorage.Delete(GetDataFileName(TablePath, Name), new SortedSet<long>(rowsToDelete));
         }
 
-        protected abstract IReadOnlyDictionary<long, T> SelectInternal(Condition<T> cond, int limit, IStorage storage);
-
-        protected abstract OperationGeneric<T> Transform(OperationNode opNode);
-        protected abstract void UpdateInternal(long idx, OperationGeneric<T> op, IStorage storage);
+        protected override void DropInternal(IStorage storage)
+        {
+            traits.PageStorage.Delete(GetDataFileName(TablePath, Name));
+        }
     }
 }

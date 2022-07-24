@@ -2,9 +2,9 @@ using System;
 
 namespace Engine.Statement
 {
-    public static class OperationDouble
+    public class OperationDouble : IOperationTransformer<double>
     {
-        public static OperationGeneric<double> Transform(OperationNode opNode)
+        public OperationGeneric<double> Transform(OperationNode opNode)
         {
             switch (opNode.Op)
             {

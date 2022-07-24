@@ -22,7 +22,9 @@ namespace UnitTests
         [TestInitialize]
         public void Setup()
         {
-            table = new Table("t1", new MemoryStorage());
+            var storage = new MemoryStorage();
+            var registry = new Registry(storage);
+            table = new Table("t1", storage, registry);
             table.AddColumn("c1", "int", 0);
             table.AddColumn("c2", "double", 0);
             table.AddColumn("c3", "bigint", 0);

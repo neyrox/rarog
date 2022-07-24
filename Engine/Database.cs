@@ -10,9 +10,12 @@ namespace Engine
         private readonly SortedList<string, Table> tables = new SortedList<string, Table>();
         private readonly IStorage storage;
 
+        private readonly Registry registry;
+
         public Database(IStorage storage)
         {
             this.storage = storage;
+            registry = new Registry(storage);
         }
 
         public bool ContainsTable(string tableName)
@@ -27,7 +30,7 @@ namespace Engine
 
         public Table CreateTable(string tableName)
         {
-            var table = new Table(tableName, storage);
+            var table = new Table(tableName, storage, registry);
             table.Store();
             tables.Add(tableName, table);
             return table;
@@ -51,7 +54,7 @@ namespace Engine
             foreach (var tableName in storage.GetTableNames())
             {
                 Console.WriteLine($"Loading table {tableName}");
-                var table = new Table(tableName, storage);
+                var table = new Table(tableName, storage, registry);
                 table.Load();
                 tables.Add(table.Name, table);
             }
@@ -64,7 +67,10 @@ namespace Engine
 
         public void Flush()
         {
-            storage.Flush();
+            registry.IntTraits.PageStorage.Flush();
+            registry.BigIntTraits.PageStorage.Flush();
+            registry.DoubleTraits.PageStorage.Flush();
+            registry.StrTraits.PageStorage.Flush();
         }
     }
 }

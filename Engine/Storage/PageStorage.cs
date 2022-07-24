@@ -47,6 +47,9 @@ namespace Engine.Storage
 
         public IReadOnlyDictionary<long, T> Select(string name, SortedSet<long> indices)
         {
+            if (indices != null && indices.Count == 0)
+                return new Dictionary<long, T>();
+
             var result = new Dictionary<long, T>();
             int pageIdx = -1;
             Stream stream = null;

@@ -1,6 +1,5 @@
 ﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 using Engine.Storage;
 
 namespace UnitTests
@@ -8,15 +7,17 @@ namespace UnitTests
     [TestClass]
     public class VarCharColumnStoreTest
     {
-        private ColumnVarChar column1;
         private IStorage storage;
+        private Registry registry;
+        private ColumnBase<string> column1;
 
         [TestInitialize]
         public void Setup()
         {
             storage = new MemoryStorage();
+            registry = new Registry(storage);
 
-            column1 = new ColumnVarChar("t1", "c1");
+            column1 = new ColumnBase<string>("t1", "c1", registry.StrTraits);
             column1.Insert(0, "000", storage);
             column1.Insert(1, "aaa", storage);
             column1.Insert(2, "bbb", storage);
@@ -27,7 +28,7 @@ namespace UnitTests
         [TestMethod]
         public void StoredAndLoaded()
         {
-            var column2 = new ColumnVarChar("t1", "c1");
+            var column2 = new ColumnBase<string>("t1", "c1", registry.StrTraits);
             var whole1 = column1.Get(null, storage);
             var whole2 = column2.Get(null, storage);
 

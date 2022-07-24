@@ -18,7 +18,7 @@ namespace Engine.Storage
             stream.Write(buf, 0, offset);
         }
 
-        public static Column LoadColumnMeta(Stream stream, string tablePath)
+        public static Column LoadColumnMeta(Stream stream, string tablePath, Registry registry)
         {
             // TODO: reformat
             var buf = new byte[1024];
@@ -36,13 +36,13 @@ namespace Engine.Storage
             switch (columnType)
             {
                 case ResultColumnInteger.TypeTag:
-                    return new ColumnInteger(tablePath, name);
+                    return new ColumnBase<int>(tablePath, name, registry.IntTraits);
                 case ResultColumnBigInt.TypeTag:
-                    return new ColumnBigInt(tablePath, name);
+                    return new ColumnBase<long>(tablePath, name, registry.BigIntTraits);
                 case ResultColumnDouble.TypeTag:
-                    return new ColumnDouble(tablePath, name);
+                    return new ColumnBase<double>(tablePath, name, registry.DoubleTraits);
                 case ResultColumnString.TypeTag:
-                    return new ColumnVarChar(tablePath, name);
+                    return new ColumnBase<string>(tablePath, name, registry.StrTraits);
             }
 
             return null;

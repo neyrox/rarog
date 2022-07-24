@@ -12,7 +12,9 @@ namespace Server
     {
         // Thread signal.
         private static readonly ManualResetEvent _tcpClientConnected = new ManualResetEvent(false);
-        private static readonly Database _db = new Database(new FileStorage());
+        private static readonly FileStorage _fileStorage = new FileStorage();
+        private static readonly Registry _registry = new Registry(_fileStorage);
+        private static readonly Database _db = new Database(_fileStorage);
         private static readonly Shell _shell = new Shell(_db);
         // TODO: implement removal on disconnect
         private static readonly ConcurrentBag<NetClient> _clients = new ConcurrentBag<NetClient>();
