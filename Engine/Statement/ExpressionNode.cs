@@ -9,13 +9,24 @@ namespace Engine
     
     public class ValueNode: ExpressionNode
     {
-        public string Item;
+        public readonly string Item;
+
+        public ValueNode(string item)
+        {
+            Item = item;
+        }
     }
 
     public class FunctionNode: ExpressionNode
     {
-        public string Function;
-        public string Item;
+        public readonly string Function;
+        public readonly string Item;
+
+        public FunctionNode(string function, string item)
+        {
+            Function = function;
+            Item = item;
+        }
     }
 
     public abstract class ExpressionFunction
@@ -34,14 +45,14 @@ namespace Engine
             }
         }
 
-        public abstract ResultColumn Evaluate(Table table, List<long> rowsToSelect);
+        public abstract void Evaluate(Table table, List<long> rowsToSelect, List<ResultColumn> result);
     }
 
     public class CountFunction : ExpressionFunction
     {
-        public override ResultColumn Evaluate(Table table, List<long> rowsToSelect)
+        public override void Evaluate(Table table, List<long> rowsToSelect, List<ResultColumn> result)
         {
-            return new ResultColumnBigInt("COUNT", new long[] {rowsToSelect.Count});
+            result.Add(new ResultColumnBigInt("COUNT", new long[] {rowsToSelect.Count}));
         }
     }
 }

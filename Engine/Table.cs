@@ -120,13 +120,6 @@ namespace Engine
             AddRow();
         }
 
-        public List<ResultColumn> Select(List<string> columnNames, ConditionNode condition, int limit)
-        {
-            var rowsToSelect = condition.GetRowsThatSatisfy(this, limit);
-
-            return Select(columnNames, rowsToSelect);
-        }
-
         // TODO: lock all columns
         public void Delete(ConditionNode condition)
         {
@@ -196,31 +189,6 @@ namespace Engine
 
             columns.Add(column.Name, column);
             storage.StoreColumnMeta(column, Name, Column.GetMetaFileName(GetTableDir(), column.Name));
-        }
-
-        private List<ResultColumn> Select(List<string> columnNames, List<long> rows)
-        {
-            var result = new List<ResultColumn>();
-
-            List<Column> columnsToQuery;
-            if (columnNames[0] == "*")
-            {
-                columnsToQuery = new List<Column>(columns.Values);
-            }
-            else
-            {
-                columnsToQuery = new List<Column>();
-                for (int i = 0; i < columnNames.Count; ++i)
-                {
-                    var columnName = columnNames[i];
-                    columnsToQuery.Add(columns[columnName]);
-                }
-            }
-
-            for (int j = 0; j < columnsToQuery.Count; ++j)
-                result.Add(columnsToQuery[j].Get(rows));
-
-            return result;
         }
 
         private void AddRow()

@@ -15,12 +15,12 @@ namespace Engine
                 tokens[pos + 1] == "(" &&
                 tokens[pos + 3] == ")")
             {
-                var result = new FunctionNode {Function = "COUNT", Item = tokens[pos + 2]};
+                var result = new FunctionNode("COUNT", tokens[pos + 2]);
                 pos += 4;
                 return result;
             }
 
-            return new ValueNode {Item = tokens[pos++]};
+            return new ValueNode(tokens[pos++]);
         }
     }
 }

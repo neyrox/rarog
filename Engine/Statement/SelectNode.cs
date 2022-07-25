@@ -87,7 +87,7 @@ namespace Engine
         private void Evaluate(Table table, List<long> rowsToSelect, FunctionNode functionNode, List<ResultColumn> results)
         {
             var func = ExpressionFunction.Convert(functionNode);
-            results.Add(func.Evaluate(table, rowsToSelect));
+            func.Evaluate(table, rowsToSelect, results);
         }
     }
 }

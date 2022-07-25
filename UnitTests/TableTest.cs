@@ -10,6 +10,7 @@ namespace UnitTests
     [TestClass]
     public class TableTest
     {
+        private Database db;
         private Table table;
         private readonly List<string> values1 = new List<string> { "1", "2.3", "10", "a" };
         private readonly List<string> values2 = new List<string> { "4", "5.4", "40", "b" };
@@ -23,8 +24,8 @@ namespace UnitTests
         public void Setup()
         {
             var storage = new MemoryStorage();
-            var registry = new Registry(storage);
-            table = new Table("t1", storage, registry);
+            db = new Database(storage);
+            table = db.CreateTable("t1");
             table.AddColumn("c1", "int", 0);
             table.AddColumn("c2", "double", 0);
             table.AddColumn("c3", "bigint", 0);
@@ -37,7 +38,7 @@ namespace UnitTests
         [TestMethod]
         public void SelectAll()
         {
-            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
+            var result = Select(new AnyConditionNode());
             Assert.AreEqual(4, result.Count);
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(col2, result[1].All());
@@ -48,7 +49,7 @@ namespace UnitTests
         [TestMethod]
         public void SelectWithLimit()
         {
-            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 1);
+            var result = Select(new AnyConditionNode(), 1);
             Assert.AreEqual(4, result.Count);
             CollectionAssert.AreEqual(col1.Take(1).ToList(), result[0].All());
             CollectionAssert.AreEqual(col2.Take(1).ToList(), result[1].All());
@@ -61,7 +62,7 @@ namespace UnitTests
         {
             var condition = new ColumnConditionNode("c1", "=", "4");
 
-            var result = table.Select(new List<string> { "*" }, condition, 0);
+            var result = Select(condition);
             Assert.AreEqual(4, result.Count);
             CollectionAssert.AreEqual(ToList("4"), result[0].All());
             CollectionAssert.AreEqual(ToList("5.4"), result[1].All());
@@ -74,7 +75,7 @@ namespace UnitTests
         {
             var condition = new ColumnConditionNode("c1", ">", "0");
 
-            var result = table.Select(new List<string> { "*" }, condition, 1);
+            var result = Select(condition, 1);
             Assert.AreEqual(4, result.Count);
             Assert.AreEqual(1, result[0].Count);
             Assert.AreEqual(1, result[1].Count);
@@ -91,7 +92,7 @@ namespace UnitTests
             var rightCond = new ColumnConditionNode("c2", ">", "0.0");
             var condition = new CompositeConditionNode(leftCond, op, rightCond);
 
-            var result = table.Select(new List<string> { "*" }, condition, 1);
+            var result = Select(condition, 1);
             Assert.AreEqual(4, result.Count);
             Assert.AreEqual(1, result[0].Count);
             Assert.AreEqual(1, result[1].Count);
@@ -107,7 +108,7 @@ namespace UnitTests
 
             table.Update(new List<string> { "c2" }, ops, condition);
 
-            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
+            var result = Select(new AnyConditionNode());
             Assert.AreEqual(4, result.Count);
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(new List<string> { "2.3", "10.1" }, result[1].All());
@@ -123,7 +124,7 @@ namespace UnitTests
 
             table.Update(new List<string> { "c2" }, ops, condition);
 
-            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
+            var result = Select(new AnyConditionNode());
             Assert.AreEqual(4, result.Count);
             CollectionAssert.AreEqual(col1, result[0].All());
             CollectionAssert.AreEqual(new List<string> { "10.2", "5.4" }, result[1].All());
@@ -135,7 +136,7 @@ namespace UnitTests
         public void OneRowDeleted()
         {
             table.Delete(new ColumnConditionNode("c1", "=", "1"));
-            var result = table.Select(new List<string> { "*" }, new AnyConditionNode(), 0);
+            var result = Select(new AnyConditionNode());
             Assert.AreEqual(4, result.Count);
             CollectionAssert.AreEqual(ToList("4"), result[0].All());
             CollectionAssert.AreEqual(ToList("5.4"), result[1].All());
@@ -146,6 +147,13 @@ namespace UnitTests
         private List<string> ToList(string item)
         {
             return new List<string> { item };
+        }
+
+        private List<ResultColumn> Select(ConditionNode cond, int limit = 0)
+        {
+            var selectNode = new SelectNode(
+                new List<ExpressionNode> {new ValueNode("*")}, "t1", cond, limit);
+            return selectNode.Execute(db).Columns;
         }
     }
 }

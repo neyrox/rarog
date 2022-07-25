@@ -9,7 +9,6 @@ namespace Engine
         public readonly object SyncObject = new object();
         private readonly SortedList<string, Table> tables = new SortedList<string, Table>();
         private readonly IStorage storage;
-
         private readonly Registry registry;
 
         public Database(IStorage storage)
