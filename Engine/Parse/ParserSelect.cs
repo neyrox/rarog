@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Engine
 {
@@ -6,27 +7,29 @@ namespace Engine
     {
         public static Node Convert(string[] tokens, ref int pos)
         {
-            var what = new List<string>();
+            var what = new List<ExpressionNode>();
             ++pos;  // skip "SELECT" itself
             ConvertWhat(tokens, what, ref pos);
             if (ParserCommon.AssertUpperToken("FROM", tokens, pos))
                 ++pos;
             else
-                return null;
-            var tableName = string.Empty;
+                return new SelectWithoutTable(what);
+
+            string tableName;
             if (pos < tokens.Length)
             {
                 tableName = tokens[pos];
                 ++pos;
             }
             else
-                return null;
+            {
+                throw new Exception("Expecting table name after WHERE");
+            }
 
-            ConditionNode condition = null;
+            ConditionNode condition;
             if (ParserCommon.AssertUpperToken("WHERE", tokens, pos))
             {
                 ++pos;
-
                 condition = ParserCondition.Convert(tokens, ref pos);
             }
             else
@@ -54,18 +57,21 @@ namespace Engine
             return result;
         }
 
-        private static void ConvertWhat(string[] tokens, List<string> what, ref int pos)
+        private static void ConvertWhat(string[] tokens, List<ExpressionNode> what, ref int pos)
         {
             while (pos < tokens.Length)
             {
-                if (tokens[pos] != ",")
+                if (tokens[pos] == ",")
                 {
-                    var tokenUpper = tokens[pos].ToUpperInvariant();
-                    if (tokenUpper == "FROM")
-                        break;
-                    what.Add(tokens[pos]);
+                    ++pos;
+                    continue;
                 }
-                ++pos;
+
+                var tokenUpper = tokens[pos].ToUpperInvariant();
+                if (tokenUpper == "FROM")
+                    break;
+                    
+                what.Add(ParserExpression.Convert(tokens, ref pos));
             }
         }
     }

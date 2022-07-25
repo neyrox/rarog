@@ -5,7 +5,7 @@ namespace Engine.Statement
     public class OperationNode
     {
         public const string Assign = "assign";
-        
+
         public string Op;
         public string Value;
     }

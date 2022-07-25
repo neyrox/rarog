@@ -14,7 +14,9 @@ namespace UnitTests
             var root = Parser.Convert(tokens);
             Assert.IsInstanceOfType(root, typeof(SelectNode));
             var select = (SelectNode)root;
-            Assert.AreEqual("*", select.What[0]);
+            Assert.IsInstanceOfType(select.What[0], typeof(ValueNode));
+            Assert.AreEqual(1, select.What.Count);
+            Assert.AreEqual("*", ((ValueNode)select.What[0]).Item);
             Assert.AreEqual("Customers", select.TableName);
         }
 
@@ -25,9 +27,25 @@ namespace UnitTests
             var root = Parser.Convert(tokens);
             Assert.IsInstanceOfType(root, typeof(SelectNode));
             var select = (SelectNode)root;
-            Assert.AreEqual("*", select.What[0]);
+            Assert.IsInstanceOfType(select.What[0], typeof(ValueNode));
+            Assert.AreEqual(1, select.What.Count);
+            Assert.AreEqual("*", ((ValueNode)select.What[0]).Item);
             Assert.AreEqual("Agents", select.TableName);
             Assert.AreEqual(1, select.Limit);
+        }
+
+        [TestMethod]
+        public void ParseSelectCount()
+        {
+            var tokens = new string[] {"SELECT", "COUNT", "(", "*", ")", "FROM", "Agents", ";" };
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(SelectNode));
+            var select = (SelectNode)root;
+            Assert.IsInstanceOfType(select.What[0], typeof(FunctionNode));
+            Assert.AreEqual(1, select.What.Count);
+            Assert.AreEqual("COUNT", ((FunctionNode)select.What[0]).Function);
+            Assert.AreEqual("*", ((FunctionNode)select.What[0]).Item);
+            Assert.AreEqual("Agents", select.TableName);
         }
 
         [TestMethod]
@@ -37,7 +55,9 @@ namespace UnitTests
             var root = Parser.Convert(tokens);
             Assert.IsInstanceOfType(root, typeof(SelectNode));
             var select = (SelectNode)root;
-            Assert.AreEqual("*", select.What[0]);
+            Assert.IsInstanceOfType(select.What[0], typeof(ValueNode));
+            Assert.AreEqual(1, select.What.Count);
+            Assert.AreEqual("*", ((ValueNode)select.What[0]).Item);
             Assert.AreEqual("Customers", select.TableName);
             Assert.IsNotNull(select.Condition);
             var columnCondition = select.Condition as ColumnConditionNode;
@@ -53,7 +73,9 @@ namespace UnitTests
             var root = Parser.Convert(tokens);
             Assert.IsInstanceOfType(root, typeof(SelectNode));
             var select = (SelectNode)root;
-            Assert.AreEqual("*", select.What[0]);
+            Assert.IsInstanceOfType(select.What[0], typeof(ValueNode));
+            Assert.AreEqual(1, select.What.Count);
+            Assert.AreEqual("*", ((ValueNode)select.What[0]).Item);
             Assert.AreEqual("t1", select.TableName);
             Assert.IsNotNull(select.Condition);
             var compositeCondition = select.Condition as CompositeConditionNode;
@@ -74,7 +96,9 @@ namespace UnitTests
             var root = Parser.Convert(tokens);
             Assert.IsInstanceOfType(root, typeof(SelectNode));
             var select = (SelectNode)root;
-            Assert.AreEqual("*", select.What[0]);
+            Assert.IsInstanceOfType(select.What[0], typeof(ValueNode));
+            Assert.AreEqual(1, select.What.Count);
+            Assert.AreEqual("*", ((ValueNode)select.What[0]).Item);
             Assert.AreEqual("t1", select.TableName);
             Assert.IsNotNull(select.Condition);
             var compositeCondition1 = select.Condition as CompositeConditionNode;
@@ -105,8 +129,10 @@ namespace UnitTests
             Assert.IsInstanceOfType(root, typeof(SelectNode));
             var select = (SelectNode)root;
             Assert.AreEqual(2, select.What.Count);
-            Assert.AreEqual("CustomerName", select.What[0]);
-            Assert.AreEqual("Country", select.What[1]);
+            Assert.IsInstanceOfType(select.What[0], typeof(ValueNode));
+            Assert.IsInstanceOfType(select.What[1], typeof(ValueNode));
+            Assert.AreEqual("CustomerName", ((ValueNode)select.What[0]).Item);
+            Assert.AreEqual("Country", ((ValueNode)select.What[1]).Item);
             Assert.AreEqual("Customers", select.TableName);
         }
 

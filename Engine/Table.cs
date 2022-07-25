@@ -29,6 +29,8 @@ namespace Engine
 
         public Column FirstColumn => columns.First().Value;
 
+        public IEnumerable<string> ColumnNames => columns.Keys;
+
         public Column GetColumn(string name)
         {
             return columns[name];
