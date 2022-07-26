@@ -52,6 +52,31 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void CombinationTest()
+        {
+            // Given
+            var create = shell.Execute("CREATE TABLE t1 (c1 int);");
+            Assert.IsTrue(create.IsOK);
+            var insert1 = shell.Execute("INSERT INTO t1 (c1) VALUES (1);");
+            Assert.IsTrue(insert1.IsOK);
+            var insert2 = shell.Execute("INSERT INTO t1 (c1) VALUES (2);");
+            Assert.IsTrue(insert2.IsOK);
+            var insert3 = shell.Execute("INSERT INTO t1 (c1) VALUES (3);");
+            Assert.IsTrue(insert3.IsOK);
+
+            var select1 = shell.Execute("select c1, abc from t1;");
+            Assert.IsTrue(select1.IsOK);
+            Assert.AreEqual(2, select1.Columns.Count);
+            CollectionAssert.AreEqual(new [] { 1, 2, 3 }, ((ResultColumnInteger)select1.Columns[0]).Values);
+            CollectionAssert.AreEqual(new List<string> { "abc", "abc", "abc" }, select1.Columns[1].All());
+
+            var select2 = shell.Execute("select c1 + 3 from t1;");
+            Assert.IsTrue(select2.IsOK);
+            Assert.AreEqual(1, select2.Columns.Count);
+            CollectionAssert.AreEqual(new [] { 4, 5, 6 }, ((ResultColumnInteger)select2.Columns[0]).Values);
+        }
+
+        [TestMethod]
         public void UseCase1()
         {
             var create = shell.Execute("CREATE TABLE t1 (c1 int, c2 int);");

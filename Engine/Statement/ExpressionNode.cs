@@ -53,9 +53,11 @@ namespace Engine
         {
             if (table == null)
             {
-                result.Add(Convert());
+                result.Add(Convert(1));
                 return;
             }
+
+            var count = rowsToSelect?.Count ?? 1;
 
             if (Item == "*")
             {
@@ -68,20 +70,28 @@ namespace Engine
             }
             else
             {
-                result.Add(Convert());
+                result.Add(Convert(count));
             }
         }
 
-        private ResultColumn Convert()
+        private ResultColumn Convert(int count)
         {
             if (int.TryParse(Item, out var intItem))
-                return new ResultColumnInteger(string.Empty, new [] {intItem});
+                return new ResultColumnInteger(string.Empty, ArrayOf(intItem, count));
             if (long.TryParse(Item, out var lngItem))
-                return new ResultColumnBigInt(string.Empty, new [] {lngItem});
+                return new ResultColumnBigInt(string.Empty, ArrayOf(lngItem, count));
             if (double.TryParse(Item, out var dblItem))
-                return new ResultColumnDouble(string.Empty, new [] {dblItem});
+                return new ResultColumnDouble(string.Empty, ArrayOf(dblItem, count));
 
-            return new ResultColumnString(string.Empty, new [] {Item});
+            return new ResultColumnString(string.Empty, ArrayOf(Item, count));
+        }
+
+        private T[] ArrayOf<T>(T value, int count)
+        {
+            var result = new T[count];
+            for (int i = 0; i < count; i++)
+                result[i] = value;
+            return result;
         }
     }
 

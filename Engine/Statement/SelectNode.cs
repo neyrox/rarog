@@ -50,8 +50,7 @@ namespace Engine
             var rowsToSelect = Condition.GetRowsThatSatisfy(table, Limit);
 
             var rows = new List<ResultColumn>();
-            
-            
+
             for (int i = 0; i < What.Count; ++i)
             {
                 var expressionNode = What[i];
