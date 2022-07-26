@@ -6,7 +6,7 @@ namespace Engine
     {
         private static string whiteSpace = " \t\r\n";
         private static HashSet<string> doubleTokens = new HashSet<string>() {">=", "<=", "<>"};
-        private static string singleTokens = "*,;()=><";
+        private static string singleTokens = "+=*/,;()=><";
         private static string symbolStoppers = singleTokens + whiteSpace;
         private static string quotes = "\'\"";
 

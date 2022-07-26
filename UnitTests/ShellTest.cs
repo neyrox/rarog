@@ -19,6 +19,19 @@ namespace UnitTests
         }
 
         [TestMethod]
+        [DataRow("SELECT 1;", "1")]
+        [DataRow("SELECT 1+2;", "3")]
+        [DataRow("SELECT 100 - 42;", "58")]
+        [DataRow("SELECT 3*5;", "15")]
+        [DataRow("SELECT 12/4;", "3")]
+        public void CalculatorTest(string query, string res)
+        {
+            var select = shell.Execute(query);
+            Assert.AreEqual(1, select.Columns.Count);
+            CollectionAssert.AreEqual(new List<string> { res }, select.Columns[0].All());
+        }
+
+        [TestMethod]
         public void UseCase1()
         {
             var create = shell.Execute("CREATE TABLE t1 (c1 int, c2 int);");

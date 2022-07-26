@@ -36,6 +36,11 @@ namespace Engine
             return columns[name];
         }
 
+        public bool TryGetColumn(string name, out Column column)
+        {
+            return columns.TryGetValue(name, out column);
+        }
+
         public void AddColumn(string name, string type, int length)
         {
             if (name.Length > MaxColumnNameLength)

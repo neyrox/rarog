@@ -11,9 +11,18 @@ namespace Engine
             ++pos;  // skip "SELECT" itself
             ConvertWhat(tokens, what, ref pos);
             if (ParserCommon.AssertUpperToken("FROM", tokens, pos))
+            {
                 ++pos;
-            else
+            }
+            else if (ParserCommon.AssertToken(";", tokens, pos))
+            {
+                pos++;
                 return new SelectWithoutTable(what);
+            }
+            else
+            {
+                throw new Exception("Unexpected end of query");
+            }
 
             string tableName;
             if (pos < tokens.Length)
@@ -68,9 +77,9 @@ namespace Engine
                 }
 
                 var tokenUpper = tokens[pos].ToUpperInvariant();
-                if (tokenUpper == "FROM")
+                if (tokenUpper == "FROM" || tokenUpper == ";")
                     break;
-                    
+
                 what.Add(ParserExpression.Convert(tokens, ref pos));
             }
         }

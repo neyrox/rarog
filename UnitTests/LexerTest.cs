@@ -114,5 +114,14 @@ namespace UnitTests
             Assert.AreEqual("1", tokens[13]);
             Assert.AreEqual(";", tokens[14]);
         }
+
+        [TestMethod]
+        public void LexerSplitsExpression()
+        {
+            var tokens = Lexer.Split("1+2");
+            Assert.AreEqual("1", tokens[0]);
+            Assert.AreEqual("+", tokens[1]);
+            Assert.AreEqual("2", tokens[2]);
+        }
     }
 }

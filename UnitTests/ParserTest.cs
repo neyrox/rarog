@@ -8,6 +8,18 @@ namespace UnitTests
     public class ParserTest
     {
         [TestMethod]
+        public void ParseSelect1()
+        {
+            var tokens = new [] {"SELECT", "1", ";" };
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(SelectWithoutTable));
+            var select = (SelectWithoutTable)root;
+            Assert.IsInstanceOfType(select.What[0], typeof(ValueNode));
+            Assert.AreEqual(1, select.What.Count);
+            Assert.AreEqual("1", ((ValueNode)select.What[0]).Item);
+        }
+
+        [TestMethod]
         public void ParseSimpleSelect()
         {
             var tokens = new string[] {"SELECT", "*", "FROM", "Customers", ";" };
@@ -44,7 +56,7 @@ namespace UnitTests
             Assert.IsInstanceOfType(select.What[0], typeof(FunctionNode));
             Assert.AreEqual(1, select.What.Count);
             Assert.AreEqual("COUNT", ((FunctionNode)select.What[0]).Function);
-            Assert.AreEqual("*", ((FunctionNode)select.What[0]).Item);
+            Assert.AreEqual("*", ((ValueNode)((FunctionNode)select.What[0]).Item).Item);
             Assert.AreEqual("Agents", select.TableName);
         }
 
