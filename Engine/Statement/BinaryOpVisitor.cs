@@ -74,15 +74,62 @@ namespace Engine
             {
                 intClmn = column;
             }
-
         }
 
         public void Visit(ResultColumnBigInt column)
         {
+            if (lngClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, lngClmn, column);
+                lngClmn = null;
+            }
+            else if (intClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, ToBigInt(intClmn), column);
+                intClmn = null;
+            }
+            else if (dblClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, dblClmn, ToDouble(column));
+                dblClmn = null;
+            }
+            else if (strClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, strClmn, ToString(column));
+                strClmn = null;
+            }
+            else
+            {
+                lngClmn = column;
+            }
         }
 
         public void Visit(ResultColumnString column)
         {
+            if (strClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, strClmn, column);
+                strClmn = null;
+            }
+            else if (lngClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, ToString(lngClmn), column);
+                lngClmn = null;
+            }
+            else if (intClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, ToString(intClmn), column);
+                intClmn = null;
+            }
+            else if (dblClmn != null)
+            {
+                result = OperationEvaluator.Eval(Op, ToString(dblClmn), column);
+                dblClmn = null;
+            }
+            else
+            {
+                strClmn = column;
+            }
         }
 
         private static ResultColumnString ToString<T>(ResultColumnBase<T> col)

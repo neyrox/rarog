@@ -20,15 +20,35 @@ namespace UnitTests
 
         [TestMethod]
         [DataRow("SELECT 1;", "1")]
-        [DataRow("SELECT 1+2;", "3")]
+        [DataRow("SELECT 9000000000;", "9000000000")]
+        [DataRow("SELECT 1 + 2;", "3")]
+        [DataRow("SELECT 5000000000+7000000000;", "12000000000")]
         [DataRow("SELECT 100 - 42;", "58")]
-        [DataRow("SELECT 3*5;", "15")]
-        [DataRow("SELECT 12/4;", "3")]
+        [DataRow("SELECT 12000000000-7000000000;", "5000000000")]
+        [DataRow("SELECT 3 * 5;", "15")]
+        [DataRow("SELECT 10000000000*2;", "20000000000")]
+        [DataRow("SELECT 12 / 4;", "3")]
+        [DataRow("SELECT 30000000000/3;", "10000000000")]
+        [DataRow("SELECT a+b;", "ab")]
         public void CalculatorTest(string query, string res)
         {
             var select = shell.Execute(query);
             Assert.AreEqual(1, select.Columns.Count);
-            CollectionAssert.AreEqual(new List<string> { res }, select.Columns[0].All());
+            Assert.AreEqual(1, select.Columns[0].Count);
+            Assert.AreEqual(res, select.Columns[0].Get(0));
+        }
+
+        [TestMethod]
+        [DataRow("SELECT 1.2;", 1.2)]
+        [DataRow("SELECT 1.2+2.3;", 3.5)]
+        [DataRow("SELECT 9.9 - 5.3;", 4.6)]
+        [DataRow("SELECT 5 * 1.2;", 6)]
+        [DataRow("SELECT 12.4 / 4;", 3.1)]
+        public void DoubleCalculatorTest(string query, double res)
+        {
+            var select = shell.Execute(query);
+            Assert.AreEqual(1, select.Columns.Count);
+            Assert.AreEqual(res, ((ResultColumnDouble)select.Columns[0])[0], 0.001);
         }
 
         [TestMethod]
@@ -148,7 +168,7 @@ namespace UnitTests
             Assert.IsTrue(drop.IsOK);
 
             var select3 = shell.Execute("SELECT * FROM t1;");
-            Assert.IsFalse(select1.IsOK);
+            Assert.IsFalse(select3.IsOK);
         }
 
         private List<string> ToList(string item)

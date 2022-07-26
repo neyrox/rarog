@@ -4,11 +4,11 @@ namespace Engine
 {
     public class Lexer
     {
-        private static string whiteSpace = " \t\r\n";
-        private static HashSet<string> doubleTokens = new HashSet<string>() {">=", "<=", "<>"};
-        private static string singleTokens = "+=*/,;()=><";
-        private static string symbolStoppers = singleTokens + whiteSpace;
-        private static string quotes = "\'\"";
+        private static readonly string whiteSpace = " \t\r\n";
+        private static readonly HashSet<string> doubleTokens = new HashSet<string> {">=", "<=", "<>"};
+        private static readonly string singleTokens = "+-*/=,;()=><";
+        private static readonly string symbolStoppers = singleTokens + whiteSpace;
+        private static readonly string quotes = "\'\"";
 
         public static string[] Split(string query)
         {
