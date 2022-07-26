@@ -192,7 +192,14 @@ namespace Engine.Storage
                 }
 
                 LoadPageData(name, insPageIdx, pageCache, ref stream);
-                pageCache.Data.Add(idx, val);
+                try
+                {
+                    pageCache.Data.Add(idx, val);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
                 pageCache.Header.MinIdx = Math.Min(pageCache.Header.MinIdx, idx);  // Maybe we don't need it?
                 pageCache.Header.MaxIdx = Math.Max(pageCache.Header.MaxIdx, idx);
                 pageCache.Header.Count++;

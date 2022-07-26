@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Engine.Storage
 {
@@ -24,17 +25,18 @@ namespace Engine.Storage
     public class MemoryStorage : IStorage, IStreamProvider
     {
         private readonly Dictionary<string, byte[]> buffers = new Dictionary<string, byte[]>();
-
-        private long nextIdx;
+        private readonly Dictionary<string, long> tableNextIdx = new Dictionary<string, long>();
 
         public void StoreTableMeta(string fileName, long nextIdx)
         {
-            this.nextIdx = nextIdx;
+            var tableName = fileName.Split('.')[0];
+            tableNextIdx[tableName] = nextIdx;
         }
 
         public void LoadTableMeta(string fileName, out long nextIdx)
         {
-            nextIdx = this.nextIdx;
+            var tableName = fileName.Split('.')[0];
+            nextIdx = tableNextIdx[tableName];
         }
 
         public void StoreColumnMeta(Column column, string tableName, string fileName)
@@ -56,12 +58,19 @@ namespace Engine.Storage
 
         public string[] GetTableNames()
         {
-            return new string[0];
+            return tableNextIdx.Keys.ToArray();
         }
 
         public string[] GetColumnFiles(string tableDir)
         {
-            return new string[0];
+            var result = new SortedSet<string>();
+            foreach (var fb in buffers)
+            {
+                if (fb.Key.StartsWith(tableDir))
+                    result.Add(fb.Key);
+            }
+
+            return result.ToArray();
         }
 
         public void CreateDirectoryIfNotExist(string tableDir)
@@ -71,6 +80,9 @@ namespace Engine.Storage
         public void DeleteFile(string fileName)
         {
             buffers.Remove(fileName);
+            var lastDot = fileName.LastIndexOf('.');
+            var tableName = fileName.Substring(0, lastDot);
+            tableNextIdx.Remove(tableName);
         }
 
         public void DeleteDirectory(string tableDir)

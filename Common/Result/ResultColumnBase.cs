@@ -2,24 +2,24 @@
 {
     public abstract class ResultColumnBase<T>: ResultColumn
     {
-        protected readonly T[] values;
+        public readonly T[] Values;
 
-        public override int Count { get { return values.Length; } }
+        public override int Count { get { return Values.Length; } }
 
-        public T this[int idx] { get { return values[idx]; } }
+        public T this[int idx] { get { return Values[idx]; } }
 
         protected ResultColumnBase(string name, T[] vals)
             : base(name)
         {
-            values = vals;
+            Values = vals;
         }
         
         public override string Get(int index)
         {
-            if (index >= values.Length)
+            if (index >= Values.Length)
                 return string.Empty;
 
-            return values[index].ToString();
+            return Values[index].ToString();
         }
     }
 }

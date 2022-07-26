@@ -7,9 +7,16 @@ namespace Engine.Storage
 {
     public class FileStorage : IStorage, IStreamProvider
     {
+        private string dataPath;
+
+        public FileStorage(string dataPath)
+        {
+            this.dataPath = dataPath;
+        }
+
         public void StoreTableMeta(string fileName, long nextIdx)
         {
-            using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.Write))
+            using (var file = File.Open(Path.Combine(dataPath, fileName), FileMode.OpenOrCreate, FileAccess.Write))
             {
                 var buffer = new byte[256];
                 int offset = 0;
@@ -20,7 +27,7 @@ namespace Engine.Storage
 
         public void LoadTableMeta(string fileName, out long nextIdx)
         {
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
+            using (var file = File.Open(Path.Combine(dataPath, fileName), FileMode.Open, FileAccess.Read))
             {
                 var buffer = new byte[256];
                 file.Read(buffer, 0, (int) Math.Min(buffer.Length, file.Length));
@@ -31,7 +38,7 @@ namespace Engine.Storage
 
         public void StoreColumnMeta(Column column, string tableName, string fileName)
         {
-            using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.Write))
+            using (var file = File.Open(Path.Combine(dataPath, fileName), FileMode.OpenOrCreate, FileAccess.Write))
             {
                 StreamStorage.StoreColumnMeta(file, column);
             }
@@ -39,7 +46,7 @@ namespace Engine.Storage
 
         public Column LoadColumnMeta(string tablePath, string fileName, Registry registry)
         {
-            using (var file = File.Open(fileName, FileMode.Open, FileAccess.Read))
+            using (var file = File.Open(Path.Combine(dataPath, fileName), FileMode.Open, FileAccess.Read))
             {
                 return StreamStorage.LoadColumnMeta(file, tablePath, registry);
             }
@@ -47,8 +54,7 @@ namespace Engine.Storage
 
         public string[] GetTableNames()
         {
-            var path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
-            var tableEntries = Directory.GetDirectories(path);
+            var tableEntries = Directory.GetDirectories(dataPath);
 
             var result = new List<string>();
 
@@ -59,7 +65,7 @@ namespace Engine.Storage
 
                 var tableDir = new DirectoryInfo(tableEntry).Name;
                 var tableName = tableDir.Substring(0, tableDir.Length - Table.TableDirExtension.Length);
-                
+
                 result.Add(tableName);
             }
 
@@ -68,15 +74,16 @@ namespace Engine.Storage
 
         public string[] GetColumnFiles(string tableDir)
         {
-            if (!Directory.Exists(tableDir))
+            var fullTableDir = Path.Combine(dataPath, tableDir);
+            if (!Directory.Exists(fullTableDir))
             {
-                Console.WriteLine($"Table directory {tableDir} doesn't exist");
+                Console.WriteLine($"Table directory {fullTableDir} doesn't exist");
                 return new string[0];
             }
 
             var result = new List<string>();
 
-            var columnEntries = Directory.GetFiles(tableDir);
+            var columnEntries = Directory.GetFiles(fullTableDir);
             foreach (var columnFile in columnEntries)
             {
                 if (!(columnFile.EndsWith(Column.MetaFileExtension) || columnFile.EndsWith(Column.DataFileExtension)))
@@ -90,28 +97,36 @@ namespace Engine.Storage
         
         public void CreateDirectoryIfNotExist(string tableDir)
         {
-            if (!Directory.Exists(tableDir))
-                Directory.CreateDirectory(tableDir);
+            var fullTableDir = Path.Combine(dataPath, tableDir);
+
+            if (!Directory.Exists(fullTableDir))
+                Directory.CreateDirectory(fullTableDir);
         }
 
         public void DeleteFile(string fileName)
         {
-            if (File.Exists(fileName))
-                File.Delete(fileName);
+            var fullPath = Path.Combine(dataPath, fileName);
+
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
         }
 
         public void DeleteDirectory(string tableDir)
         {
-            if (Directory.Exists(tableDir))
-                Directory.Delete(tableDir);
+            var fullPath = Path.Combine(dataPath, tableDir);
+
+            if (Directory.Exists(fullPath))
+                Directory.Delete(fullPath);
         }
 
         public Stream OpenRead(string name)
         {
+            var fullPath = Path.Combine(dataPath, name);
+
             try
             {
-                Console.WriteLine($"Opening {name} to read");
-                return File.Open(name, FileMode.OpenOrCreate, FileAccess.Read);
+                Console.WriteLine($"Opening {fullPath} to read");
+                return File.Open(fullPath, FileMode.OpenOrCreate, FileAccess.Read);
             }
             catch (Exception e)
             {
@@ -123,10 +138,12 @@ namespace Engine.Storage
 
         public Stream OpenReadWrite(string name)
         {
+            var fullPath = Path.Combine(dataPath, name);
+
             try
             {
-                Console.WriteLine($"Opening {name} to read and write");
-                return File.Open(name, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                Console.WriteLine($"Opening {fullPath} to read and write");
+                return File.Open(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             }
             catch (Exception e)
             {

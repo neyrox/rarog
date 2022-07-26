@@ -13,10 +13,10 @@ namespace Engine
 
         public override string Get(int index)
         {
-            if (index >= values.Length)
+            if (index >= Values.Length)
                 return string.Empty;
 
-            return values[index].ToString(CultureInfo.InvariantCulture);
+            return Values[index].ToString(CultureInfo.InvariantCulture);
         }
 
         public override void Accept(IResultColumnVisitor visitor)

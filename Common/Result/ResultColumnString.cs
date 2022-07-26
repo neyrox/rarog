@@ -11,10 +11,10 @@
 
         public override string Get(int index)
         {
-            if (index >= values.Length)
+            if (index >= Values.Length)
                 return string.Empty;
 
-            return values[index];
+            return Values[index];
         }
 
         public override void Accept(IResultColumnVisitor visitor)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -12,8 +13,7 @@ namespace Server
     {
         // Thread signal.
         private static readonly ManualResetEvent _tcpClientConnected = new ManualResetEvent(false);
-        private static readonly FileStorage _fileStorage = new FileStorage();
-        private static readonly Registry _registry = new Registry(_fileStorage);
+        private static readonly FileStorage _fileStorage = new FileStorage(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]));
         private static readonly Database _db = new Database(_fileStorage);
         private static readonly Shell _shell = new Shell(_db);
         // TODO: implement removal on disconnect

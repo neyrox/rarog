@@ -110,7 +110,7 @@ namespace Engine.Serialization
             long longValue;
             unsafe
             {
-                longValue = *((int*)(&ulongValue));
+                longValue = *((long*)(&ulongValue));
             }
             return longValue;
         }
