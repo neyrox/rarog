@@ -15,7 +15,7 @@ namespace Engine
                 case "*":
                     return Mul(left, right);
                 case "/":
-                    return Mul(left, right);
+                    return Div(left, right);
                 default:
                     throw new Exception($"Unknown operation {op}");
             }
@@ -32,7 +32,7 @@ namespace Engine
                 case "*":
                     return Mul(left, right);
                 case "/":
-                    return Mul(left, right);
+                    return Div(left, right);
                 default:
                     throw new Exception($"Unknown operation {op}");
             }
@@ -49,7 +49,7 @@ namespace Engine
                 case "*":
                     return Mul(left, right);
                 case "/":
-                    return Mul(left, right);
+                    return Div(left, right);
                 default:
                     throw new Exception($"Unknown operation {op}");
             }

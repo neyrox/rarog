@@ -74,12 +74,12 @@ namespace Engine
 
         private ResultColumn Convert()
         {
-            if (double.TryParse(Item, out var dblItem))
-                return new ResultColumnDouble(string.Empty, new [] {dblItem});
             if (int.TryParse(Item, out var intItem))
                 return new ResultColumnInteger(string.Empty, new [] {intItem});
             if (long.TryParse(Item, out var lngItem))
                 return new ResultColumnBigInt(string.Empty, new [] {lngItem});
+            if (double.TryParse(Item, out var dblItem))
+                return new ResultColumnDouble(string.Empty, new [] {dblItem});
 
             return new ResultColumnString(string.Empty, new [] {Item});
         }
