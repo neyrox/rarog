@@ -23,6 +23,8 @@ namespace UnitTests
             column1.Insert(2, "300.3");
             column1.Insert(5, "600.6");
             column1.Insert(7, "800.8");
+
+            registry.DoubleTraits.PageStorage.Flush();
         }
 
         [TestMethod]

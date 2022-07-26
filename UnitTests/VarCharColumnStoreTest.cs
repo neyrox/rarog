@@ -23,6 +23,8 @@ namespace UnitTests
             column1.Insert(2, "bbb");
             column1.Insert(5, "eee");
             column1.Insert(7, "ggg");
+
+            registry.StrTraits.PageStorage.Flush();
         }
 
         [TestMethod]

@@ -42,6 +42,8 @@ namespace UnitTests
             Assert.IsTrue(insert1.IsOK);
             var insert2 = shell.Execute("INSERT INTO t1 (c1, c2, c3) VALUES (3, 2, b);");
             Assert.IsTrue(insert2.IsOK);
+            var flush1 = shell.Execute("FLUSH;");
+            Assert.IsTrue(flush1.IsOK);
             var select1 = shell.Execute("SELECT * FROM t1 WHERE c2 = 2 and c3 = a;");
             Assert.AreEqual(3, select1.Columns.Count);
             CollectionAssert.AreEqual(new List<string> { "1" }, select1.Columns[0].All());
@@ -109,6 +111,9 @@ namespace UnitTests
             Assert.AreEqual(2, select2.Columns.Count);
             CollectionAssert.AreEqual(new List<string> { "pi", "e" }, select2.Columns[0].All());
             CollectionAssert.AreEqual(new List<string> { "3.14", "2.72" }, select2.Columns[1].All());
+
+            var flush1 = shell.Execute("FLUSH;");
+            Assert.IsTrue(flush1.IsOK);
 
             var delete = shell.Execute("DELETE FROM t1 WHERE value > 3.0;");
             var select3 = shell.Execute("SELECT * FROM t1;");
