@@ -13,7 +13,7 @@ namespace Engine
             {"*", 2},
             {"/", 2},
         };
-        private static HashSet<string> funcs = new HashSet<string> { "COUNT" };
+        private static readonly HashSet<string> funcs = new HashSet<string> { "COUNT", "MIN", "MAX" };
 
         public static ExpressionNode Convert(string[] tokens, ref int pos)
         {

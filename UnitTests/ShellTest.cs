@@ -77,6 +77,49 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void FunctionsTest()
+        {
+            // Given
+            var create = shell.Execute("CREATE TABLE t1 (c_int int, c_lng bigint, c_dbl double, c_str varchar(3));");
+            Assert.IsTrue(create.IsOK);
+            var insert1 = shell.Execute("INSERT INTO t1 (c_int, c_lng, c_dbl, c_str) VALUES (1, 11, 4.0, aaa);");
+            Assert.IsTrue(insert1.IsOK);
+            var insert2 = shell.Execute("INSERT INTO t1 (c_int, c_lng, c_dbl, c_str) VALUES (2, 7, 2.0, ccc);");
+            Assert.IsTrue(insert2.IsOK);
+            var insert3 = shell.Execute("INSERT INTO t1 (c_int, c_lng, c_dbl, c_str) VALUES (3, 5, 6.0, bbb);");
+            Assert.IsTrue(insert3.IsOK);
+
+            // When
+            var selectCount = shell.Execute("select COUNT(*) from t1;");
+            // Then
+            Assert.IsTrue(selectCount.IsOK);
+            Assert.AreEqual(1, selectCount.Columns.Count);
+            var column1 = (ResultColumnBigInt) selectCount.Columns[0];
+            Assert.AreEqual(1, column1.Count);
+            Assert.AreEqual(3, column1.Values[0]);
+
+            // When
+            var selectMin = shell.Execute("select MIN(c_int), MIN(c_lng), MIN(c_dbl), MIN(c_str) from t1;");
+            // Then
+            Assert.IsTrue(selectMin.IsOK);
+            Assert.AreEqual(4, selectMin.Columns.Count);
+            CollectionAssert.AreEqual(new [] {1}, ((ResultColumnInteger)selectMin.Columns[0]).Values);
+            CollectionAssert.AreEqual(new [] {5l}, ((ResultColumnBigInt)selectMin.Columns[1]).Values);
+            Assert.AreEqual(2.0, ((ResultColumnDouble)selectMin.Columns[2]).Values[0]);
+            CollectionAssert.AreEqual(new [] {"aaa"}, ((ResultColumnString)selectMin.Columns[3]).Values);
+
+            // When
+            var selectMax = shell.Execute("select MAX(c_int), MAX(c_lng), MAX(c_dbl), MAX(c_str) from t1;");
+            // Then
+            Assert.IsTrue(selectMax.IsOK);
+            Assert.AreEqual(4, selectMax.Columns.Count);
+            CollectionAssert.AreEqual(new [] {3}, ((ResultColumnInteger)selectMax.Columns[0]).Values);
+            CollectionAssert.AreEqual(new [] {11l}, ((ResultColumnBigInt)selectMax.Columns[1]).Values);
+            Assert.AreEqual(6.0, ((ResultColumnDouble)selectMax.Columns[2]).Values[0], 0.0001);
+            CollectionAssert.AreEqual(new [] {"ccc"}, ((ResultColumnString)selectMax.Columns[3]).Values);
+        }
+
+        [TestMethod]
         public void UseCase1()
         {
             var create = shell.Execute("CREATE TABLE t1 (c1 int, c2 int);");

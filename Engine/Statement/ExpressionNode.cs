@@ -114,10 +114,41 @@ namespace Engine
             switch (Function)
             {
                 case "COUNT":
-                    result.Add(new ResultColumnBigInt("COUNT", new long[] {ps.Count}));
+                    Count(ps, result);
+                    break;
+                case "MIN":
+                    Min(ps, result);
+                    break;
+                case "MAX":
+                    Max(ps, result);
                     break;
                 default:
                     throw new Exception($"Unknown function {Function}");
+            }
+        }
+
+        private void Count(List<ResultColumn> ps, List<ResultColumn> result)
+        {
+            result.Add(new ResultColumnBigInt("COUNT", new long[] {ps[0].Count}));
+        }
+
+        private void Min(List<ResultColumn> sources, List<ResultColumn> result)
+        {
+            for (int i = 0; i < sources.Count; ++i)
+            {
+                var visitor = new MinVisitor();
+                sources[i].Accept(visitor);
+                result.Add(visitor.ExtractResult());
+            }
+        }
+        
+        private void Max(List<ResultColumn> sources, List<ResultColumn> result)
+        {
+            for (int i = 0; i < sources.Count; ++i)
+            {
+                var visitor = new MaxVisitor();
+                sources[i].Accept(visitor);
+                result.Add(visitor.ExtractResult());
             }
         }
     }
