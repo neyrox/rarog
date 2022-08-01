@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Common;
 using Engine.Serialization;
 using Engine.Statement;
 
@@ -10,6 +11,8 @@ namespace Engine.Storage
 {
     public abstract class PageStorage<T> where T: IComparable<T>
     {
+        private static readonly Log Log = LogManager.Create<PageStorage<T>>();
+
         // Here can be pages from multiple tables
         private readonly ConcurrentDictionary<string, PagesCache<T>> cache =
             new ConcurrentDictionary<string, PagesCache<T>>();
@@ -38,7 +41,7 @@ namespace Engine.Storage
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Log.Error(e);
                 }
             }
 
@@ -198,7 +201,7 @@ namespace Engine.Storage
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Log.Error(e);
                 }
                 pageCache.Header.MinIdx = Math.Min(pageCache.Header.MinIdx, idx);  // Maybe we don't need it?
                 pageCache.Header.MaxIdx = Math.Max(pageCache.Header.MaxIdx, idx);

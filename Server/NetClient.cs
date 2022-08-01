@@ -52,7 +52,7 @@ namespace Server
             var bytesAvailable = _stream.EndRead(asyncResult);
 
             var query = System.Text.Encoding.UTF8.GetString(buffer, 0, bytesAvailable);
-            Console.WriteLine("Received: {0}", query);
+            //Console.WriteLine("Received: {0}", query);
 
             // Process the data sent by the client.
             var result = _shell.Execute(query);

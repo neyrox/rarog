@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common;
 using Engine.Storage;
 
 namespace Engine
 {
     public class Database
     {
+        private static readonly Log Log = LogManager.Create<Database>();
+
         public readonly object SyncObject = new object();
         private readonly SortedList<string, Table> tables = new SortedList<string, Table>();
         private readonly IStorage storage;
@@ -52,7 +55,7 @@ namespace Engine
         {
             foreach (var tableName in storage.GetTableNames())
             {
-                Console.WriteLine($"Loading table {tableName}");
+                Log.Debug($"Loading table {tableName}");
                 var table = new Table(tableName, storage, registry);
                 table.Load();
                 tables.Add(table.Name, table);

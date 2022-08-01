@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Common;
 using Engine;
 using Engine.Storage;
 
@@ -11,6 +12,8 @@ namespace Server
 {
     class Program
     {
+        private static readonly Log Log = LogManager.Create<Program>();
+
         // Thread signal.
         private static readonly ManualResetEvent _tcpClientConnected = new ManualResetEvent(false);
         private static readonly FileStorage _fileStorage = new FileStorage(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]));
@@ -38,18 +41,18 @@ namespace Server
             }
             catch(SocketException e)
             {
-                Console.WriteLine("SocketException: {0}", e);
+                Log.Error(e);
                 server?.Stop();
                 server = null;
             }
 
             if (server != null)
             {
-                Console.WriteLine("Server Started");
+                Log.Info("Server Started");
             }
             else
             {
-                Console.WriteLine("Server Failed to Start");
+                Log.Error("Server Failed to Start");
                 return;
             }
 
@@ -66,7 +69,7 @@ namespace Server
             }
             catch(SocketException e)
             {
-                Console.WriteLine("SocketException: {0}", e);
+                Log.Error(e);
             }
             finally
             {
@@ -86,7 +89,7 @@ namespace Server
             _tcpClientConnected.Reset();
 
             // Start to listen for connections from a client.
-            Console.WriteLine("Waiting for a connection...");
+            Log.Info("Waiting for a connection...");
 
             // Accept the connection.
             // BeginAcceptSocket() creates the accepted socket.
@@ -109,7 +112,7 @@ namespace Server
 
             // Process the connection here. (Add the client to a
             // server table, read data, etc.)
-            Console.WriteLine("Client connected");
+            Log.Debug("Client connected");
             NetClient netClient = new NetClient(client, _shell);
             _clients.Add(netClient);
             netClient.Serve();

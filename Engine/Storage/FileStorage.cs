@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Common;
 using Engine.Serialization;
 
 namespace Engine.Storage
 {
     public class FileStorage : IStorage, IStreamProvider
     {
-        private string dataPath;
+        private static readonly Log Log = LogManager.Create<FileStorage>();
+
+        private readonly string dataPath;
 
         public FileStorage(string dataPath)
         {
@@ -77,7 +80,7 @@ namespace Engine.Storage
             var fullTableDir = Path.Combine(dataPath, tableDir);
             if (!Directory.Exists(fullTableDir))
             {
-                Console.WriteLine($"Table directory {fullTableDir} doesn't exist");
+                Log.Warn($"Table directory {fullTableDir} doesn't exist");
                 return new string[0];
             }
 
@@ -125,12 +128,12 @@ namespace Engine.Storage
 
             try
             {
-                Console.WriteLine($"Opening {fullPath} to read");
+                Log.Debug($"Opening {fullPath} to read");
                 return File.Open(fullPath, FileMode.OpenOrCreate, FileAccess.Read);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error(e);
             }
 
             return null;
@@ -142,12 +145,12 @@ namespace Engine.Storage
 
             try
             {
-                Console.WriteLine($"Opening {fullPath} to read and write");
+                Log.Debug($"Opening {fullPath} to read and write");
                 return File.Open(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error(e);
             }
 
             return null;

@@ -1,9 +1,12 @@
 ﻿using System;
+using Common;
 
 namespace Engine
 {
     public class Shell
     {
+        private static readonly Log Log = LogManager.Create<Shell>();
+
         private readonly Database db;
 
         public Shell(Database database)
@@ -14,6 +17,7 @@ namespace Engine
 
         public Result Execute(string query)
         {
+            Log.Debug(query);
             try
             {
                 var tokens = Lexer.Split(query);
@@ -27,7 +31,7 @@ namespace Engine
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error(e);
                 return new Result(null, e.Message);
             }
         }

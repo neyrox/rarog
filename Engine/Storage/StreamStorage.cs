@@ -1,11 +1,14 @@
 using System;
 using System.IO;
+using Common;
 using Engine.Serialization;
 
 namespace Engine.Storage
 {
     public static class StreamStorage
     {
+        private static readonly Log Log = LogManager.Create(nameof(StreamStorage));
+
         private const int FormatVersion = 0;
 
         public static void StoreColumnMeta(Stream stream, Column column)
@@ -31,7 +34,7 @@ namespace Engine.Storage
             var name = BytePacker.UnpackString8(buf, ref offset);
             var columnType = BytePacker.UnpackString8(buf, ref offset);
 
-            Console.WriteLine($"Loading column {name} of type {columnType}");
+            Log.Debug($"Loading column {name} of type {columnType}");
 
             switch (columnType)
             {
@@ -56,7 +59,7 @@ namespace Engine.Storage
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error(e);
             }
         }
 
@@ -68,7 +71,7 @@ namespace Engine.Storage
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error(e);
             }
         }
 
@@ -117,7 +120,7 @@ namespace Engine.Storage
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error(e);
             }
         }
 
