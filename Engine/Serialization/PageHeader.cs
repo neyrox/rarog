@@ -7,8 +7,6 @@ namespace Engine.Storage
     {
         public const int DataOffset = Page.HeaderSize;
 
-        
-        
         private long minIdx;
         private long maxIdx;
         private int count;

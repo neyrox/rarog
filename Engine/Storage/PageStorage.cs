@@ -17,35 +17,13 @@ namespace Engine.Storage
         private readonly ConcurrentDictionary<string, PagesCache<T>> cache =
             new ConcurrentDictionary<string, PagesCache<T>>();
 
-        private IStreamProvider streams;
-        private CacheHost cacheHost;
+        private readonly IStreamProvider streams;
+        private readonly CacheHost cacheHost;
 
         protected PageStorage(IStreamProvider streams, CacheHost cacheHost)
         {
             this.streams = streams;
             this.cacheHost = cacheHost;
-        }
-
-        public SortedDictionary<long, T> LoadData(PageHeader header, byte[] buffer)
-        {
-            var result = new SortedDictionary<long, T>();
-            int offset = 0;
-            // TODO: decompress
-            for (int i = 0; i < header.Count; ++i)
-            {
-                var idx = BytePacker.UnpackSInt64(buffer, ref offset);
-                var val = UnpackValue(buffer, ref offset);
-                try
-                {
-                    result.Add(idx, val);
-                }
-                catch (Exception e)
-                {
-                    Log.Error(e);
-                }
-            }
-
-            return result;
         }
 
         public IReadOnlyDictionary<long, T> Select(string name, SortedSet<long> indices)
@@ -348,6 +326,8 @@ namespace Engine.Storage
             long maxIdx = long.MinValue;
             int offset = PageHeader.DataOffset;
             bool split = false;
+            // Synthetic value to give diff more than 255 with any idx
+            long lastIdx = -1000;
             foreach (var idxVal in idxVals)
             {
                 if (!split && offset + CalcMaxPairSize(idxVal.Value) >= buffer.Length)
@@ -363,7 +343,18 @@ namespace Engine.Storage
                     if (idxVal.Key > maxIdx)
                         maxIdx = idxVal.Key;
 
-                    BytePacker.PackSInt64(buffer, idxVal.Key, ref offset);
+                    var iDelta = idxVal.Key - lastIdx;
+                    if (iDelta < 255)
+                    {
+                        BytePacker.PackUInt8(buffer, (byte)iDelta, ref offset);
+                    }
+                    else
+                    {
+                        BytePacker.PackUInt8(buffer, 0, ref offset);
+                        BytePacker.PackSInt64(buffer, idxVal.Key, ref offset);
+                    }
+                    lastIdx = idxVal.Key;
+
                     PackValue(buffer, idxVal.Value, ref offset);
                 }
                 else
@@ -385,6 +376,35 @@ namespace Engine.Storage
             header.Serialize(buffer);
 
             return buffer;
+        }
+
+        private SortedDictionary<long, T> LoadData(PageHeader header, byte[] buffer)
+        {
+            var result = new SortedDictionary<long, T>();
+            int offset = 0;
+            long lastIdx = 0;
+            for (int i = 0; i < header.Count; ++i)
+            {
+                var bDelta = BytePacker.UnpackUInt8(buffer, ref offset);
+                long idx;
+                if (bDelta == 0)
+                    idx = BytePacker.UnpackSInt64(buffer, ref offset);
+                else
+                    idx = lastIdx + bDelta;
+                lastIdx = idx;
+
+                var val = UnpackValue(buffer, ref offset);
+                try
+                {
+                    result.Add(idx, val);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e);
+                }
+            }
+
+            return result;
         }
 
         private bool GetPageCache(string name, int pageIdx, ref Stream stream, out PageCache<T> pageCache)
