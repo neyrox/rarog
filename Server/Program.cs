@@ -10,23 +10,40 @@ using Engine.Storage;
 
 namespace Server
 {
-    class Program
+    public interface Callbacks
+    {
+        void OnDisconnect(long clientId);
+    }
+
+    class Program : Callbacks
     {
         private static readonly Log Log = LogManager.Create<Program>();
 
         // Thread signal.
-        private static readonly ManualResetEvent _tcpClientConnected = new ManualResetEvent(false);
-        private static readonly FileStorage _fileStorage = new FileStorage(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]));
-        private static readonly Database _db = new Database(_fileStorage);
-        private static readonly Shell _shell = new Shell(_db);
-        // TODO: implement removal on disconnect
-        private static readonly ConcurrentBag<NetClient> _clients = new ConcurrentBag<NetClient>();
-        private static readonly ManualResetEvent _stopping = new ManualResetEvent(false);
-        private static Thread _flushThread;
+        private readonly ManualResetEvent _tcpClientConnected = new ManualResetEvent(false);
+        private readonly FileStorage _fileStorage = new FileStorage(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]));
+        private readonly Database _db;
+        private readonly Shell _shell;
+        private readonly ConcurrentDictionary<long, NetClient> _clients = new ConcurrentDictionary<long, NetClient>();
+        private readonly ManualResetEvent _stopping = new ManualResetEvent(false);
+        private Thread _flushThread;
+        private long _nextClientId = 0;
+
+        private Program()
+        {
+            _db = new Database(_fileStorage);
+            _shell = new Shell(_db);
+        }
 
         static void Main(string[] args)
         {
-            TcpListener server=null;
+            var program = new Program();
+            program.Start();
+        }
+
+        void Start()
+        {
+            TcpListener server = null;
             try
             {
                 // Set the TcpListener on port 33777.
@@ -39,7 +56,7 @@ namespace Server
                 // Start listening for client requests.
                 server.Start();
             }
-            catch(SocketException e)
+            catch (SocketException e)
             {
                 Log.Error(e);
                 server?.Stop();
@@ -83,7 +100,7 @@ namespace Server
         }
 
         // Accept one client connection asynchronously.
-        private static void BeginAcceptClient(TcpListener listener)
+        private void BeginAcceptClient(TcpListener listener)
         {
             // Set the event to nonsignaled state.
             _tcpClientConnected.Reset();
@@ -101,7 +118,7 @@ namespace Server
         }
 
         // Process the client connection.
-        private static void EndAccept(IAsyncResult ar)
+        private void EndAccept(IAsyncResult ar)
         {
             // Get the listener that handles the client request.
             var listener = (TcpListener)ar.AsyncState;
@@ -112,16 +129,19 @@ namespace Server
 
             // Process the connection here. (Add the client to a
             // server table, read data, etc.)
-            Log.Debug("Client connected");
-            NetClient netClient = new NetClient(client, _shell);
-            _clients.Add(netClient);
-            netClient.Serve();
+            var clientId = _nextClientId++;
+            Log.Debug($"Client {clientId} connected");
+            NetClient netClient = new NetClient(clientId, client, new Shell(_db), this);
+            if (_clients.TryAdd(_nextClientId++, netClient))
+            {
+                netClient.Serve();
+            }
 
             // Signal the calling thread to continue.
             _tcpClientConnected.Set();
         }
 
-        private static void Flush()
+        private void Flush()
         {
             while (!_stopping.WaitOne(0))
             {
@@ -130,6 +150,12 @@ namespace Server
                 if (_stopping.WaitOne(10000))
                     break;
             }
+        }
+
+        public void OnDisconnect(long clientId)
+        {
+            Log.Debug($"Client {clientId} disconnected");
+            _clients.TryRemove(clientId, out var client);
         }
     }
 }

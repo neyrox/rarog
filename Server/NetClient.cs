@@ -1,20 +1,28 @@
 using System;
 using System.Net.Sockets;
+using Common;
 using Engine;
 
 namespace Server
 {
     public class NetClient
     {
+        private static readonly Log Log = LogManager.Create<NetClient>();
+
+        private readonly long _id;
         private readonly TcpClient _client;
         private readonly NetworkStream _stream;
         private readonly Shell _shell;
+        private readonly Callbacks _cbs;
         private readonly byte[] _requestLength = new byte[4];
+        private int _offset = 0;
 
-        public NetClient(TcpClient client, Shell shell)
+        public NetClient(long id, TcpClient client, Shell shell, Callbacks cbs)
         {
+            _id = id;
             _client = client;
             _shell = shell;
+            _cbs = cbs;
 
             _stream = _client.GetStream();
         }
@@ -26,8 +34,8 @@ namespace Server
 
         private void BeginRead()
         {
-            // TODO: implement framing
-            _stream.BeginRead(_requestLength, 0, _requestLength.Length, EndReadHeader, null);
+            _offset = 0;
+            _stream.BeginRead(_requestLength, _offset, _requestLength.Length, EndReadHeader, null);
         }
 
         private void EndReadHeader(IAsyncResult asyncResult)
@@ -35,21 +43,47 @@ namespace Server
             var bytesAvailable = _stream.EndRead(asyncResult);
             if (bytesAvailable != 4)
             {
-                //handle loading more
+                if (bytesAvailable == 0)
+                {
+                    Log.Debug("Read 0 bytes");
+                    _cbs.OnDisconnect(_id);
+                }
+                else
+                {
+                    Log.Debug("Read more");
+                    _offset += bytesAvailable;
+                    _stream.BeginRead(_requestLength, _offset, _requestLength.Length - _offset, EndReadHeader, null);
+                }
                 return;
             }
 
             int length = BitConverter.ToInt32(_requestLength);
 
             // TODO: use pools
+            _offset = 0;
             var buffer = new byte[length];
-            _stream.BeginRead(buffer, 0, buffer.Length, EndReadBody, buffer);
+            _stream.BeginRead(buffer, _offset, buffer.Length, EndReadBody, buffer);
         }
 
         private void EndReadBody(IAsyncResult asyncResult)
         {
             var buffer = (byte[])asyncResult.AsyncState;
             var bytesAvailable = _stream.EndRead(asyncResult);
+            if (bytesAvailable != buffer.Length)
+            {
+                if (bytesAvailable == 0)
+                {
+                    Log.Debug("Read 0 bytes");
+                    _cbs.OnDisconnect(_id);
+                }
+                else
+                {
+                    Log.Debug("Read more");
+                    _offset += bytesAvailable;
+                    _stream.BeginRead(buffer, _offset, buffer.Length - _offset, EndReadBody, buffer);
+                }
+                return;
+            }
 
             var query = System.Text.Encoding.UTF8.GetString(buffer, 0, bytesAvailable);
             //Console.WriteLine("Received: {0}", query);
