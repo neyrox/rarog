@@ -2,9 +2,9 @@
 {
     public class AlterTableAddColumnNode: BaseTableNode
     {
-        public string ColumnName;
-        public string DataType;
-        public int Length;
+        public readonly string ColumnName;
+        public readonly string DataType;
+        public readonly int Length;
 
         public AlterTableAddColumnNode(string tableName, string columnName, string dataType, int length)
             : base(tableName)
@@ -14,7 +14,7 @@
             Length = length;
         }
 
-        protected override Result ExecuteInternal(Table table)
+        protected override Result ExecuteInternal(Table table, ref Transaction tx)
         {
             table.AddColumn(ColumnName, DataType, Length);
             return Result.OK;

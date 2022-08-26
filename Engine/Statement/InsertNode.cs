@@ -4,8 +4,8 @@ namespace Engine
 {
     public class InsertNode: BaseTableNode
     {
-        public List<string> ColumnNames;
-        public List<string> Values;
+        public readonly List<string> ColumnNames;
+        public readonly List<string> Values;
 
         public InsertNode(string tableName, List<string> columnNames, List<string> values)
             : base(tableName)
@@ -14,7 +14,7 @@ namespace Engine
             Values = values;
         }
 
-        protected override Result ExecuteInternal(Table table)
+        protected override Result ExecuteInternal(Table table, ref Transaction tx)
         {
             table.Insert(ColumnNames, Values);
             return Result.OK;

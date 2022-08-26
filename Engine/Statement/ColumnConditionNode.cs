@@ -4,9 +4,9 @@ namespace Engine
 {
     public class ColumnConditionNode: ConditionNode
     {
-        public string ColumnName;
-        public string Operation;
-        public string Value;
+        public readonly string ColumnName;
+        public readonly string Operation;
+        public readonly string Value;
 
         public ColumnConditionNode(string columnName, string operation, string value)
         {

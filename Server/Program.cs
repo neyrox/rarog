@@ -32,6 +32,7 @@ namespace Server
         private Program()
         {
             _db = new Database(_fileStorage);
+            _db.Load();
             _shell = new Shell(_db);
         }
 

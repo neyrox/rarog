@@ -5,11 +5,11 @@ namespace Engine
 {
     public class CreateTableNode: Node
     {
-        public string TableName;
-        public List<string> ColumnNames;
-        public List<string> DataTypes;
-        public List<int> Lengths;
-        public bool IfNotExists;
+        public readonly string TableName;
+        public readonly List<string> ColumnNames;
+        public readonly List<string> DataTypes;
+        public readonly List<int> Lengths;
+        public readonly bool IfNotExists;
 
         public CreateTableNode(string tableName, List<string> columnNames, List<string> dataTypes, List<int> lengths,
             bool ifNotExists)
@@ -21,7 +21,7 @@ namespace Engine
             IfNotExists = ifNotExists;
         }
 
-        public override Result Execute(Database db)
+        public override Result Execute(Database db, ref Transaction tx)
         {
             Table table;
             if (!Monitor.TryEnter(db.SyncObject, LockTimeout))
@@ -39,18 +39,11 @@ namespace Engine
                 Monitor.Exit(db.SyncObject);
             }
 
-            if (!Monitor.TryEnter(table.SyncObject, LockTimeout))
+            if (!tx.TryLock(table.SyncObject, LockTimeout))
                 throw Exceptions.FailedToLockTable(TableName);
 
-            try
-            {
-                for (int i = 0; i < ColumnNames.Count; ++i)
-                    table.AddColumn(ColumnNames[i], DataTypes[i], Lengths[i]);
-            }
-            finally
-            {
-                Monitor.Exit(table.SyncObject);
-            }
+            for (int i = 0; i < ColumnNames.Count; ++i)
+                table.AddColumn(ColumnNames[i], DataTypes[i], Lengths[i]);
 
             return Result.OK;
         }

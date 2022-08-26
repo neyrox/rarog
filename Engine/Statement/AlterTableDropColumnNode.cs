@@ -2,7 +2,7 @@
 {
     public class AlterTableDropColumnNode: BaseTableNode
     {
-        public string ColumnName;
+        public readonly string ColumnName;
 
         public AlterTableDropColumnNode(string tableName, string columnName)
             : base(tableName)
@@ -10,7 +10,7 @@
             ColumnName = columnName;
         }
 
-        protected override Result ExecuteInternal(Table table)
+        protected override Result ExecuteInternal(Table table, ref Transaction tx)
         {
             table.DropColumn(ColumnName);
             return Result.OK;

@@ -5,9 +5,9 @@ namespace Engine
 {
     public class UpdateNode: BaseTableNode
     {
-        public List<string> ColumnNames;
-        public List<OperationNode> Ops;
-        public ConditionNode Condition;
+        public readonly List<string> ColumnNames;
+        public readonly List<OperationNode> Ops;
+        public readonly ConditionNode Condition;
 
         public UpdateNode(string tableName, List<string> columnNames, List<OperationNode> ops, ConditionNode condition)
             : base(tableName)
@@ -17,7 +17,7 @@ namespace Engine
             Condition = condition;
         }
 
-        protected override Result ExecuteInternal(Table table)
+        protected override Result ExecuteInternal(Table table, ref Transaction tx)
         {
             table.Update(ColumnNames, Ops, Condition);
             return Result.OK;

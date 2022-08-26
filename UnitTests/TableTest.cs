@@ -153,7 +153,8 @@ namespace UnitTests
         {
             var selectNode = new SelectNode(
                 new List<ExpressionNode> {new ValueNode("*")}, "t1", cond, limit);
-            return selectNode.Execute(db).Columns;
+            Transaction tx = new SingleQueryTransaction();
+            return selectNode.Execute(db, ref tx).Columns;
         }
     }
 }

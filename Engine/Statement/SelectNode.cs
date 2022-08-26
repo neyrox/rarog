@@ -4,14 +4,14 @@ namespace Engine
 {
     public class SelectWithoutTable: Node
     {
-        public List<ExpressionNode> What;
+        public readonly List<ExpressionNode> What;
 
         public SelectWithoutTable(List<ExpressionNode> what)
         {
             What = what;
         }
 
-        public override Result Execute(Database db)
+        public override Result Execute(Database db, ref Transaction tx)
         {
             var rows = new List<ResultColumn>();
             for (int i = 0; i < What.Count; ++i)
@@ -32,9 +32,9 @@ namespace Engine
 
     public class SelectNode: BaseTableNode
     {
-        public List<ExpressionNode> What;
-        public ConditionNode Condition;
-        public int Limit;
+        public readonly List<ExpressionNode> What;
+        public readonly ConditionNode Condition;
+        public readonly int Limit;
 
         public SelectNode(List<ExpressionNode> what, string tableName, ConditionNode condition, int limit)
             : base(tableName)
@@ -44,7 +44,7 @@ namespace Engine
             Limit = limit;
         }
 
-        protected override Result ExecuteInternal(Table table)
+        protected override Result ExecuteInternal(Table table, ref Transaction tx)
         {
             // TODO: optimize for empty condition etc
             var rowsToSelect = Condition.GetRowsThatSatisfy(table, Limit);
