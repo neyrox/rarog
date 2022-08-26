@@ -12,7 +12,6 @@ namespace Engine
         public Shell(Database database)
         {
             db = database;
-            db.Load();
         }
 
         public Result Execute(string query)
