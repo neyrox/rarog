@@ -196,6 +196,21 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void ParseInsertNegative()
+        {
+            var tokens = new string[] { "INSERT", "INTO", "Numbers",
+                "(", "Value", ")", "VALUES", "(", "-", "100", ")", ";"};
+            var root = Parser.Convert(tokens);
+            Assert.IsInstanceOfType(root, typeof(InsertNode));
+            var insert = (InsertNode)root;
+            Assert.AreEqual("Numbers", insert.TableName);
+            Assert.AreEqual(1, insert.ColumnNames.Count);
+            Assert.AreEqual("Value", insert.ColumnNames[0]);
+            Assert.AreEqual(1, insert.Values.Count);
+            Assert.AreEqual("-100", insert.Values[0]);
+        }
+
+        [TestMethod]
         public void ParseSimpleUpdate()
         {
             var tokens = new string[] { "UPDATE", "Customers",

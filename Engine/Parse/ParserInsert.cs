@@ -6,12 +6,11 @@ namespace Engine
     {
         public static Node Convert(string[] tokens, ref int pos)
         {
-            var what = new List<string>();
             ++pos;  // skip "INSERT"
             if (ParserCommon.AssertUpperToken("INTO", tokens, pos))
                 ++pos;  // skip "INTO"
 
-            var tableName = string.Empty;
+            string tableName;
             if (pos < tokens.Length)
             {
                 tableName = tokens[pos];
@@ -46,21 +45,27 @@ namespace Engine
             else
                 return;
 
+            var capacitor = string.Empty;
+
             while (pos < tokens.Length)
             {
                 if (ParserCommon.AssertToken(")", tokens, pos))
                 {
+                    items.Add(capacitor);
                     ++pos;
                     break;
                 }
 
-                items.Add(tokens[pos]);  // TODO: check column names
-                ++pos;
+                capacitor += tokens[pos++];
                 if (pos >= tokens.Length)
                     break;
 
                 if (ParserCommon.AssertToken(",", tokens, pos))
+                {
+                    items.Add(capacitor);
+                    capacitor = string.Empty;
                     ++pos;
+                }
             }
         }
     }
