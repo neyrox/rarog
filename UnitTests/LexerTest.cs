@@ -76,7 +76,7 @@ namespace UnitTests
         [TestMethod]
         public void LexerSplitsSimpleInsert()
         {
-            var tokens = Lexer.Split("INSERT INTO Customers (CustomerName, Country) VALUES (\'Cardinal\', \'Norway\');");
+            var tokens = Lexer.Split("INSERT INTO Customers (CustomerName, Country) VALUES (\'Cardinal Richelieu\', \'Norway\');");
             Assert.AreEqual("INSERT", tokens[0]);
             Assert.AreEqual("INTO", tokens[1]);
             Assert.AreEqual("Customers", tokens[2]);
@@ -87,7 +87,7 @@ namespace UnitTests
             Assert.AreEqual(")", tokens[7]);
             Assert.AreEqual("VALUES", tokens[8]);
             Assert.AreEqual("(", tokens[9]);
-            Assert.AreEqual("Cardinal", tokens[10]);
+            Assert.AreEqual("Cardinal Richelieu", tokens[10]);
             Assert.AreEqual(",", tokens[11]);
             Assert.AreEqual("Norway", tokens[12]);
             Assert.AreEqual(")", tokens[13]);
