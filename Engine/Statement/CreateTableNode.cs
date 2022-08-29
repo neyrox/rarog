@@ -39,7 +39,7 @@ namespace Engine
                 Monitor.Exit(db.SyncObject);
             }
 
-            if (!tx.TryLock(table.SyncObject, LockTimeout))
+            if (!tx.TryLock(table.Sem, LockTimeout))
                 throw Exceptions.FailedToLockTable(TableName);
 
             for (int i = 0; i < ColumnNames.Count; ++i)

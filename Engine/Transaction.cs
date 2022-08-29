@@ -6,18 +6,18 @@ namespace Engine
 {
     public abstract class Transaction
     {
-        private readonly List<object> syncObjectsList = new List<object>();
-        private readonly HashSet<object> syncObjectsSet = new HashSet<object>();
+        private readonly List<Semaphore> semList = new List<Semaphore>();
+        private readonly HashSet<Semaphore> semSet = new HashSet<Semaphore>();
 
         public virtual bool IsSingleQuery { get; } = true;
 
-        public bool TryLock(object syncObject, TimeSpan timeout)
+        public bool TryLock(Semaphore sem, TimeSpan timeout)
         {
-            if (syncObjectsSet.Add(syncObject))
+            if (semSet.Add(sem))
             {
-                if (Monitor.TryEnter(syncObject, timeout))
+                if (sem.WaitOne(timeout))
                 {
-                    syncObjectsList.Add(syncObject);
+                    semList.Add(sem);
                     return true;
                 }
 
@@ -29,10 +29,10 @@ namespace Engine
 
         public void Unlock()
         {
-            for (int i = syncObjectsList.Count - 1; i >= 0; --i)
-                Monitor.Exit(syncObjectsList[i]);
-            syncObjectsList.Clear();
-            syncObjectsSet.Clear();
+            for (int i = semList.Count - 1; i >= 0; --i)
+                semList[i].Release();
+            semList.Clear();
+            semSet.Clear();
         }
 
         public abstract void QueryEnd();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Engine.Statement;
 using Engine.Storage;
 
@@ -8,7 +9,7 @@ namespace Engine
 {
     public class Table
     {
-        public readonly object SyncObject = new object();
+        public readonly Semaphore Sem = new Semaphore(1, 1);
 
         private const int MaxColumnNameLength = 64;
         public const string MetaFileExtension = ".meta";

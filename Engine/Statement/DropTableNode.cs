@@ -23,7 +23,7 @@ namespace Engine
                 if (db.ContainsTable(TableName))
                 {
                     var table = GetTable(db, TableName);
-                    if (!tx.TryLock(table.SyncObject, LockTimeout))
+                    if (!tx.TryLock(table.Sem, LockTimeout))
                         throw Exceptions.FailedToLockTable(TableName);
 
                     if (db.RemoveTable(TableName))

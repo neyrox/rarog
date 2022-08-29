@@ -16,7 +16,7 @@ namespace Engine
         {
             var table = GetTable(db, TableName);
 
-            if (!tx.TryLock(table.SyncObject, LockTimeout))
+            if (!tx.TryLock(table.Sem, LockTimeout))
                 throw Exceptions.FailedToLockTable(TableName);
 
             return ExecuteInternal(table, ref tx);
