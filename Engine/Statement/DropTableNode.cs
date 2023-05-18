@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 
 namespace Engine
 {
     public class DropTableNode: Node
     {
-        public string TableName;
-        public bool IfExists;
+        public readonly string TableName;
+        public readonly bool IfExists;
 
         public DropTableNode(string tableName, bool ifExists)
         {
@@ -14,25 +13,33 @@ namespace Engine
             IfExists = ifExists;
         }
 
-        public override Result Execute(Database db)
+        public override Result Execute(Database db, ref Transaction tx)
         {
             if (!Monitor.TryEnter(db.SyncObject, LockTimeout))
                 throw Exceptions.FailedToLockDb();
 
             try
             {
-                if (db.RemoveTable(TableName))
-                    return Result.OK;
+                if (db.ContainsTable(TableName))
+                {
+                    var table = GetTable(db, TableName);
+                    if (!tx.TryLock(table.Sem, LockTimeout))
+                        throw Exceptions.FailedToLockTable(TableName);
 
-                if (IfExists)
-                    return Result.OK;
+                    if (db.RemoveTable(TableName))
+                        return Result.OK;
+                }
+                else if (!IfExists)
+                {
+                    throw Exceptions.TableNotFound(TableName);
+                }
             }
             finally
             {
                 Monitor.Exit(db.SyncObject);
             }
 
-            throw Exceptions.TableNotFound(TableName);
+            return Result.OK;
         }
     }
 }

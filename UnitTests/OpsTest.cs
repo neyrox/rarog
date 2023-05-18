@@ -1,6 +1,7 @@
 ﻿using Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Globalization;
 using Engine.Storage;
 
 namespace UnitTests
@@ -61,12 +62,8 @@ namespace UnitTests
             shell.Execute($"UPDATE t1 SET c2 = c2 {op} {val} WHERE c1 = 1;");
             var select1 = shell.Execute("SELECT * FROM t1;");
             Assert.AreEqual(2, select1.Columns.Count);
-            if (src == "24.2")
-            {
-                int a = 1;
-            }
             CollectionAssert.AreEqual(new List<string> { "1" }, select1.Columns[0].All());
-            Assert.AreEqual(dst, double.Parse(select1.Columns[1].Get(0)), 0.001);
+            Assert.AreEqual(dst, double.Parse(select1.Columns[1].Get(0), NumberFormatInfo.InvariantInfo), 0.001);
         }
     }
 }

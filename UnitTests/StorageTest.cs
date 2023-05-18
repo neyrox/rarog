@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using Engine;
 using Engine.Storage;
@@ -46,10 +47,10 @@ namespace UnitTests
                     new List<string> {"12345", "9876543210", "123.456", "abracodabra"});
                 t10.Insert(
                     new List<string> {"c_int", "c_lng", "c_dbl", "c_str"},
-                    new List<string> {int.MinValue.ToString(), long.MinValue.ToString(), double.MinValue.ToString(), "hmm..."});
+                    new List<string> {int.MinValue.ToString(), long.MinValue.ToString(), double.MinValue.ToString(CultureInfo.InvariantCulture), "hmm..."});
                 t10.Insert(
                     new List<string> {"c_int", "c_lng", "c_dbl", "c_str"},
-                    new List<string> {int.MaxValue.ToString(), long.MaxValue.ToString(), double.MaxValue.ToString(), "WOW"});
+                    new List<string> {int.MaxValue.ToString(), long.MaxValue.ToString(), double.MaxValue.ToString(CultureInfo.InvariantCulture), "WOW"});
 
                 db2Store.Flush();
             }

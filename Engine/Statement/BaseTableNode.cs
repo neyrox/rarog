@@ -5,30 +5,23 @@ namespace Engine
 {
     public abstract class BaseTableNode: Node
     {
-        public string TableName;
+        public readonly string TableName;
 
         protected BaseTableNode(string tableName)
         {
             TableName = tableName;
         }
 
-        public override Result Execute(Database db)
+        public override Result Execute(Database db, ref Transaction tx)
         {
             var table = GetTable(db, TableName);
 
-            if (!Monitor.TryEnter(table.SyncObject, LockTimeout))
+            if (!tx.TryLock(table.Sem, LockTimeout))
                 throw Exceptions.FailedToLockTable(TableName);
 
-            try
-            {
-                return ExecuteInternal(table);
-            }
-            finally
-            {
-                Monitor.Exit(table.SyncObject);
-            }
+            return ExecuteInternal(table, ref tx);
         }
 
-        protected abstract Result ExecuteInternal(Table table);
+        protected abstract Result ExecuteInternal(Table table, ref Transaction tx);
     }
 }

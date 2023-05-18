@@ -8,7 +8,7 @@ namespace Engine
     {
         public readonly ConditionNode Left;
         public readonly ConditionNode Right;
-        private readonly string Operation;
+        public readonly string Operation;
 
         public CompositeConditionNode(ConditionNode left, string operation, ConditionNode right)
         {

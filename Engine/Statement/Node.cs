@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Threading;
 
 namespace Engine
@@ -8,7 +7,7 @@ namespace Engine
     {
         protected readonly TimeSpan LockTimeout = new TimeSpan(0, 1, 0);
 
-        public abstract Result Execute(Database db);
+        public abstract Result Execute(Database db, ref Transaction tx);
 
         protected Table GetTable(Database db, string tableName)
         {

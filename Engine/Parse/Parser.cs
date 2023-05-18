@@ -38,6 +38,12 @@ namespace Engine
                     case "FLUSH":
                         root = ParserFlush.Convert(tokens, ref pos);
                         break;
+                    case "BEGIN":
+                        root = ParserBegin.Convert(tokens, ref pos);
+                        break;
+                    case "END":
+                        root = ParserEnd.Convert(tokens, ref pos);
+                        break;
                     default:
                         throw new Exception($"Unexpected token {tokens[pos]}");
                 }

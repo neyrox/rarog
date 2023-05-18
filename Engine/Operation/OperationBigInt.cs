@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Engine.Statement
 {
@@ -60,7 +61,7 @@ namespace Engine.Statement
 
         public MultiplicationBigInt(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override long Perform(long source)
@@ -75,7 +76,7 @@ namespace Engine.Statement
 
         public DivisionBigInt(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override long Perform(long source)

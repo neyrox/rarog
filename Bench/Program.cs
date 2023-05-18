@@ -65,8 +65,8 @@ namespace Bench
                 job.Join();
 
             var elapsedSeconds = sw.ElapsedMilliseconds * 0.001;
-            var qps = BenchJob.QueriesCount / elapsedSeconds; 
-            Console.WriteLine($"Total: {qps} queries per second");
+            var tps = BenchJob.TransactionsCount / elapsedSeconds; 
+            Console.WriteLine($"Total: {tps} transactions per second");
         }
     }
 }

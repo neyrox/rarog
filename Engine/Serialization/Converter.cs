@@ -1,3 +1,6 @@
+using System;
+using System.Globalization;
+
 namespace Engine.Storage
 {
     public interface IConverter<T>
@@ -31,7 +34,7 @@ namespace Engine.Storage
 
         public double FromString(string str, int length)
         {
-            return double.Parse(str);
+            return double.Parse(str, NumberFormatInfo.InvariantInfo);
         }
     }
 

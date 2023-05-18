@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Engine.Statement
 {
@@ -30,7 +31,7 @@ namespace Engine.Statement
 
         public AdditionDouble(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override double Perform(double source)
@@ -45,7 +46,7 @@ namespace Engine.Statement
 
         public SubtractionDouble(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override double Perform(double source)
@@ -60,7 +61,7 @@ namespace Engine.Statement
 
         public MultiplicationDouble(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override double Perform(double source)
@@ -75,7 +76,7 @@ namespace Engine.Statement
 
         public DivisionDouble(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override double Perform(double source)
