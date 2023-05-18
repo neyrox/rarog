@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Engine
 {
-
     public abstract class ExpressionNode
     {
         public abstract void Evaluate(Table table, List<long> rowsToSelect, List<ResultColumn> result);
@@ -80,7 +80,7 @@ namespace Engine
                 return new ResultColumnInteger(string.Empty, ArrayOf(intItem, count));
             if (long.TryParse(Item, out var lngItem))
                 return new ResultColumnBigInt(string.Empty, ArrayOf(lngItem, count));
-            if (double.TryParse(Item, out var dblItem))
+            if (double.TryParse(Item, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out var dblItem))
                 return new ResultColumnDouble(string.Empty, ArrayOf(dblItem, count));
 
             return new ResultColumnString(string.Empty, ArrayOf(Item, count));

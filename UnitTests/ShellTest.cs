@@ -104,7 +104,7 @@ namespace UnitTests
             Assert.IsTrue(selectMin.IsOK);
             Assert.AreEqual(4, selectMin.Columns.Count);
             CollectionAssert.AreEqual(new [] {1}, ((ResultColumnInteger)selectMin.Columns[0]).Values);
-            CollectionAssert.AreEqual(new [] {5l}, ((ResultColumnBigInt)selectMin.Columns[1]).Values);
+            CollectionAssert.AreEqual(new [] {5L}, ((ResultColumnBigInt)selectMin.Columns[1]).Values);
             Assert.AreEqual(2.0, ((ResultColumnDouble)selectMin.Columns[2]).Values[0]);
             CollectionAssert.AreEqual(new [] {"aaa"}, ((ResultColumnString)selectMin.Columns[3]).Values);
 
@@ -114,7 +114,7 @@ namespace UnitTests
             Assert.IsTrue(selectMax.IsOK);
             Assert.AreEqual(4, selectMax.Columns.Count);
             CollectionAssert.AreEqual(new [] {3}, ((ResultColumnInteger)selectMax.Columns[0]).Values);
-            CollectionAssert.AreEqual(new [] {11l}, ((ResultColumnBigInt)selectMax.Columns[1]).Values);
+            CollectionAssert.AreEqual(new [] {11L}, ((ResultColumnBigInt)selectMax.Columns[1]).Values);
             Assert.AreEqual(6.0, ((ResultColumnDouble)selectMax.Columns[2]).Values[0], 0.0001);
             CollectionAssert.AreEqual(new [] {"ccc"}, ((ResultColumnString)selectMax.Columns[3]).Values);
         }

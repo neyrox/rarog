@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Engine.Statement
 {
@@ -27,7 +28,7 @@ namespace Engine.Statement
 
         public OperationAssignGeneric(string value)
         {
-            this.value = (T)Convert.ChangeType(value, typeof(T));
+            this.value = (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
         }
 
         public override T Perform(T source)

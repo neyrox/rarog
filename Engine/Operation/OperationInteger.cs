@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Engine.Statement
 {
@@ -53,14 +54,14 @@ namespace Engine.Statement
             return source - value;
         }
     }
-    
+
     public class MultiplicationInteger : OperationGeneric<int>
     {
         private readonly double value;
 
         public MultiplicationInteger(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override int Perform(int source)
@@ -75,7 +76,7 @@ namespace Engine.Statement
 
         public DivisionInteger(string value)
         {
-            this.value = double.Parse(value);
+            this.value = double.Parse(value, NumberFormatInfo.InvariantInfo);
         }
 
         public override int Perform(int source)

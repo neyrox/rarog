@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Engine
 {
@@ -31,7 +32,7 @@ namespace Engine
 
         protected ConditionWithOrigin(string origin)
         {
-            this.origin = (T)Convert.ChangeType(origin, typeof(T));
+            this.origin = (T)Convert.ChangeType(origin, typeof(T), CultureInfo.InvariantCulture);
         }
     }
 
